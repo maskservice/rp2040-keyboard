@@ -355,26 +355,34 @@ HTML_RESPONSE = '''
 
         <!-- Tab: Test -->
         <div id="test" class="tab-content">
-            <div class="test-area">
+            <div class="test-area" id="testArea" tabindex="0">
                 <h2>🧪 Testowanie klawiszy</h2>
                 <p>Wykrywanie naciśnięć klawiszy RP2040 w czasie rzeczywistym:</p>
                 
                 <div class="test-stats">
                     <div class="test-stat">
                         <div class="value" id="totalPresses">0</div>
-                        <div class="label">Liczba naciśnięć</div>
+                        <div class="label">Zaakceptowane naciśnięcia</div>
                     </div>
                     <div class="test-stat">
                         <div class="value" id="avgDuration">0ms</div>
-                        <div class="label">Średni czas trwania</div>
+                        <div class="label">Średni czas trzymania</div>
                     </div>
                     <div class="test-stat">
                         <div class="value" id="lastReaction">0ms</div>
-                        <div class="label">Ostatni czas reakcji</div>
+                        <div class="label">Ostatni odstęp aktywacji</div>
                     </div>
                     <div class="test-stat">
                         <div class="value" id="activeKeys">0</div>
                         <div class="label">Aktywne klawisze</div>
+                    </div>
+                    <div class="test-stat">
+                        <div class="value" id="bounceCount">0</div>
+                        <div class="label">Podejrzane drgania</div>
+                    </div>
+                    <div class="test-stat">
+                        <div class="value" id="debounceThreshold">35ms</div>
+                        <div class="label">Próg filtracji</div>
                     </div>
                 </div>
                 
@@ -390,8 +398,36 @@ HTML_RESPONSE = '''
                     <div class="test-key" data-key="9">9<br><small>Ctrl+Shift+9</small><div class="status"></div><div class="timing"></div></div>
                 </div>
                 
-                <div class="test-log" id="testLog">
-                    <div style="text-align: center; color: #666;">Oczekiwanie na naciśnięcia klawiszy...</div>
+                <div class="wiring-diagram" style="margin-top: 20px;">
+                    <h4>📊 Statystyka klawiszy</h4>
+                    <table class="pin-table" id="testStatsTable">
+                        <tr>
+                            <th>Klawisz</th>
+                            <th>Naciśnięcia</th>
+                            <th>Odrzucone</th>
+                            <th>Średni czas</th>
+                            <th>Ostatni czas</th>
+                            <th>Ostatni status</th>
+                        </tr>
+                        <tr data-stat-key="1"><td>Ctrl+Shift+1</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="2"><td>Ctrl+Shift+2</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="3"><td>Ctrl+Shift+3</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="4"><td>Ctrl+Shift+4</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="5"><td>Ctrl+Shift+5</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="6"><td>Ctrl+Shift+6</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="7"><td>Ctrl+Shift+7</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="8"><td>Ctrl+Shift+8</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="9"><td>Ctrl+Shift+9</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                    </table>
+                </div>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <button class="btn btn-primary" onclick="testKeyboardListener()">🧪 Testuj nasłuchiwanie klawiatury</button>
+                    <button class="btn btn-warning" onclick="simulateKeyCombo()">⌨️ Symuluj Ctrl+Shift+1</button>
+                </div>
+
+                <div class="info" style="margin-bottom: 20px;">
+                    <strong>🎧 Status nasłuchu:</strong> <span id="listenerStatus">inicjalizacja...</span>
                 </div>
                 
                 <div class="test-encoder">
@@ -404,7 +440,9 @@ HTML_RESPONSE = '''
                     <strong>ℹ️ Uwaga:</strong> Testowanie wymaga podłączonego urządzenia RP2040 z wgranym firmware.
                     <br><strong>ℹ️ Zmiana:</strong> Klawisze używają teraz mapowania Ctrl+Shift+1..9 dla makr globalnych.
                     <br><strong>💡 Podpowiedź:</strong> Taki układ ogranicza kolizje z typowymi skrótami przeglądarki opartymi o same cyfry i klawisze funkcyjne.
-                    <br><strong>🔧 Tryb testu:</strong> Symuluje wykrywanie naciśnięć - kliknij klawisz aby przetestować wizualizację.
+                    <br><strong>🔧 Tryb testu:</strong> Mierzy rzeczywiste naciśnięcia Ctrl+Shift+1..9 z klawiatury, czas trzymania, odstęp między aktywacjami i potencjalne drgania.
+                    <br><strong>🛡️ Filtracja:</strong> Zdarzenia krótsze od progu debounce lub zbyt szybkie powtórki są oznaczane jako podejrzane i nie zwiększają licznika zaakceptowanych naciśnięć.
+                    <br><strong>⌨️ Test:</strong> Wciśnij Ctrl+Shift+1..9 na klawiaturze aby obserwować czasy reakcji i ewentualne zakłócenia na żywo.
                 </div>
             </div>
         </div>
@@ -414,6 +452,21 @@ HTML_RESPONSE = '''
         let config = {};
         let generatedCode = '';
         let generatedBoot = '';
+        
+        // Test state
+        let testStats = {
+            totalPresses: 0,
+            durations: [],
+            lastReaction: 0,
+            activeKeys: new Set(),
+            keyPressStart: {},
+            keyDownMeta: {},
+            bounceCount: 0,
+            debounceThresholdMs: 35,
+            perKey: {}
+        };
+        let keyboardListenerAttached = false;
+        
         const KEYCODES = ['ONE','TWO','THREE','FOUR','FIVE','SIX','SEVEN','EIGHT','NINE','ZERO','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','ENTER','SPACE','TAB','ESCAPE','BACKSPACE','DELETE','UP_ARROW','DOWN_ARROW','LEFT_ARROW','RIGHT_ARROW','HOME','END','PAGE_UP','PAGE_DOWN'];
         const MODIFIERS = ['CONTROL', 'SHIFT', 'CONTROL+SHIFT', 'ALT', 'GUI'];
 
@@ -422,6 +475,9 @@ HTML_RESPONSE = '''
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             evt.target.classList.add('active');
             document.getElementById(tabName).classList.add('active');
+            if (tabName === 'test') {
+                armTestListener();
+            }
             // Update URL hash
             window.location.hash = tabName;
         }
@@ -431,6 +487,9 @@ HTML_RESPONSE = '''
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelector(`.tab[onclick*="'${tabName}'"]`).classList.add('active');
             document.getElementById(tabName).classList.add('active');
+            if (tabName === 'test') {
+                armTestListener();
+            }
         }
 
         // Handle URL hash on page load and hash change
@@ -445,6 +504,334 @@ HTML_RESPONSE = '''
         const initialTab = window.location.hash.slice(1) || 'config';
         if (initialTab !== 'config' && document.getElementById(initialTab)) {
             showTabByName(initialTab);
+        }
+        
+        // Test functions
+        function simulateKeyPress(keyNum) {
+            const keyElement = document.querySelector(`[data-key="${keyNum}"]`);
+            const statusElement = keyElement.querySelector('.status');
+            const timingElement = keyElement.querySelector('.timing');
+
+            keyElement.classList.add('pressed');
+            statusElement.textContent = '▼';
+            statusElement.style.background = '#28a745';
+            statusElement.style.color = 'white';
+            timingElement.textContent = 'TEST';
+
+            const pressTime = performance.now();
+            const syntheticDuration = 160;
+            const reactionGap = testStats.keyDownMeta[keyNum]?.lastAcceptedAt ? Math.max(0, pressTime - testStats.keyDownMeta[keyNum].lastAcceptedAt) : 0;
+
+            testStats.keyPressStart[keyNum] = pressTime;
+            testStats.activeKeys.add(keyNum);
+            testStats.totalPresses++;
+            testStats.lastReaction = reactionGap;
+            testStats.durations.push(syntheticDuration);
+            testStats.keyDownMeta[keyNum] = {
+                lastAcceptedAt: pressTime,
+                pressStartedAt: pressTime,
+                source: 'simulation'
+            };
+            updateTestStats();
+            addLogEntry(`SYMULACJA: Klawisz ${keyNum} aktywowany`, 'press');
+
+            let elapsed = 0;
+            const interval = setInterval(() => {
+                elapsed += 10;
+                timingElement.textContent = `${elapsed}ms`;
+                
+                if (elapsed >= syntheticDuration) {
+                    clearInterval(interval);
+                    simulateKeyRelease(keyNum, syntheticDuration);
+                }
+            }, 10);
+        }
+        
+        function simulateKeyRelease(keyNum, duration) {
+            const keyElement = document.querySelector(`[data-key="${keyNum}"]`);
+            const statusElement = keyElement.querySelector('.status');
+            const timingElement = keyElement.querySelector('.timing');
+            
+            delete testStats.keyPressStart[keyNum];
+            testStats.activeKeys.delete(keyNum);
+
+            keyElement.classList.remove('pressed');
+            statusElement.textContent = '○';
+            statusElement.style.background = '#dc3545';
+            statusElement.style.color = 'white';
+            timingElement.textContent = `${duration}ms`;
+            
+            updateTestStats();
+            addLogEntry(`SYMULACJA: Klawisz ${keyNum} zwolniony (${duration}ms)`, 'release');
+
+            setTimeout(() => {
+                statusElement.textContent = '';
+                statusElement.style.background = 'rgba(0,0,0,0.1)';
+                statusElement.style.color = '';
+                timingElement.textContent = '';
+            }, 1000);
+        }
+        
+        function updateTestStats() {
+            document.getElementById('totalPresses').textContent = testStats.totalPresses;
+            document.getElementById('activeKeys').textContent = testStats.activeKeys.size;
+            document.getElementById('lastReaction').textContent = `${Math.round(testStats.lastReaction)}ms`;
+            document.getElementById('bounceCount').textContent = testStats.bounceCount;
+            document.getElementById('debounceThreshold').textContent = `${testStats.debounceThresholdMs}ms`;
+            
+            if (testStats.durations.length > 0) {
+                const avgDuration = testStats.durations.reduce((a, b) => a + b, 0) / testStats.durations.length;
+                document.getElementById('avgDuration').textContent = `${Math.round(avgDuration)}ms`;
+            }
+        }
+
+        function ensurePerKeyStats(keyNum) {
+            if (!testStats.perKey[keyNum]) {
+                testStats.perKey[keyNum] = {
+                    count: 0,
+                    rejected: 0,
+                    durations: [],
+                    lastDuration: 0,
+                    state: 'Oczekiwanie'
+                };
+            }
+            return testStats.perKey[keyNum];
+        }
+
+        function updatePerKeyTableRow(keyNum) {
+            const row = document.querySelector(`[data-stat-key="${keyNum}"]`);
+            if (!row) {
+                return;
+            }
+            const stats = ensurePerKeyStats(keyNum);
+            const avg = stats.durations.length ? Math.round(stats.durations.reduce((a, b) => a + b, 0) / stats.durations.length) : 0;
+            row.querySelector('.count').textContent = stats.count;
+            row.querySelector('.rejected').textContent = stats.rejected;
+            row.querySelector('.avg').textContent = `${avg}ms`;
+            row.querySelector('.last').textContent = `${Math.round(stats.lastDuration)}ms`;
+            row.querySelector('.state').textContent = stats.state;
+        }
+
+        function setListenerStatus(message) {
+            const statusElement = document.getElementById('listenerStatus');
+            if (statusElement) {
+                statusElement.textContent = message;
+            }
+        }
+
+        function armTestListener() {
+            const testArea = document.getElementById('testArea');
+            if (testArea) {
+                testArea.focus({ preventScroll: true });
+            }
+            // Ensure keyboard listener is always active
+            setupKeyboardListener();
+            setListenerStatus('aktywny - ciągły nasłuch Ctrl+Shift+1..9');
+        }
+        
+        function testKey(keyNum) {
+            simulateKeyPress(keyNum);
+        }
+        
+        // Test functions for debugging
+        function testKeyboardListener() {
+            armTestListener();
+            setListenerStatus('test nasłuchu uruchomiony');
+            
+            // Test if event listeners are working
+            const testEvent = new KeyboardEvent('keydown', {
+                key: '1',
+                ctrlKey: true,
+                shiftKey: true,
+                bubbles: true
+            });
+            
+            document.dispatchEvent(testEvent);
+            setListenerStatus('wygenerowano zdarzenie testowe Ctrl+Shift+1');
+        }
+        
+        function simulateKeyCombo() {
+            armTestListener();
+            setListenerStatus('symulacja Ctrl+Shift+1 w toku');
+            
+            // Simulate the key combination
+            const keyDownEvent = new KeyboardEvent('keydown', {
+                key: '1',
+                ctrlKey: true,
+                shiftKey: true,
+                bubbles: true
+            });
+            
+            const keyUpEvent = new KeyboardEvent('keyup', {
+                key: '1',
+                ctrlKey: false,
+                shiftKey: false,
+                bubbles: true
+            });
+            
+            document.dispatchEvent(keyDownEvent);
+            
+            setTimeout(() => {
+                document.dispatchEvent(keyUpEvent);
+                setListenerStatus('symulacja Ctrl+Shift+1 zakończona');
+            }, 200);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const testKeys = document.querySelectorAll('.test-key');
+            testKeys.forEach(key => {
+                const keyNum = key.getAttribute('data-key');
+                key.addEventListener('click', () => testKey(keyNum));
+                ensurePerKeyStats(keyNum);
+                updatePerKeyTableRow(keyNum);
+            });
+            // Setup continuous keyboard listener immediately
+            setupKeyboardListener();
+            updateTestStats();
+            armTestListener();
+            
+            // Auto-start continuous listening on test tab
+            if (window.location.hash === '#test') {
+                setListenerStatus('aktywny - ciągły nasłuch Ctrl+Shift+1..9');
+            }
+        });
+
+        function setupKeyboardListener() {
+            // Always setup listener - remove the guard to ensure continuous listening
+            const keyStates = {};
+
+            window.addEventListener('keydown', (e) => {
+                // Only process Ctrl+Shift+1..9 combinations
+                if (e.ctrlKey && e.shiftKey && e.key >= '1' && e.key <= '9') {
+                    const keyNum = parseInt(e.key);
+                    if (!keyStates[keyNum]) {
+                        keyStates[keyNum] = performance.now();
+                        handleRealKeyPress(keyNum, true, 0, e.timeStamp || performance.now());
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, true);
+            
+            window.addEventListener('keyup', (e) => {
+                if (e.key >= '1' && e.key <= '9' && keyStates[parseInt(e.key)]) {
+                    const keyNum = parseInt(e.key);
+                    const duration = performance.now() - keyStates[keyNum];
+                    delete keyStates[keyNum];
+                    handleRealKeyPress(keyNum, false, duration);
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                // Handle modifier key release
+                if (e.key === 'Control' || e.key === 'Shift') {
+                    Object.keys(keyStates).forEach(keyNum => {
+                        const duration = performance.now() - keyStates[keyNum];
+                        delete keyStates[keyNum];
+                        handleRealKeyPress(parseInt(keyNum), false, duration);
+                    });
+                }
+            }, true);
+
+            // Ensure continuous listener status
+            window.addEventListener('focus', () => {
+                setListenerStatus('aktywny - ciągły nasłuch Ctrl+Shift+1..9');
+            });
+            
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    setListenerStatus('aktywny - ciągły nasłuch Ctrl+Shift+1..9');
+                }
+            });
+            
+            setListenerStatus('aktywny - ciągły nasłuch Ctrl+Shift+1..9');
+        }
+        
+        function handleRealKeyPress(keyNum, isPressed, duration = 0, eventTimestamp = 0) {
+            const keyElement = document.querySelector(`[data-key="${keyNum}"]`);
+            if (!keyElement) {
+                return;
+            }
+            
+            const statusElement = keyElement.querySelector('.status');
+            const timingElement = keyElement.querySelector('.timing');
+            const now = performance.now();
+            const currentMeta = testStats.keyDownMeta[keyNum] || {};
+            
+            if (isPressed) {
+                const perKeyStats = ensurePerKeyStats(keyNum);
+                const reactionGap = currentMeta.lastAcceptedAt ? now - currentMeta.lastAcceptedAt : 0;
+                const isBounce = currentMeta.lastAcceptedAt && reactionGap < testStats.debounceThresholdMs;
+                if (isBounce) {
+                    testStats.bounceCount++;
+                    testStats.lastReaction = reactionGap;
+                    perKeyStats.rejected++;
+                    perKeyStats.lastDuration = reactionGap;
+                    perKeyStats.state = 'Odrzucone drganie';
+                    statusElement.textContent = '!';
+                    statusElement.style.background = '#ffc107';
+                    statusElement.style.color = 'black';
+                    timingElement.textContent = `${Math.round(reactionGap)}ms`;
+                    updateTestStats();
+                    updatePerKeyTableRow(keyNum);
+                    return;
+                }
+
+                testStats.keyPressStart[keyNum] = now;
+                testStats.activeKeys.add(keyNum);
+                testStats.totalPresses++;
+                testStats.lastReaction = reactionGap;
+                perKeyStats.count++;
+                perKeyStats.state = 'Wciśnięty';
+                perKeyStats.lastDuration = reactionGap;
+                testStats.keyDownMeta[keyNum] = {
+                    lastAcceptedAt: now,
+                    pressStartedAt: now,
+                    eventTimestamp,
+                    source: 'keyboard'
+                };
+
+                keyElement.classList.add('pressed');
+                statusElement.textContent = '▼';
+                statusElement.style.background = '#007bff';
+                statusElement.style.color = 'white';
+                timingElement.textContent = eventTimestamp ? `${Math.round(Math.max(0, now - eventTimestamp))}ms` : 'LIVE';
+
+                updateTestStats();
+                updatePerKeyTableRow(keyNum);
+            } else {
+                const perKeyStats = ensurePerKeyStats(keyNum);
+                if (testStats.keyPressStart[keyNum]) {
+                    delete testStats.keyPressStart[keyNum];
+                    testStats.activeKeys.delete(keyNum);
+                    testStats.durations.push(duration);
+                    perKeyStats.durations.push(duration);
+                }
+
+                keyElement.classList.remove('pressed');
+                statusElement.textContent = '○';
+                statusElement.style.background = '#007bff';
+                statusElement.style.color = 'white';
+                timingElement.textContent = `${duration}ms`;
+                
+                updateTestStats();
+                perKeyStats.lastDuration = duration;
+                if (duration < testStats.debounceThresholdMs) {
+                    testStats.bounceCount++;
+                    perKeyStats.rejected++;
+                    perKeyStats.state = 'Podejrzane drganie';
+                } else {
+                    perKeyStats.state = 'Zwolniony';
+                }
+                updatePerKeyTableRow(keyNum);
+
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                    statusElement.style.background = 'rgba(0,0,0,0.1)';
+                    statusElement.style.color = '';
+                    timingElement.textContent = '';
+                }, 2000);
+            }
         }
 
         async function loadDefault() {

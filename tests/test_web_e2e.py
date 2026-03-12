@@ -152,6 +152,12 @@ def test_e2e_health_endpoints(server_fixture, request):
     root_response = httpx.get(f"{base_url}/", timeout=5.0)
     assert root_response.status_code == 200
     assert "text/html" in root_response.headers["content-type"]
+    assert "Podejrzane drgania" in root_response.text
+    assert "Próg filtracji" in root_response.text
+    assert "Status nasłuchu" in root_response.text
+    assert "Statystyka klawiszy" in root_response.text
+    assert "Naciśnięcia" in root_response.text
+    assert "Odrzucone" in root_response.text
 
     keycodes_response = httpx.get(f"{base_url}/api/keycodes", timeout=5.0)
     assert keycodes_response.status_code == 200

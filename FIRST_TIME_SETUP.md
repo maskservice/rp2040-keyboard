@@ -115,7 +115,7 @@ make install
 make deploy
 
 # 5. Gotowe! Sprawdź działanie:
-# - Przyciski: Ctrl+1..Ctrl+9
+# - Przyciski: Ctrl+Shift+1..Ctrl+Shift+9
 # - Enkoder: Scroll + Left Click
 ```
 
@@ -166,8 +166,8 @@ Po udanym deployment:
 
 ```bash
 # Test przycisków
-# Naciśnij GP1 -> powinno wygenerować Ctrl+1
-# Naciśnij GP2 -> powinno wygenerować Ctrl+2
+# Naciśnij GP1 -> powinno wygenerować Ctrl+Shift+1
+# Naciśnij GP2 -> powinno wygenerować Ctrl+Shift+2
 # ... itd.
 
 # Test enkodera

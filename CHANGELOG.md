@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.11] - 2026-03-12
+
+### Docs
+- Update DEPLOYMENT_HAL.md
+- Update FIRST_TIME_SETUP.md
+- Update PROJECT_STRUCTURE.md
+- Update README.md
+
+### Test
+- Update test_ctrl_shift_1_debug.py
+- Update tests/test_web_e2e.py
+
+### Other
+- Update .hal_sync.json
+- Update Makefile
+- Update hal/hal_config.toml
+- Update hal/profiles/minimal.toml
+- Update rp2040_keyboard/firmware/code.py
+- Update rp2040_keyboard/web/app.py
+
 ## [0.0.10] - 2026-03-12
 
 ### Docs

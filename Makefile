@@ -68,6 +68,10 @@ dev: ## Uruchom web configurator (dev z auto-reload)
 	@echo "$(C_CYAN)► Web configurator DEV:$(C_RESET) http://localhost:$(PORT)"
 	$(PYTHON) -m uvicorn rp2040_keyboard.web.app:app --host 0.0.0.0 --port $(PORT) --reload
 
+stop: ## Zatrzymaj web configurator
+	@echo "$(C_YELLOW)► Zatrzymywanie web configurator...$(C_RESET)"
+	@lsof -ti :$(PORT) | xargs kill -9 2>/dev/null || echo "Brak procesów na porcie $(PORT)"
+
 # ============================================================================
 # TESTOWANIE
 # ============================================================================

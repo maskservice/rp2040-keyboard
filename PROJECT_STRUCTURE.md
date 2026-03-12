@@ -134,7 +134,7 @@ make deploy-monitor
 ## 🔧 HAL Profiles
 
 ### Available Profiles
-- **default**: 9 keys (Ctrl+1..9) + encoder
+- **default**: 9 keys (Ctrl+Shift+1..9) + encoder
 - **minimal**: 4 keys + encoder (GPIO efficient)
 - **gaming**: WASD + functions + fast encoder
 

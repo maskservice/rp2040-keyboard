@@ -183,15 +183,15 @@ make deploy-diagnose
 Każdy przycisk podłączony jest jednym pinem do GPIO, drugim do GND. Wewnętrzny pull-up aktywowany programowo — **nie trzeba zewnętrznych rezystorów**.
 
 ```
-Przycisk 1:  GP1  ←→ [SWITCH] ←→ GND    → Ctrl+1
-Przycisk 2:  GP2  ←→ [SWITCH] ←→ GND    → Ctrl+2
-Przycisk 3:  GP3  ←→ [SWITCH] ←→ GND    → Ctrl+3
-Przycisk 4:  GP4  ←→ [SWITCH] ←→ GND    → Ctrl+4
-Przycisk 5:  GP5  ←→ [SWITCH] ←→ GND    → Ctrl+5
-Przycisk 6:  GP6  ←→ [SWITCH] ←→ GND    → Ctrl+6
-Przycisk 7:  GP7  ←→ [SWITCH] ←→ GND    → Ctrl+7
-Przycisk 8:  GP8  ←→ [SWITCH] ←→ GND    → Ctrl+8
-Przycisk 9:  GP29 ←→ [SWITCH] ←→ GND    → Ctrl+9
+Przycisk 1:  GP1  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+1
+Przycisk 2:  GP2  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+2
+Przycisk 3:  GP3  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+3
+Przycisk 4:  GP4  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+4
+Przycisk 5:  GP5  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+5
+Przycisk 6:  GP6  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+6
+Przycisk 7:  GP7  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+7
+Przycisk 8:  GP8  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+8
+Przycisk 9:  GP9  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+9
 ```
 
 ### Enkoder obrotowy (KY-040) → Emulacja myszki
@@ -201,14 +201,14 @@ Moduł enkodera ma 5 wyprowadzeń. Trzy wymagają podłączenia do GPIO, dwa do 
 ```
 Pin enkodera    →  RP2040-One       Funkcja
 ─────────────────────────────────────────────
-CLK (A)         →  GP9              Sygnał A enkodera
-DT  (B)         →  GP10             Sygnał B enkodera
-SW              →  GP11             Przycisk enkodera
+CLK (A)         →  GP11             Sygnał A enkodera
+DT  (B)         →  GP12             Sygnał B enkodera
+SW              →  GP13             Przycisk enkodera
 +   (VCC)       →  3V3              Zasilanie 3.3V
 GND             →  GND              Masa
 ```
 
-> **Uwaga:** GP12 i GP13 pozostają wolne — można je wykorzystać w przyszłych rozszerzeniach (np. LED statusu, drugi enkoder, buzzer).
+> **Uwaga:** GP10 pozostaje wolne — można je wykorzystać w przyszłych rozszerzeniach.
 
 ### Diagram fizyczny
 
@@ -225,13 +225,12 @@ GND             →  GND              Masa
       Btn6 ────→│  GP6  ●                       │
       Btn7 ────→│  GP7  ●                       │
       Btn8 ────→│  GP8  ●                       │
-   ENC CLK ────→│  GP9  ●                       │
-   ENC DT  ────→│  GP10 ●                       │
-   ENC SW  ────→│  GP11 ●                       │
-     (wolny)    │  GP12 ○                       │
-     (wolny)    │  GP13 ○                       │
+      Btn9 ────→│  GP9  ●                       │
+     (wolny)    │  GP10 ○                       │
+   ENC CLK ────→│  GP11 ●                       │
+   ENC DT  ────→│  GP12 ●                       │
+   ENC SW  ────→│  GP13 ●                       │
                 │  ...                           │
-      Btn9 ────→│  GP29 ●                       │
                 │  3V3  ●←──── ENC VCC (+)       │
                 │  GND  ●←──── ENC GND + BTN GND│
                  └──────────────────────────────┘
@@ -259,7 +258,7 @@ CIRCUITPY/
 Repozytorium:
 ├── firmware/
 │   ├── boot.py        ← Plik startowy USB HID
-│   └── code.py        ← Domyślny program (Ctrl+1..9 + scroll)
+│   └── code.py        ← Domyślny program (Ctrl+Shift+1..9 + scroll)
 ├── rp2040-one/        ← Firmware UF2 dla RP2040-One
 │   └── *.uf2
 ├── rp2040-zero/       ← Firmware UF2 dla RP2040-Zero

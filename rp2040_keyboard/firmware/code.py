@@ -45,7 +45,7 @@ ENCODER_SW_PIN = board.GP13   # Encoder push button (SW)
 
 # Parametry scroll
 SCROLL_SPEED = 2              # Ilość kroków scrolla na tick enkodera
-DEBOUNCE_MS = 50              # Debounce w milisekundach dla przycisków
+DEBOUNCE_MS = 20              # Debounce w milisekundach dla przycisków
 ENCODER_DEBOUNCE_MS = 5       # Debounce enkodera (krótszy dla płynności)
 
 # =============================================================================
@@ -114,7 +114,7 @@ while True:
                 if not current:  # Wciśnięcie (falling edge)
                     keyboard.press(Keycode.CONTROL, Keycode.SHIFT, key['keycode'])
                 else:            # Zwolnienie (rising edge)
-                    keyboard.release(Keycode.CONTROL, Keycode.SHIFT, key['keycode'])
+                    keyboard.release_all()
 
     # --- Obsługa enkodera obrotowego (scroll myszki) ---
     clk_val = encoder_clk.value

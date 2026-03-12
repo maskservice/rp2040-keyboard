@@ -150,8 +150,8 @@ debounce = 3
 scroll_speed = 2
 
 [switches]
-switch_1 = {gpio = 1, keycode = "Keycode.ONE", modifier = "Keycode.CONTROL", label = "Ctrl+1"}
-switch_2 = {gpio = 2, keycode = "Keycode.TWO", modifier = "Keycode.CONTROL", label = "Ctrl+2"}
+switch_1 = {gpio = 1, keycode = "Keycode.ONE", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+1"}
+switch_2 = {gpio = 2, keycode = "Keycode.TWO", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+2"}
 # ... more switches
 ```
 
@@ -184,7 +184,7 @@ make deploy-monitor
 ## 🎯 HAL Profiles
 
 ### Available Profiles
-- **default**: 9 keys (Ctrl+1..Ctrl+9) + encoder with left click
+- **default**: 9 keys (Ctrl+Shift+1..Ctrl+Shift+9) + encoder with left click
 - **minimal**: 4 keys + encoder (GPIO efficient)
 - **gaming**: WASD + functions + fast encoder
 
