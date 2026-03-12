@@ -4,7 +4,7 @@ base = "../hal_config.toml"
 name = "RP2040-One-Keypad-Default"
 profile = "default"
 description = "Standard 9-key layout with encoder"
-modified = "2026-03-12T17:04:25.001760"
+modified = "2026-03-12T18:48:30.753043"
 
 [encoder]
 enabled = true

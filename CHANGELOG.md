@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.9] - 2026-03-12
+
+### Docs
+- Update README.md
+
+### Test
+- Update tests/test_web_e2e.py
+
+### Other
+- Update .hal_sync.json
+- Update Makefile
+- Update deploy.py
+- Update hal/hal_config.toml
+- Update rp2040-one/adafruit-circuitpython-waveshare_rp2040_one-pl-10.1.4.uf2
+- Update rp2040-one/circuitpython-waveshare_rp2040_one-en_US-9.2.0.uf2
+- Update rp2040-zero/adafruit-circuitpython-waveshare_rp2040_zero-pl-10.1.4.uf2
+- Update rp2040_keyboard/web/app.py
+
 ## [0.0.8] - 2026-03-12
 
 ### Docs

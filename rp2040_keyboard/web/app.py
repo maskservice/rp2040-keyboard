@@ -92,15 +92,15 @@ async def get_default_config():
         print(f"⚠️ Błąd HAL, używam domyślnej konfiguracji: {e}")
         # Fallback do domyślnej konfiguracji
     default_keys = [
-        KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL", label="Ctrl+1"),
-        KeyConfig(gpio=2, keycode="Keycode.TWO", modifier="Keycode.CONTROL", label="Ctrl+2"),
-        KeyConfig(gpio=3, keycode="Keycode.THREE", modifier="Keycode.CONTROL", label="Ctrl+3"),
-        KeyConfig(gpio=4, keycode="Keycode.FOUR", modifier="Keycode.CONTROL", label="Ctrl+4"),
-        KeyConfig(gpio=5, keycode="Keycode.FIVE", modifier="Keycode.CONTROL", label="Ctrl+5"),
-        KeyConfig(gpio=6, keycode="Keycode.SIX", modifier="Keycode.CONTROL", label="Ctrl+6"),
-        KeyConfig(gpio=7, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL", label="Ctrl+7"),
-        KeyConfig(gpio=8, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL", label="Ctrl+8"),
-        KeyConfig(gpio=9, keycode="Keycode.NINE", modifier="Keycode.CONTROL", label="Ctrl+9"),  # Zmiana z GP29 na GP9
+        KeyConfig(gpio=1, keycode="Keycode.F1", modifier="", label="F1"),
+        KeyConfig(gpio=2, keycode="Keycode.F2", modifier="", label="F2"),
+        KeyConfig(gpio=3, keycode="Keycode.F3", modifier="", label="F3"),
+        KeyConfig(gpio=4, keycode="Keycode.F4", modifier="", label="F4"),
+        KeyConfig(gpio=5, keycode="Keycode.F5", modifier="", label="F5"),
+        KeyConfig(gpio=6, keycode="Keycode.F6", modifier="", label="F6"),
+        KeyConfig(gpio=7, keycode="Keycode.F7", modifier="", label="F7"),
+        KeyConfig(gpio=8, keycode="Keycode.F8", modifier="", label="F8"),
+        KeyConfig(gpio=9, keycode="Keycode.F9", modifier="", label="F9"),  # Zmiana z GP29 na GP9
     ]
     
     default_encoder = EncoderConfig(
@@ -178,44 +178,287 @@ HTML_RESPONSE = '''
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .header { text-align: center; margin-bottom: 30px; }
+        .header { text-align: center; margin-bottom: 20px; }
         .header h1 { color: #333; margin-bottom: 10px; }
+        
+        /* Tabs */
+        .tabs { display: flex; border-bottom: 2px solid #007bff; margin-bottom: 20px; }
+        .tab { padding: 12px 24px; cursor: pointer; background: #e9ecef; border: none; border-radius: 4px 4px 0 0; margin-right: 4px; }
+        .tab:hover { background: #dee2e6; }
+        .tab.active { background: #007bff; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Buttons */
         .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
         .btn-primary { background: #007bff; color: white; }
         .btn-success { background: #28a745; color: white; }
-        .code-output { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; font-family: monospace; white-space: pre-wrap; max-height: 400px; overflow-y: auto; margin: 20px 0; }
-        .message { padding: 10px; margin: 10px 0; border-radius: 4px; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
+        .btn-warning { background: #ffc107; color: black; }
+        
+        /* Config Editor */
+        .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin: 20px 0; }
+        .key-config { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .key-config h4 { margin-bottom: 10px; color: #333; }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 14px; }
+        .form-group select, .form-group input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        
+        /* Code Output */
+        .code-output { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; white-space: pre-wrap; max-height: 400px; overflow-y: auto; margin: 20px 0; font-size: 13px; }
+        
+        /* Messages */
+        .message { padding: 12px; margin: 10px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        
+        /* Wiring Diagram */
+        .wiring-diagram { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .pin-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .pin-table th, .pin-table td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        .pin-table th { background: #f8f9fa; font-weight: 600; }
+        
+        /* Flash Instructions */
+        .flash-steps { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .flash-steps ol { margin-left: 20px; }
+        .flash-steps li { margin: 10px 0; line-height: 1.6; }
+        .flash-steps code { background: #f8f9fa; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+        
+        /* Test Section */
+        .test-area { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .test-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 400px; margin: 20px auto; }
+        .test-key { padding: 30px; border: 2px solid #007bff; border-radius: 8px; text-align: center; cursor: pointer; background: white; transition: all 0.2s; }
+        .test-key:hover { background: #e3f2fd; }
+        .test-key:active { background: #007bff; color: white; }
+        .test-encoder { margin-top: 20px; padding: 20px; border: 2px dashed #28a745; border-radius: 8px; text-align: center; }
+        
+        /* Status indicators */
+        .status { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+        .status.ok { background: #28a745; }
+        .status.error { background: #dc3545; }
+        .status.warning { background: #ffc107; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎹 RP2040-One Keypad Configurator</h1>
-            <p>Generator kodu CircuitPython dla klawiatury HID</p>
+            <h1>🎹 RP2040-One/Zero Keypad Configurator</h1>
+            <p>Generator kodu CircuitPython dla klawiatury HID + enkoder myszy</p>
         </div>
 
-        <div>
-            <button class="btn btn-primary" onclick="loadDefault()">📥 Wczytaj domyślną konfigurację</button>
-            <button class="btn btn-success" onclick="generateCode()">🚀 Generuj Kod</button>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab(event, 'config')">⚙️ Konfiguracja</button>
+            <button class="tab" onclick="showTab(event, 'wiring')">🔌 Schemat</button>
+            <button class="tab" onclick="showTab(event, 'flash')">💾 Wgrywanie</button>
+            <button class="tab" onclick="showTab(event, 'test')">🧪 Testowanie</button>
         </div>
 
         <div id="messages"></div>
-        <div id="codeOutput" class="code-output">Kliknij "Generuj Kod" aby zobaczyć rezultat...</div>
+
+        <!-- Tab: Config -->
+        <div id="config" class="tab-content active">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="loadDefault()">📥 Wczytaj domyślną konfigurację</button>
+                <button class="btn btn-success" onclick="generateCode()">🚀 Generuj Kod CircuitPython</button>
+                <button class="btn btn-warning" onclick="downloadCode()">💾 Pobierz pliki</button>
+            </div>
+            
+            <div class="config-grid" id="keyConfigs">
+                <!-- Key configs will be generated here -->
+            </div>
+            
+            <h3 style="margin-top: 30px;">Wygenerowany kod:</h3>
+            <div id="codeOutput" class="code-output">Kliknij "Generuj Kod" aby zobaczyć rezultat...</div>
+        </div>
+
+        <!-- Tab: Wiring -->
+        <div id="wiring" class="tab-content">
+            <div class="wiring-diagram">
+                <h2>🔌 Schemat podłączeń</h2>
+                
+                <h3>Przyciski (9 sztuk) → Emulacja klawiatury</h3>
+                <table class="pin-table">
+                    <tr><th>Przycisk</th><th>GPIO</th><th>Akcja</th><th>Opis</th></tr>
+                    <tr><td>Btn 1</td><td>GP1</td><td>F1</td><td>Klawisz funkcyjny F1</td></tr>
+                    <tr><td>Btn 2</td><td>GP2</td><td>F2</td><td>Klawisz funkcyjny F2</td></tr>
+                    <tr><td>Btn 3</td><td>GP3</td><td>F3</td><td>Klawisz funkcyjny F3</td></tr>
+                    <tr><td>Btn 4</td><td>GP4</td><td>F4</td><td>Klawisz funkcyjny F4</td></tr>
+                    <tr><td>Btn 5</td><td>GP5</td><td>F5</td><td>Klawisz funkcyjny F5</td></tr>
+                    <tr><td>Btn 6</td><td>GP6</td><td>F6</td><td>Klawisz funkcyjny F6</td></tr>
+                    <tr><td>Btn 7</td><td>GP7</td><td>F7</td><td>Klawisz funkcyjny F7</td></tr>
+                    <tr><td>Btn 8</td><td>GP8</td><td>F8</td><td>Klawisz funkcyjny F8</td></tr>
+                    <tr><td>Btn 9</td><td>GP9</td><td>F9</td><td>Klawisz funkcyjny F9</td></tr>
+                </table>
+                
+                <h3>Enkoder obrotowy (KY-040) → Emulacja myszki</h3>
+                <table class="pin-table">
+                    <tr><th>Pin enkodera</th><th>→ RP2040</th><th>Funkcja</th></tr>
+                    <tr><td>CLK (A)</td><td>GP9</td><td>Sygnał A enkodera</td></tr>
+                    <tr><td>DT (B)</td><td>GP10</td><td>Sygnał B enkodera</td></tr>
+                    <tr><td>SW</td><td>GP11</td><td>Przycisk enkodera (middle-click)</td></tr>
+                    <tr><td>+ (VCC)</td><td>3V3</td><td>Zasilanie 3.3V</td></tr>
+                    <tr><td>GND</td><td>GND</td><td>Masa</td></tr>
+                </table>
+                
+                <div class="info" style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 4px;">
+                    <strong>💡 Wskazówka:</strong> GP12 i GP13 pozostają wolne — można je wykorzystać w przyszłych rozszerzeniach.
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Flash -->
+        <div id="flash" class="tab-content">
+            <div class="flash-steps">
+                <h2>💾 Instrukcja wgrywania firmware</h2>
+                
+                <h3>Krok 1: Tryb BOOT (RPI-RP2)</h3>
+                <ol>
+                    <li><strong>Odłącz</strong> RP2040 od komputera</li>
+                    <li><strong>Przytrzymaj przycisk BOOT</strong> na płytce</li>
+                    <li><strong>Podłącz</strong> kabel USB <strong>trzymając BOOT</strong></li>
+                    <li>Zwolnij BOOT — pojawi się dysk <code>RPI-RP2</code></li>
+                </ol>
+                
+                <h3>Krok 2: Wgranie CircuitPython UF2</h3>
+                <ol>
+                    <li>Skopiuj plik <code>*.uf2</code> na dysk RPI-RP2:
+                        <br><code>sudo cp rp2040-one/*.uf2 /media/$USER/RPI-RP2/</code> (dla One)
+                        <br><code>sudo cp rp2040-zero/*.uf2 /media/$USER/RPI-RP2/</code> (dla Zero)
+                    </li>
+                    <li>Płytka automatycznie się zrestartuje</li>
+                    <li>Pojawi się dysk <code>CIRCUITPY</code></li>
+                </ol>
+                
+                <h3>Krok 3: Wgranie programu</h3>
+                <ol>
+                    <li>Skopiuj wygenerowany <code>boot.py</code> i <code>code.py</code> na CIRCUITPY</li>
+                    <li>Odłącz i podłącz ponownie USB</li>
+                    <li>Sprawdź czy działa: <code>lsusb | grep -i rp2040</code></li>
+                </ol>
+                
+                <h3>Automatyczny deployment</h3>
+                <p>Użyj komendy:</p>
+                <code>make deploy</code> lub <code>make deploy BOARD=one|zero</code>
+            </div>
+        </div>
+
+        <!-- Tab: Test -->
+        <div id="test" class="tab-content">
+            <div class="test-area">
+                <h2>🧪 Testowanie klawiszy</h2>
+                <p>Kliknij przyciski poniżej aby przetestować działanie (wymaga połączenia z RP2040):</p>
+                
+                <div class="test-grid">
+                    <div class="test-key" onclick="testKey(1)">1<br><small>F1</small></div>
+                    <div class="test-key" onclick="testKey(2)">2<br><small>F2</small></div>
+                    <div class="test-key" onclick="testKey(3)">3<br><small>F3</small></div>
+                    <div class="test-key" onclick="testKey(4)">4<br><small>F4</small></div>
+                    <div class="test-key" onclick="testKey(5)">5<br><small>F5</small></div>
+                    <div class="test-key" onclick="testKey(6)">6<br><small>F6</small></div>
+                    <div class="test-key" onclick="testKey(7)">7<br><small>F7</small></div>
+                    <div class="test-key" onclick="testKey(8)">8<br><small>F8</small></div>
+                    <div class="test-key" onclick="testKey(9)">9<br><small>F9</small></div>
+                </div>
+                
+                <div class="test-encoder">
+                    <h4>🖱️ Test enkodera</h4>
+                    <p>Obrót enkodera = scroll myszy</p>
+                    <p>Wciśnięcie enkodera = middle-click</p>
+                </div>
+                
+                <div class="info" style="margin-top: 20px;">
+                    <strong>ℹ️ Uwaga:</strong> Testowanie wymaga podłączonego urządzenia RP2040 z wgranym firmware.
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         let config = {};
+        let generatedCode = '';
+        let generatedBoot = '';
+        const KEYCODES = ['ONE','TWO','THREE','FOUR','FIVE','SIX','SEVEN','EIGHT','NINE','ZERO','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','ENTER','SPACE','TAB','ESCAPE','BACKSPACE','DELETE','UP_ARROW','DOWN_ARROW','LEFT_ARROW','RIGHT_ARROW','HOME','END','PAGE_UP','PAGE_DOWN'];
+        const MODIFIERS = ['CONTROL', 'ALT', 'SHIFT', 'GUI'];
+
+        function showTab(evt, tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            evt.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            // Update URL hash
+            window.location.hash = tabName;
+        }
+
+        function showTabByName(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[onclick*="'${tabName}'"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Handle URL hash on page load and hash change
+        window.addEventListener('hashchange', () => {
+            const tabName = window.location.hash.slice(1) || 'config';
+            if (document.getElementById(tabName)) {
+                showTabByName(tabName);
+            }
+        });
+
+        // Load tab from URL on startup
+        const initialTab = window.location.hash.slice(1) || 'config';
+        if (initialTab !== 'config' && document.getElementById(initialTab)) {
+            showTabByName(initialTab);
+        }
 
         async function loadDefault() {
             try {
                 const response = await fetch('/api/default');
                 config = await response.json();
-                showMessage('Domyślna konfiguracja wczytana!', 'success');
+                renderKeyConfigs();
+                showMessage('✅ Domyślna konfiguracja wczytana!', 'success');
             } catch (error) {
-                showMessage('Błąd wczytywania: ' + error.message, 'error');
+                showMessage('❌ Błąd wczytywania: ' + error.message, 'error');
             }
+        }
+
+        function renderKeyConfigs() {
+            const container = document.getElementById('keyConfigs');
+            container.innerHTML = '';
+            
+            if (!config.keys) return;
+            
+            config.keys.forEach((key, index) => {
+                const div = document.createElement('div');
+                div.className = 'key-config';
+                div.innerHTML = `
+                    <h4>🔘 Przycisk ${index + 1} (GPIO${key.gpio})</h4>
+                    <div class="form-group">
+                        <label>Klawisz:</label>
+                        <select id="key-${index}-keycode" onchange="updateConfig(${index})">
+                            ${KEYCODES.map(k => `<option value="Keycode.${k}" ${key.keycode === `Keycode.${k}` ? 'selected' : ''}>${k}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Modyfikator:</label>
+                        <select id="key-${index}-modifier" onchange="updateConfig(${index})">
+                            <option value="">Brak</option>
+                            ${MODIFIERS.map(m => `<option value="Keycode.${m}" ${key.modifier === `Keycode.${m}` ? 'selected' : ''}>${m}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Etykieta:</label>
+                        <input type="text" id="key-${index}-label" value="${key.label || ''}" onchange="updateConfig(${index})">
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateConfig(index) {
+            if (!config.keys || !config.keys[index]) return;
+            config.keys[index].keycode = document.getElementById(`key-${index}-keycode`).value;
+            config.keys[index].modifier = document.getElementById(`key-${index}-modifier`).value;
+            config.keys[index].label = document.getElementById(`key-${index}-label`).value;
         }
 
         async function generateCode() {
@@ -229,14 +472,46 @@ HTML_RESPONSE = '''
                 const result = await response.json();
                 
                 if (result.valid) {
-                    document.getElementById('codeOutput').textContent = result.code;
-                    showMessage('Kod wygenerowany pomyślnie!', 'success');
+                    generatedCode = result.code;
+                    generatedBoot = result.boot;
+                    document.getElementById('codeOutput').textContent = 
+                        '# boot.py\\n' + result.boot + '\\n\\n# code.py\\n' + result.code;
+                    showMessage('✅ Kod wygenerowany pomyślnie!', 'success');
                 } else {
-                    showMessage('Błędy: ' + result.errors.join(', '), 'error');
+                    showMessage('❌ Błędy: ' + result.errors.join(', '), 'error');
                 }
             } catch (error) {
-                showMessage('Błąd generowania: ' + error.message, 'error');
+                showMessage('❌ Błąd generowania: ' + error.message, 'error');
             }
+        }
+
+        function downloadCode() {
+            if (!generatedCode || !generatedBoot) {
+                showMessage('❌ Najpierw wygeneruj kod!', 'error');
+                return;
+            }
+            
+            // Download boot.py
+            const bootBlob = new Blob([generatedBoot], {type: 'text/x-python'});
+            const bootUrl = URL.createObjectURL(bootBlob);
+            const bootLink = document.createElement('a');
+            bootLink.href = bootUrl;
+            bootLink.download = 'boot.py';
+            bootLink.click();
+            
+            // Download code.py
+            const codeBlob = new Blob([generatedCode], {type: 'text/x-python'});
+            const codeUrl = URL.createObjectURL(codeBlob);
+            const codeLink = document.createElement('a');
+            codeLink.href = codeUrl;
+            codeLink.download = 'code.py';
+            codeLink.click();
+            
+            showMessage('✅ Pliki pobrane!', 'success');
+        }
+
+        function testKey(keyNum) {
+            showMessage(`🔘 Test przycisku ${keyNum} - wciśnij fizyczny przycisk na płytce`, 'info');
         }
 
         function showMessage(message, type) {
@@ -247,6 +522,9 @@ HTML_RESPONSE = '''
             container.appendChild(div);
             setTimeout(() => div.remove(), 5000);
         }
+
+        // Load default on startup
+        loadDefault();
     </script>
 </body>
 </html>

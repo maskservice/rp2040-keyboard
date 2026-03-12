@@ -1,10 +1,19 @@
 # rp2040-keyboard
 
-- RP2040-One HID Keypad + Encoder Mouse
+- RP2040-One / RP2040-Zero HID Keypad + Encoder Mouse
 
-Projekt makro-klawiatury 9-przyciskowej z enkoderem obrotowym opartej na Waveshare RP2040-One. Po podłączeniu do portu USB komputer rozpoznaje urządzenie jako **klawiaturę + myszkę** jednocześnie — bez instalacji sterowników.
+Projekt makro-klawiatury 9-przyciskowej z enkoderem obrotowym opartej na **Waveshare RP2040-One** lub **RP2040-Zero**. Po podłączeniu do portu USB komputer rozpoznaje urządzenie jako **klawiaturę + myszkę** jednocześnie — bez instalacji sterowników.
 
 **Repozytorium:** Softreck / Prototypowanie.pl
+
+---
+
+## Wspierane płytki
+
+| Płytka | Specyfikacja | Firmware |
+|--------|-------------|----------|
+| **RP2040-One** | USB-A wbudowany, 4MB Flash, 20 GPIO | `rp2040-one/*.uf2` |
+| **RP2040-Zero** | Micro-USB, 2MB Flash, 20 GPIO | `rp2040-zero/*.uf2` |
 
 ---
 
@@ -21,12 +30,16 @@ Projekt makro-klawiatury 9-przyciskowej z enkoderem obrotowym opartej na Wavesha
 
 ## 🚀 Auto-Deployment System with HAL
 
-Automatyczny system pobierania bibliotek i deploymentu firmware na RP2040-One z **HAL (Hardware Abstraction Layer)**:
+Automatyczny system pobierania bibliotek i deploymentu firmware na RP2040-One/Zero z **HAL (Hardware Abstraction Layer)**:
 
 ### Szybki start
 ```bash
-# Podłącz RP2040-One i uruchom
+# Podłącz RP2040 i uruchom (automatyczna detekcja płytki)
 make deploy
+
+# Wymuś konkretną płytkę (jeśli detekcja się myli)
+make deploy BOARD=zero
+make deploy BOARD=one
 
 # Lub monitoruj w tle (auto-deployment przy podłączeniu)
 make deploy-monitor
@@ -51,7 +64,10 @@ hal/profiles/gaming.toml    # Gaming WASD + fast encoder
 - ✅ **Validation**: Automatyczne sprawdzanie konfliktów GPIO
 - ✅ **Version Control**: Konfiguracja sprzętowa w systemie kontroli wersji
 
-### Nowe Funkcje v0.0.6
+### Nowe Funkcje v0.0.7
+- 🔀 **Wsparcie RP2040-Zero**: Detekcja i firmware dla płytki Zero
+- 🎯 **Wymuszanie płytki**: `BOARD=one|zero` lub `--board=one|zero`
+- 📁 **Organizacja firmware**: Foldery `rp2040-one/` i `rp2040-zero/`
 - 🧠 **Inteligentna detekcja**: Automatyczne rozpoznawanie trybu BOOT/CIRCUITPY
 - 🔥 **Auto-flashing**: Wgrywanie firmware CircuitPython dla świeżych urządzeń
 - 🔄 **Auto-mounting**: Systemowe montowanie urządzeń CIRCUITPY
@@ -69,6 +85,67 @@ make hal-show                # Pokaż aktualną konfigurację
 
 ---
 
+## 📁 Struktura firmware
+
+Firmware CircuitPython jest organizowane w podkatalogach według typu płytki:
+
+```
+rp2040-keyboard/
+├── rp2040-one/          ← Firmware dla RP2040-One
+│   ├── circuitpython-waveshare_rp2040_one-en_US-9.2.0.uf2
+│   └── adafruit-circuitpython-waveshare_rp2040_one-pl-10.1.4.uf2
+├── rp2040-zero/         ← Firmware dla RP2040-Zero
+│   └── adafruit-circuitpython-waveshare_rp2040_zero-pl-10.1.4.uf2
+├── deploy.py            ← Auto-deployment z detekcją płytki
+└── Makefile
+```
+
+### Pobieranie firmware
+
+```bash
+# Pobierz dla obu płytek
+make download-uf2-all
+
+# Lub pojedynczo
+make download-uf2       # Tylko RP2040-One
+make download-uf2-zero  # Tylko RP2040-Zero
+```
+
+### Wymuszanie typu płytki
+
+Jeśli automatyczna detekcja nie działa poprawnie:
+
+```bash
+# Metoda 1: Zmienna środowiskowa (globalna dla sesji)
+export RP2040_BOARD=zero
+make deploy
+
+# Metoda 2: Argument w make (jednorazowo)
+make deploy BOARD=zero
+make deploy BOARD=one
+
+# Metoda 3: Argument w deploy.py (bezpośrednio)
+.venv/bin/python3 deploy.py deploy --board=zero
+
+# Metoda 4: Environment variable inline
+RP2040_BOARD=zero make deploy
+```
+
+### Komendy diagnostyczne
+
+```bash
+# Sprawdź wykrytą płytkę
+make deploy-board
+
+# Sprawdź z wymuszeniem
+make deploy-board BOARD=zero
+
+# Pełna diagnostyka USB
+make deploy-diagnose
+```
+
+---
+
 ## Sprzęt
 
 ### Waveshare RP2040-One
@@ -79,11 +156,19 @@ make hal-show                # Pokaż aktualną konfigurację
 - 20 GPIO, programowalny w CircuitPython / MicroPython / C SDK
 - Wiki: https://www.waveshare.com/wiki/RP2040-One
 
+### Waveshare RP2040-Zero
+
+- Mikrokontroler: RP2040 (dual-core Cortex-M0+, 133 MHz)
+- Flash: 2 MB
+- Micro-USB port (wymaga kabla micro-USB)
+- 20 GPIO, programowalny w CircuitPython / MicroPython / C SDK
+- Wiki: https://www.waveshare.com/wiki/RP2040-Zero
+
 ### Wymagane komponenty
 
 | Komponent | Ilość | Uwagi |
 |-----------|-------|-------|
-| Waveshare RP2040-One | 1 | Z wbudowanym wtyczką USB-A |
+| Waveshare RP2040-One **lub** RP2040-Zero | 1 | One ma wbudowany USB-A, Zero wymaga kabla micro-USB |
 | Przycisk tact switch | 9 | Normalnie otwarty (NO), 2 lub 4 pin |
 | Enkoder obrotowy z przyciskiem | 1 | Moduł KY-040 lub równoważny (5 pinów: CLK, DT, SW, +, GND) |
 | Przewody połączeniowe | ~25 | Dupont lub lutowane |
@@ -175,6 +260,10 @@ Repozytorium:
 ├── firmware/
 │   ├── boot.py        ← Plik startowy USB HID
 │   └── code.py        ← Domyślny program (Ctrl+1..9 + scroll)
+├── rp2040-one/        ← Firmware UF2 dla RP2040-One
+│   └── *.uf2
+├── rp2040-zero/       ← Firmware UF2 dla RP2040-Zero
+│   └── *.uf2
 ├── web/
 │   └── app.py         ← Web Configurator (FastAPI + frontend)
 ├── tests/
@@ -195,16 +284,33 @@ Repozytorium:
 
 ### Krok 1: Pobranie CircuitPython UF2
 
-1. Otwórz: https://circuitpython.org/board/waveshare_rp2040_one/
-2. Pobierz najnowszy plik `.uf2` (CircuitPython 9.x)
+1. **Dla RP2040-One**: Otwórz https://circuitpython.org/board/waveshare_rp2040_one/
+2. **Dla RP2040-Zero**: Otwórz https://circuitpython.org/board/waveshare_rp2040_zero/
+3. Pobierz najnowszy plik `.uf2` (CircuitPython 9.x)
+
+Lub użyj make:
+```bash
+# Pobierz dla obu płytek
+make download-uf2-all
+```
 
 ### Krok 2: Wgranie firmware CircuitPython
 
+**Dla RP2040-One (USB-A wbudowane):**
 1. **Odłącz** RP2040-One od komputera
 2. **Przytrzymaj przycisk BOOT** na płytce (mały przycisk przy krawędzi)
 3. **Włóż** RP2040-One do portu USB-A komputera **trzymając BOOT**
+
+**Dla RP2040-Zero (Micro-USB):**
+1. **Odłącz** kabel micro-USB od płytki
+2. **Przytrzymaj przycisk BOOT** na płytce
+3. **Podłącz** kabel micro-USB **trzymając BOOT**
+
+**Dla obu płytek (kontynuacja):**
 4. Zwolnij przycisk BOOT — w systemie pojawi się dysk **RPI-RP2**
 5. **Skopiuj** pobrany plik `.uf2` na dysk RPI-RP2
+   - Automatycznie: `make deploy`
+   - Ręcznie: `sudo cp rp2040-one/*.uf2 /media/$USER/RPI-RP2/` (lub `rp2040-zero/`)
 6. Płytka automatycznie się zrestartuje
 7. W systemie pojawi się nowy dysk o nazwie **CIRCUITPY**
 
@@ -319,6 +425,8 @@ Prędkość scrolla reguluje stała `SCROLL_SPEED` (domyślnie 2 — zwiększ dl
 | Scroll za szybki/wolny | Zmień `SCROLL_SPEED` (1 = wolniej, 5 = szybciej) |
 | Debugowanie | Podłącz terminal szeregowy (Mu Editor / `screen /dev/ttyACM0 115200`) |
 | Import error: adafruit_hid | Skopiuj bibliotekę do CIRCUITPY/lib/ |
+| **Zła detekcja płytki** (wgrywa zły firmware) | Użyj `make deploy BOARD=zero` lub `make deploy BOARD=one` |
+| Nie można zapisać na RPI-RP2 (uprawnienia) | Użyj `sudo cp rp2040-X/*.uf2 /media/$USER/RPI-RP2/` |
 
 ---
 

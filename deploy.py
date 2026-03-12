@@ -29,6 +29,96 @@ class RP2040Deployer:
         self.config = self.load_config()
         self.hal_manager = HALConfigManager(self.project_root)
         self.username = os.environ.get("USER") or os.environ.get("USERNAME") or "tom"
+        self.trace = False
+        
+        # Supported board definitions
+        self.SUPPORTED_BOARDS = {
+            'waveshare_rp2040_one': {
+                'name': 'Waveshare RP2040-One',
+                'uf2_pattern': 'waveshare_rp2040_one',
+            },
+            'waveshare_rp2040_zero': {
+                'name': 'Waveshare RP2040-Zero',
+                'uf2_pattern': 'waveshare_rp2040_zero',
+            },
+            'rp2040_generic': {
+                'name': 'RP2040 Generic',
+                'uf2_pattern': None,
+            }
+        }
+        
+    def detect_board_type(self):
+        """Detect which RP2040 board is connected via USB."""
+        try:
+            result = subprocess.run(
+                ["lsusb"],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            output = result.stdout.lower()
+            
+            # Check for specific board identifiers in lsusb output
+            for board_id, board_info in self.SUPPORTED_BOARDS.items():
+                if board_info['uf2_pattern'] and board_info['uf2_pattern'].replace('_', '') in output.replace('_', ''):
+                    return board_id
+            
+            # If we see RP2040 but can't identify specific board
+            if 'rp2040' in output or 'raspberry pi' in output:
+                return 'rp2040_generic'
+                
+        except Exception as e:
+            if self.trace:
+                print(f"   ⚠️ Błąd wykrywania płytki: {e}")
+        
+        return None
+    
+    def get_board_info(self, force_board=None):
+        """Get information about the connected board."""
+        # Check for explicit override first
+        if force_board:
+            if force_board in self.SUPPORTED_BOARDS:
+                info = self.SUPPORTED_BOARDS[force_board].copy()
+                info['id'] = force_board
+                info['forced'] = True
+                return info
+        
+        # Check environment variable
+        env_board = os.environ.get('RP2040_BOARD')
+        if env_board:
+            board_key = f"waveshare_rp2040_{env_board.lower()}"
+            if board_key in self.SUPPORTED_BOARDS:
+                info = self.SUPPORTED_BOARDS[board_key].copy()
+                info['id'] = board_key
+                info['forced'] = True
+                return info
+        
+        board_type = self.detect_board_type()
+        
+        if not board_type:
+            # Try to infer from UF2 files present in project (including subdirs)
+            uf2_files = list(self.project_root.glob("*.uf2"))
+            uf2_files.extend(self.project_root.glob("rp2040-*/*.uf2"))
+            for uf2_file in uf2_files:
+                name = uf2_file.name.lower()
+                path = str(uf2_file).lower()
+                if 'zero' in name or 'rp2040-zero' in path:
+                    board_type = 'waveshare_rp2040_zero'
+                    break
+                elif 'one' in name and 'rp2040-one' in path:
+                    board_type = 'waveshare_rp2040_one'
+                    break
+                elif 'one' in name:
+                    board_type = 'waveshare_rp2040_one'
+                    break
+        
+        if board_type and board_type in self.SUPPORTED_BOARDS:
+            info = self.SUPPORTED_BOARDS[board_type].copy()
+            info['id'] = board_type
+            info['forced'] = False
+            return info
+        
+        return {'id': 'unknown', 'name': 'Unknown RP2040 Board', 'uf2_pattern': None, 'forced': False}
         
     def load_config(self):
         """Wczytaj konfigurację z .env pliku."""
@@ -139,30 +229,38 @@ class RP2040Deployer:
         previous_boot_path = Path(previous_boot_path) if previous_boot_path else None
         boot_path_gone = False
 
+        print(f"📡 Oczekiwanie na powrót urządzenia CIRCUITPY (timeout: {timeout}s)...")
+        print("   Krok 1: Wykrycie zniknięcia RPI-RP2...")
+
         for i in range(timeout):
             time.sleep(1)
 
             if previous_boot_path and not boot_path_gone and not previous_boot_path.exists():
                 boot_path_gone = True
-                print("   ✓ RPI-RP2 zniknął z systemu plików")
+                print("   ✓ RPI-RP2 zniknął (RP2040 zaczął flashowanie/restart)")
+                print("   Krok 2: Oczekiwanie na label blokowy /dev/disk/by-label/CIRCUITPY...")
 
             quick_devices = self._quick_check_circuitpy()
             if quick_devices:
-                print(f"✅ Wykryto CIRCUITPY po {i+1}s")
+                print(f"\n✅ KROK 3: Wykryto i zamontowano CIRCUITPY po {i+1}s")
                 print("🎉 RP2040 zrestartował się pomyślnie!")
                 print()
+                self._capture_system_logs("PO RESTRARCIE")
                 return True
 
             if i % 10 == 0 and i > 0:
-                print(f"   ... czekam na restart ({i}s)")
+                print(f"   ... ({i}s) czekam na restart...")
+                if i == 30:
+                    self._capture_system_logs("W TRAKCIE CZEKANIA (30s)")
 
+        print("\n⚠️ Próba końcowa: wymuszone szukanie labela i montowanie...")
         if self._find_device_by_label("CIRCUITPY"):
             mounted = self.mount_circuitpy_device()
             if mounted:
-                print("✅ Wykryto CIRCUITPY po końcowej próbie montowania")
-                print()
+                print("✅ Wykryto CIRCUITPY w ostatniej próbie")
                 return True
 
+        self._capture_system_logs("PO TIMEOUTCIE")
         return False
 
     def _label_mount_patterns(self, label):
@@ -198,49 +296,119 @@ class RP2040Deployer:
             if link.name.upper() == label.upper():
                 return os.path.realpath(link)
         return None
+
+    def _wait_for_block_device_label(self, label, timeout=30, poll_interval=0.5):
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            device = self._find_device_by_label(label)
+            if device:
+                return device
+            time.sleep(poll_interval)
+        return None
+
+    def _capture_system_logs(self, label="LOG"):
+        """Przechwyć ostatnie logi systemowe dmesg."""
+        if not self.trace:
+            return
+            
+        print(f"\n--- {label}: Ostatnie logi dmesg ---")
+        try:
+            # Używamy sudo tylko jeśli dmesg tego wymaga, lub próbujemy bez
+            result = subprocess.run(
+                ["dmesg", "-T", "--level=emerg,alert,crit,err,warn"],
+                capture_output=True, text=True, timeout=5
+            )
+            if result.returncode != 0:
+                result = subprocess.run(
+                    ["sudo", "dmesg", "-T", "--level=emerg,alert,crit,err,warn"],
+                    capture_output=True, text=True, timeout=5
+                )
+            
+            if result.returncode == 0:
+                # Pokaż tylko ostatnie 10 linii związanych z USB lub SCSI
+                lines = result.stdout.splitlines()
+                relevant = [l for l in lines if any(x in l.lower() for x in ("usb", "scsi", "sda", "sdb", "sdc", "sd-v"))]
+                for line in relevant[-10:]:
+                    print(f"  {line}")
+            else:
+                print("  ⚠️ Nie udało się pobrać dmesg")
+        except Exception as e:
+            print(f"  ⚠️ Błąd dmesg: {e}")
+        print("-" * 40)
+
+    def _get_udisks_info(self, device_path):
+        try:
+            result = subprocess.run(
+                ["udisksctl", "info", "-b", str(device_path)],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result.returncode == 0:
+                return result.stdout
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            pass
+        return None
     
-    def mount_circuitpy_device(self):
-        """Znajdź i zamontuj niezamontowane urządzenie CIRCUITPY."""
+    def mount_circuitpy_device(self, retries=5, initial_delay=1):
+        """Znajdź i zamontuj niezamontowane urządzenie CIRCUITPY z retry i backoff."""
         print("🔍 Szukam niezamontowanego urządzenia CIRCUITPY...")
 
         device_real = self._find_device_by_label("CIRCUITPY")
+        if not device_real:
+            # Poczekaj chwilę, może label jeszcze się nie pojawił
+            device_real = self._wait_for_block_device_label("CIRCUITPY", timeout=10)
+
         if device_real:
             print(f"   ✓ Znaleziono urządzenie: {device_real}")
 
-            try:
-                result = subprocess.run(
-                    ["udisksctl", "mount", "-b", device_real],
-                    capture_output=True, text=True, timeout=10
-                )
-                if result.returncode == 0:
-                    mount_path = self._extract_mount_path(result.stdout)
-                    if mount_path:
-                        print(f"   ✓ Zamontowano w: {mount_path}")
-                        return mount_path
-                elif result.stderr and "already mounted" not in result.stderr.lower():
-                    print(f"   ⚠️ udisksctl error: {result.stderr}")
-            except (subprocess.TimeoutExpired, FileNotFoundError):
-                pass
+            delay = initial_delay
+            for attempt in range(1, retries + 1):
+                try:
+                    if attempt > 1:
+                        print(f"   ⏳ Próba {attempt}/{retries} (powrót za {delay}s)...")
+                        time.sleep(delay)
+                        delay *= 2 # Exponential backoff
 
-            mounted_paths = self._find_mounted_label_paths("CIRCUITPY")
-            if mounted_paths:
-                print(f"   ✓ Wykryto istniejący mount: {mounted_paths[0]}")
-                return mounted_paths[0]
+                    result = subprocess.run(
+                        ["udisksctl", "mount", "--no-user-interaction", "-b", device_real],
+                        capture_output=True, text=True, timeout=15
+                    )
+                    
+                    if result.returncode == 0:
+                        mount_path = self._extract_mount_path(result.stdout)
+                        if mount_path:
+                            print(f"   ✓ Zamontowano w: {mount_path} (próba {attempt})")
+                            return mount_path
+                    
+                    stderr = result.stderr.lower() if result.stderr else ""
+                    if "already mounted" in stderr:
+                        mounted_paths = self._find_mounted_label_paths("CIRCUITPY")
+                        if mounted_paths:
+                            print(f"   ✓ Urządzenie już zamontowane: {mounted_paths[0]}")
+                            return mounted_paths[0]
+                    
+                    if attempt == retries:
+                        print(f"   ⚠️ udisksctl mount nieudany po {retries} próbach: {result.stderr.strip()}")
+                
+                except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+                    if attempt == retries:
+                        print(f"   ⚠️ Błąd podczas montowania: {e}")
 
+            # Fallback do sudo mount
+            print("   🔧 Próba montowania przez sudo mount (fallback)...")
             mount_point = f"/media/{self.username}/CIRCUITPY"
             try:
                 os.makedirs(mount_point, exist_ok=True)
                 result = subprocess.run(
-                    ["sudo", "mount", device_real, mount_point],
-                    capture_output=True, text=True, timeout=5
+                    ["sudo", "mount", "-o", "rw,user,sync", device_real, mount_point],
+                    capture_output=True, text=True, timeout=10
                 )
                 if result.returncode == 0:
-                    print(f"   ✓ Zamontowano w: {mount_point}")
+                    print(f"   ✓ Zamontowano (sudo) w: {mount_point}")
                     return mount_point
-            except (subprocess.TimeoutExpired, FileNotFoundError):
-                pass
-
-            print(f"   ⚠️ Nie udało się zamontować {device_real}")
+            except Exception as e:
+                print(f"   ❌ Fallback mount nieudany: {e}")
 
         return None
     
@@ -339,28 +507,58 @@ class RP2040Deployer:
         
         return devices
     
-    def flash_uf2(self, device_path):
+    def flash_uf2(self, device_path, force_board=None):
         """Wgraj firmware UF2 w trybie boot."""
         print(f"🔥 Flashowanie firmware na {device_path}...")
         
-        # Znajdź plik UF2
+        # Wykryj typ płytki (z możliwością wymuszenia)
+        board_info = self.get_board_info(force_board or getattr(self, 'force_board', None))
+        if board_info.get('forced'):
+            print(f"📋 Wymuszona płytka: {board_info['name']}")
+        else:
+            print(f"📋 Wykryta płytka: {board_info['name']}")
+        
+        # Znajdź plik UF2 (w katalogu głównym i podkatalogach płytek)
         uf2_files = list(self.project_root.glob("*.uf2"))
+        uf2_files.extend(self.project_root.glob("rp2040-*/*.uf2"))
         if not uf2_files:
             print("❌ Nie znaleziono pliku .uf2 w katalogu projektu")
+            print("💡 Pobierz firmware: make download-uf2")
             return False
         
-        # Preferuj oficjalny plik CircuitPython (en_US) zamiast lokalizacji
-        preferred_uf2 = None
-        official_uf2 = None
+        # Wybierz odpowiedni plik UF2 na podstawie wykrytej płytki
+        selected_uf2 = None
+        board_pattern = board_info.get('uf2_pattern')
         
-        for uf2_file in uf2_files:
-            if "circuitpython-waveshare_rp2040_one-en_US" in uf2_file.name:
-                official_uf2 = uf2_file
-            elif "circuitpython-waveshare_rp2040_one" in uf2_file.name and "en_US" not in uf2_file.name:
-                preferred_uf2 = uf2_file
+        if board_pattern:
+            # Szukaj pliku pasującego do wykrytej płytki
+            preferred_uf2 = None
+            official_uf2 = None
+            
+            for uf2_file in uf2_files:
+                name = uf2_file.name.lower()
+                if board_pattern.lower().replace('_', '') in name.replace('_', ''):
+                    # Preferuj oficjalny plik en_US
+                    if "en_us" in name:
+                        official_uf2 = uf2_file
+                    else:
+                        preferred_uf2 = uf2_file
+            
+            selected_uf2 = official_uf2 or preferred_uf2
         
-        # Użyj oficjalnego pliku jeśli dostępny
-        uf2_file = official_uf2 or preferred_uf2 or uf2_files[0]
+        # Fallback: użyj dostępnego pliku UF2
+        if not selected_uf2:
+            # Sprawdź czy mamy plik dla waveshare_rp2040_one (domyślny)
+            for uf2_file in uf2_files:
+                if "waveshare_rp2040_one" in uf2_file.name and "en_us" in uf2_file.name.lower():
+                    selected_uf2 = uf2_file
+                    break
+        
+        # Ostateczny fallback: pierwszy dostępny plik UF2
+        if not selected_uf2:
+            selected_uf2 = uf2_files[0]
+        
+        uf2_file = selected_uf2
         print(f"📁 Używam: {uf2_file.name}")
         
         # Sprawdź rozmiar pliku
@@ -383,11 +581,16 @@ class RP2040Deployer:
         try:
             dest_path = Path(device_path) / uf2_file.name
             print(f"📝 Kopiowanie {uf2_file.name} ({file_size:,} bytes)...")
+            
+            self._capture_system_logs("PRZED KOPIOWANIEM UF2")
+            
             written_size = self._copy_file_verified(uf2_file, dest_path, "UF2")
             print("💾 Wymuszam zapis na urządzenie USB (sync)...")
             self._sync_path(dest_path)
             print(f"✅ Zapis zweryfikowany: {written_size:,} bytes")
             
+            self._capture_system_logs("PO KOPIOWANIU UF2")
+
             # Czekamy na pełne zakończenie zapisu USB
             print("⏳ Czekam 5s na zakończenie zapisu USB...")
             time.sleep(5)
@@ -417,10 +620,24 @@ class RP2040Deployer:
             print("   RP2040 powinien automatycznie się zrestartować po odczyciu UF2")
             print()
 
-            if self._wait_for_circuitpy_after_flash(device_path, timeout=60):
+            restart_ok = self._wait_for_circuitpy_after_flash(device_path, timeout=60)
+            if restart_ok:
                 return True
 
-            if uf2_disappeared:
+            if self.detect_boot_mode_devices():
+                print("❌ RP2040 wrócił do trybu BOOT zamiast do CircuitPython")
+                print("💡 Najbardziej prawdopodobne przyczyny:")
+                print("   1. Wgrany UF2 nie jest zgodny z tą płytką")
+                print("   2. Przycisk BOOT/BOOTSEL jest wciśnięty lub zwarty")
+                print("   3. Jest problem sprzętowy z pamięcią flash lub zasilaniem USB")
+                print("   4. Ten wariant firmware CircuitPython nie startuje poprawnie na tej rewizji płytki")
+                print()
+                print("🔍 Zalecane kroki:")
+                print("   1. Sprawdź, czy BOOT nie jest fizycznie wciśnięty")
+                print("   2. Odłącz i podłącz płytkę bez trzymania BOOT")
+                print("   3. Spróbuj innej wersji UF2 dla tego boarda")
+                print("   4. Uruchom: make deploy-diagnose")
+            elif uf2_disappeared:
                 print("⚠️ Timeout, ale plik UF2 zniknął")
                 print("💡 RP2040 odczytał firmware, ale system nie udostępnił jeszcze CIRCUITPY.")
                 print("   Spróbuj ponownie: make deploy")
@@ -447,7 +664,7 @@ class RP2040Deployer:
             if Path(direct_circuitpy).exists():
                 return [{'path': direct_circuitpy, 'name': 'CIRCUITPY'}]
 
-        if self._find_device_by_label("CIRCUITPY"):
+        if self._wait_for_block_device_label("CIRCUITPY", timeout=2, poll_interval=0.25):
             mounted = self.mount_circuitpy_device()
             if mounted:
                 return [{'path': mounted, 'name': 'CIRCUITPY'}]
@@ -540,6 +757,16 @@ class RP2040Deployer:
                         
                 except Exception:
                     pass
+
+                for label in ("RPI-RP2", "CIRCUITPY"):
+                    device = self._find_device_by_label(label)
+                    if device:
+                        print(f"   🔍 /dev/disk/by-label/{label} -> {device}")
+                        info = self._get_udisks_info(device)
+                        if info:
+                            for line in info.splitlines():
+                                if any(key in line for key in ("IdLabel:", "PreferredDevice:", "MountPoints:", "HintAuto:", "IdType:")):
+                                    print(f"      {line.strip()}")
         
         except Exception as e:
             print(f"   ⚠️ Błąd sprawdzania urządzeń blokowych: {e}")
@@ -896,6 +1123,17 @@ class RP2040Deployer:
         
         try:
             while True:
+                boot_devices = self.detect_boot_mode_devices()
+                if boot_devices:
+                    current_boot = boot_devices[0]['path']
+                    last_device = self.config.get('CIRCUITPY_DEVICE_PATH')
+                    if current_boot != last_device:
+                        print(f"\n🔥 Wykryto urządzenie w trybie BOOT: {boot_devices[0]['name']}")
+                        if self.config.get('AUTO_DEPLOY_ON_BOOT', 'true').lower() == 'true':
+                            self.auto_deploy()
+                    time.sleep(interval)
+                    continue
+
                 devices = self.detect_circuitpy_devices()
                 
                 if devices:
@@ -917,8 +1155,27 @@ def main():
     """Main entry point."""
     deployer = RP2040Deployer()
     
-    if len(sys.argv) > 1:
-        command = sys.argv[1]
+    # Parse arguments
+    force_board = None
+    args = sys.argv[1:]
+    
+    # Check for --board argument
+    for i, arg in enumerate(args):
+        if arg.startswith('--board='):
+            force_board = f"waveshare_rp2040_{arg.split('=')[1].lower()}"
+            args.pop(i)
+            break
+        elif arg == '--board' and i + 1 < len(args):
+            force_board = f"waveshare_rp2040_{args[i+1].lower()}"
+            args.pop(i)
+            args.pop(i)  # Remove the value too
+            break
+    
+    # Store force_board for use in auto_deploy
+    deployer.force_board = force_board
+    
+    if args:
+        command = args[0]
         
         if command == "detect":
             devices = deployer.detect_circuitpy_devices()
@@ -930,10 +1187,26 @@ def main():
                 print("Brak wykrytych urządzeń")
         
         elif command == "deploy":
+            if "--trace" in args:
+                deployer.trace = True
             deployer.auto_deploy()
         
         elif command == "monitor":
             deployer.monitor_devices()
+        
+        elif command == "board":
+            board_info = deployer.get_board_info(force_board)
+            print(f"Wykryta płytka: {board_info['name']}")
+            print(f"ID: {board_info['id']}")
+            if board_info.get('uf2_pattern'):
+                print(f"UF2 pattern: {board_info['uf2_pattern']}")
+            if board_info.get('forced'):
+                print("⚠️  Wymuszona płytka (override)")
+            
+            # Also try USB detection
+            usb_board = deployer.detect_board_type()
+            if usb_board:
+                print(f"Wykryto przez USB: {usb_board}")
         
         elif command == "setup":
             deployer.setup_libraries()
@@ -941,7 +1214,8 @@ def main():
         else:
             print("Dostępne komendy:")
             print("  detect  - Wykryj urządzenia")
-            print("  deploy  - Automatyczny deployment")
+            print("  board   - Wykryj typ płytki")
+            print("  deploy  - Automatyczny deployment [--trace] [--board=one|zero]")
             print("  monitor - Monitoruj urządzenia")
             print("  setup   - Pobierz biblioteki")
     else:

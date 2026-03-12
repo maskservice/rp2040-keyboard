@@ -7,9 +7,12 @@
 
 PYTHON       ?= .venv/bin/python3
 PIP          ?= .venv/bin/pip3
-PORT         ?= 8080
+PORT         ?= 8081
 CIRCUITPY    ?= /media/$(USER)/CIRCUITPY
 UF2_URL      := https://downloads.circuitpython.org/bin/waveshare_rp2040_one/en_US/adafruit-circuitpython-waveshare_rp2040_one-en_US-9.2.0.uf2
+UF2_URL_ZERO := https://downloads.circuitpython.org/bin/waveshare_rp2040_zero/en_US/adafruit-circuitpython-waveshare_rp2040_zero-en_US-9.2.0.uf2
+UF2_FILE     := adafruit-circuitpython-waveshare_rp2040_one-en_US-9.2.0.uf2
+UF2_FILE_ZERO:= adafruit-circuitpython-waveshare_rp2040_zero-en_US-9.2.0.uf2
 HID_BUNDLE   := https://github.com/adafruit/Adafruit_CircuitPython_Bundle/releases/latest
 DOCKER_IMG   := rp2040-keypad-test
 VERSION      := 0.0.6
@@ -59,11 +62,11 @@ requirements.txt: ## Wygeneruj requirements.txt
 
 web: ## Uruchom web configurator (produkcja)
 	@echo "$(C_CYAN)► Web configurator:$(C_RESET) http://localhost:$(PORT)"
-	$(PYTHON) -m uvicorn web.app:app --host 0.0.0.0 --port $(PORT)
+	$(PYTHON) -m uvicorn rp2040_keyboard.web.app:app --host 0.0.0.0 --port $(PORT)
 
 dev: ## Uruchom web configurator (dev z auto-reload)
 	@echo "$(C_CYAN)► Web configurator DEV:$(C_RESET) http://localhost:$(PORT)"
-	$(PYTHON) -m uvicorn web.app:app --host 0.0.0.0 --port $(PORT) --reload
+	$(PYTHON) -m uvicorn rp2040_keyboard.web.app:app --host 0.0.0.0 --port $(PORT) --reload
 
 # ============================================================================
 # TESTOWANIE
@@ -116,10 +119,22 @@ flash-custom: ## Wgraj wygenerowany config (z web configuratora)
 		echo "  Najpierw wygeneruj config w web configuratorze"; \
 	fi
 
-download-uf2: ## Pobierz firmware CircuitPython UF2
-	@echo "$(C_CYAN)► Pobieranie CircuitPython UF2...$(C_RESET)"
-	curl -L -o firmware.uf2 "$(UF2_URL)"
-	@echo "$(C_GREEN)✓ Firmware zapisany: firmware.uf2$(C_RESET)"
+download-uf2: ## Pobierz firmware CircuitPython UF2 dla RP2040-One
+	@echo "$(C_CYAN)► Pobieranie CircuitPython UF2 dla RP2040-One...$(C_RESET)"
+	curl -L -o "$(UF2_FILE)" "$(UF2_URL)"
+	@echo "$(C_GREEN)✓ Firmware zapisany: $(UF2_FILE)$(C_RESET)"
+
+download-uf2-zero: ## Pobierz firmware CircuitPython UF2 dla RP2040-Zero
+	@echo "$(C_CYAN)► Pobieranie CircuitPython UF2 dla RP2040-Zero...$(C_RESET)"
+	curl -L -o "$(UF2_FILE_ZERO)" "$(UF2_URL_ZERO)"
+	@echo "$(C_GREEN)✓ Firmware zapisany: $(UF2_FILE_ZERO)$(C_RESET)"
+
+download-uf2-all: ## Pobierz firmware dla obu płytek (One i Zero)
+	@$(MAKE) download-uf2
+	@$(MAKE) download-uf2-zero
+	@echo "$(C_GREEN)✓ Wszystkie firmware pobrane$(C_RESET)"
+	@echo "  • $(UF2_FILE)"
+	@echo "  • $(UF2_FILE_ZERO)"
 	@echo "  Wgraj na dysk RPI-RP2 (przytrzymaj BOOT przy podłączaniu)"
 
 # ============================================================================
@@ -147,16 +162,38 @@ dist: ## Przygotuj paczkę do dystrybucji
 clean: ## Wyczyść pliki tymczasowe
 	rm -rf __pycache__ .pytest_cache tests/__pycache__
 	rm -rf web/__pycache__ output/ dist/
-	rm -f firmware.uf2
+	rm -f *.uf2 rp2040-*/*.uf2
 
 # Deployment targets
-deploy: ## Deploy firmware to RP2040 device
+deploy: ## Deploy firmware to RP2040 device (use BOARD=one|zero to force)
 	@echo "🚀 Deploying to RP2040..."
-	$(PYTHON) deploy.py deploy
+	@if [ -n "$(BOARD)" ]; then \
+		echo "📋 Wymuszona płytka: $(BOARD)"; \
+		$(PYTHON) deploy.py deploy --board=$(BOARD); \
+	else \
+		$(PYTHON) deploy.py deploy; \
+	fi
 
 deploy-monitor: ## Monitor for device connection and auto-deploy
 	@echo "👀 Monitoring for RP2040 device..."
 	$(PYTHON) deploy.py monitor
+
+deploy-trace: ## Deploy with full trace (dmesg, etc.)
+	@echo "🔍 Deploying with trace enabled..."
+	@if [ -n "$(BOARD)" ]; then \
+		echo "📋 Wymuszona płytka: $(BOARD)"; \
+		$(PYTHON) deploy.py deploy --trace --board=$(BOARD); \
+	else \
+		$(PYTHON) deploy.py deploy --trace; \
+	fi
+
+deploy-board: ## Show detected board type (use BOARD=one|zero to test override)
+	@echo "🔍 Detecting board type..."
+	@if [ -n "$(BOARD)" ]; then \
+		$(PYTHON) deploy.py board --board=$(BOARD); \
+	else \
+		$(PYTHON) deploy.py board; \
+	fi
 
 deploy-setup: ## Download required libraries
 	@echo "📚 Setting up libraries..."
