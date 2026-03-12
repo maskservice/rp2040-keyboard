@@ -10,6 +10,7 @@ import sys
 import time
 import json
 import shutil
+import errno
 import zipfile
 import urllib.request
 import subprocess
@@ -27,6 +28,7 @@ class RP2040Deployer:
         self.env_file = self.project_root / ".env"
         self.config = self.load_config()
         self.hal_manager = HALConfigManager(self.project_root)
+        self.username = os.environ.get("USER") or os.environ.get("USERNAME") or "tom"
         
     def load_config(self):
         """Wczytaj konfigurację z .env pliku."""
@@ -44,53 +46,202 @@ class RP2040Deployer:
         with open(self.env_file, 'w') as f:
             for key, value in self.config.items():
                 f.write(f"{key}={value}\n")
+
+    def _sync_path(self, path):
+        path = Path(path)
+        try:
+            if path.exists() and path.is_file():
+                with open(path, 'rb') as f:
+                    os.fsync(f.fileno())
+        except OSError:
+            pass
+
+        try:
+            parent = path.parent if path.parent.exists() else None
+            if parent:
+                fd = os.open(parent, os.O_RDONLY)
+                try:
+                    os.fsync(fd)
+                finally:
+                    os.close(fd)
+        except OSError:
+            pass
+
+        os.sync()
+
+    def _get_free_space(self, path):
+        try:
+            stats = os.statvfs(path)
+            return stats.f_bavail * stats.f_frsize
+        except OSError:
+            return None
+
+    def _ensure_target_ready(self, target_dir, required_bytes=0):
+        target_dir = Path(target_dir)
+        if not target_dir.exists() or not target_dir.is_dir():
+            raise FileNotFoundError(f"Ścieżka urządzenia nie istnieje: {target_dir}")
+
+        if not os.access(target_dir, os.W_OK):
+            raise PermissionError(f"Brak prawa zapisu do: {target_dir}")
+
+        free_bytes = self._get_free_space(target_dir)
+        if free_bytes is not None and required_bytes and free_bytes < required_bytes:
+            raise OSError(
+                errno.ENOSPC,
+                f"Za mało miejsca na urządzeniu: potrzeba {required_bytes:,} B, dostępne {free_bytes:,} B"
+            )
+
+    def _copy_file_verified(self, src_path, dest_path, label=None):
+        src_path = Path(src_path)
+        dest_path = Path(dest_path)
+        label = label or dest_path.name
+
+        self._ensure_target_ready(dest_path.parent, src_path.stat().st_size)
+        shutil.copy2(src_path, dest_path)
+        self._sync_path(dest_path)
+
+        if not dest_path.exists():
+            raise IOError(f"{label}: plik nie istnieje po kopiowaniu")
+
+        src_size = src_path.stat().st_size
+        dst_size = dest_path.stat().st_size
+        if src_size != dst_size:
+            raise IOError(
+                f"{label}: rozmiar po kopiowaniu niezgodny (src={src_size:,} B, dst={dst_size:,} B)"
+            )
+
+        return dst_size
+
+    def _write_text_verified(self, dest_path, content, label=None):
+        dest_path = Path(dest_path)
+        label = label or dest_path.name
+        encoded = content.encode("utf-8")
+
+        self._ensure_target_ready(dest_path.parent, len(encoded))
+        with open(dest_path, 'w', encoding='utf-8', newline='\n') as f:
+            f.write(content)
+            f.flush()
+            os.fsync(f.fileno())
+
+        self._sync_path(dest_path)
+
+        if not dest_path.exists():
+            raise IOError(f"{label}: plik nie istnieje po zapisie")
+
+        if dest_path.stat().st_size != len(encoded):
+            raise IOError(
+                f"{label}: rozmiar po zapisie niezgodny (expected={len(encoded):,} B, actual={dest_path.stat().st_size:,} B)"
+            )
+
+        return dest_path.stat().st_size
+
+    def _wait_for_circuitpy_after_flash(self, previous_boot_path=None, timeout=60):
+        previous_boot_path = Path(previous_boot_path) if previous_boot_path else None
+        boot_path_gone = False
+
+        for i in range(timeout):
+            time.sleep(1)
+
+            if previous_boot_path and not boot_path_gone and not previous_boot_path.exists():
+                boot_path_gone = True
+                print("   ✓ RPI-RP2 zniknął z systemu plików")
+
+            quick_devices = self._quick_check_circuitpy()
+            if quick_devices:
+                print(f"✅ Wykryto CIRCUITPY po {i+1}s")
+                print("🎉 RP2040 zrestartował się pomyślnie!")
+                print()
+                return True
+
+            if i % 10 == 0 and i > 0:
+                print(f"   ... czekam na restart ({i}s)")
+
+        if self._find_device_by_label("CIRCUITPY"):
+            mounted = self.mount_circuitpy_device()
+            if mounted:
+                print("✅ Wykryto CIRCUITPY po końcowej próbie montowania")
+                print()
+                return True
+
+        return False
+
+    def _label_mount_patterns(self, label):
+        label = label.upper()
+        return [
+            f"/media/{self.username}/{label}",
+            f"/media/*/{label}",
+            f"/mnt/*/{label}",
+            f"/run/media/{self.username}/{label}",
+            f"/run/media/*/{label}",
+            f"/Volumes/{label}",
+        ]
+
+    def _find_mounted_label_paths(self, label):
+        from glob import glob
+
+        found = []
+        seen = set()
+        for pattern in self._label_mount_patterns(label):
+            for path in glob(pattern):
+                resolved = str(Path(path).resolve())
+                if resolved not in seen and Path(path).exists():
+                    seen.add(resolved)
+                    found.append(path)
+        return found
+
+    def _find_device_by_label(self, label):
+        by_label_path = Path("/dev/disk/by-label/")
+        if not by_label_path.exists():
+            return None
+
+        for link in by_label_path.iterdir():
+            if link.name.upper() == label.upper():
+                return os.path.realpath(link)
+        return None
     
     def mount_circuitpy_device(self):
         """Znajdź i zamontuj niezamontowane urządzenie CIRCUITPY."""
         print("🔍 Szukam niezamontowanego urządzenia CIRCUITPY...")
-        
-        # Sprawdź /dev/disk/by-label/ dla CIRCUITPY
-        by_label_path = Path("/dev/disk/by-label/")
-        if by_label_path.exists():
-            for link in by_label_path.iterdir():
-                if link.name.upper() == "CIRCUITPY":
-                    # Znaleziono urządzenie, sprawdź czy już zamontowane
-                    device_real = os.path.realpath(link)
-                    print(f"   ✓ Znaleziono urządzenie: {device_real}")
-                    
-                    # Spróbuj zamontować używając udisksctl
-                    try:
-                        result = subprocess.run(
-                            ["udisksctl", "mount", "-b", device_real],
-                            capture_output=True, text=True, timeout=10
-                        )
-                        if result.returncode == 0:
-                            # Wyciągnij ścieżkę mount z outputu
-                            mount_path = self._extract_mount_path(result.stdout)
-                            if mount_path:
-                                print(f"   ✓ Zamontowano w: {mount_path}")
-                                return mount_path
-                        else:
-                            print(f"   ⚠️ udisksctl error: {result.stderr}")
-                    except (subprocess.TimeoutExpired, FileNotFoundError):
-                        pass
-                    
-                    # Fallback - spróbuj zamontować ręcznie
-                    mount_point = "/media/tom/CIRCUITPY"
-                    try:
-                        os.makedirs(mount_point, exist_ok=True)
-                        result = subprocess.run(
-                            ["sudo", "mount", device_real, mount_point],
-                            capture_output=True, text=True, timeout=5
-                        )
-                        if result.returncode == 0:
-                            print(f"   ✓ Zamontowano w: {mount_point}")
-                            return mount_point
-                    except (subprocess.TimeoutExpired, FileNotFoundError):
-                        pass
-                    
-                    print(f"   ⚠️ Nie udało się zamontować {device_real}")
-        
+
+        device_real = self._find_device_by_label("CIRCUITPY")
+        if device_real:
+            print(f"   ✓ Znaleziono urządzenie: {device_real}")
+
+            try:
+                result = subprocess.run(
+                    ["udisksctl", "mount", "-b", device_real],
+                    capture_output=True, text=True, timeout=10
+                )
+                if result.returncode == 0:
+                    mount_path = self._extract_mount_path(result.stdout)
+                    if mount_path:
+                        print(f"   ✓ Zamontowano w: {mount_path}")
+                        return mount_path
+                elif result.stderr and "already mounted" not in result.stderr.lower():
+                    print(f"   ⚠️ udisksctl error: {result.stderr}")
+            except (subprocess.TimeoutExpired, FileNotFoundError):
+                pass
+
+            mounted_paths = self._find_mounted_label_paths("CIRCUITPY")
+            if mounted_paths:
+                print(f"   ✓ Wykryto istniejący mount: {mounted_paths[0]}")
+                return mounted_paths[0]
+
+            mount_point = f"/media/{self.username}/CIRCUITPY"
+            try:
+                os.makedirs(mount_point, exist_ok=True)
+                result = subprocess.run(
+                    ["sudo", "mount", device_real, mount_point],
+                    capture_output=True, text=True, timeout=5
+                )
+                if result.returncode == 0:
+                    print(f"   ✓ Zamontowano w: {mount_point}")
+                    return mount_point
+            except (subprocess.TimeoutExpired, FileNotFoundError):
+                pass
+
+            print(f"   ⚠️ Nie udało się zamontować {device_real}")
+
         return None
     
     def _extract_mount_path(self, udisks_output):
@@ -106,97 +257,52 @@ class RP2040Deployer:
         """Wykryj podłączone urządzenia CircuitPython."""
         print("🔍 Wykrywanie urządzeń CircuitPython...")
         
+        found_paths = set()  # Uniknij duplikatów
         devices = []
         
-        # Bezpośrednie sprawdzenie CIRCUITPY
-        direct_circuitpy = "/media/tom/CIRCUITPY"
-        if Path(direct_circuitpy).exists():
-            if self.is_circuitpy_device(Path(direct_circuitpy)):
+        def _add_device(path_str, name=None):
+            """Dodaj urządzenie jeśli nie jest duplikatem."""
+            real_path = str(Path(path_str).resolve())
+            if real_path not in found_paths:
+                found_paths.add(real_path)
                 devices.append({
-                    'path': direct_circuitpy,
-                    'name': 'CIRCUITPY',
+                    'path': path_str,
+                    'name': name or Path(path_str).name,
                     'detected_at': datetime.now().isoformat()
                 })
+                return True
+            return False
+        
+        direct_paths = self._find_mounted_label_paths("CIRCUITPY")
+        for direct_circuitpy in direct_paths:
+            if self.is_circuitpy_device(Path(direct_circuitpy)):
+                _add_device(direct_circuitpy, 'CIRCUITPY')
                 print(f"   ✓ Znaleziono: {direct_circuitpy}")
                 return devices
         
         # Jeśli nie zamontowane, spróbuj zamontować
         mounted_path = self.mount_circuitpy_device()
         if mounted_path:
-            devices.append({
-                'path': mounted_path,
-                'name': 'CIRCUITPY',
-                'detected_at': datetime.now().isoformat()
-            })
+            _add_device(mounted_path, 'CIRCUITPY')
             print(f"   ✓ Zamontowano i wykryto: {mounted_path}")
             return devices
         
-        # Sprawdź common mount points dla różnych systemów
-        mount_points = [
-            "/media/",  # Linux
-            "/mnt/",     # Linux
-            "/run/media/",  # Linux
-            os.path.expanduser("~/Desktop/"),  # macOS/Windows
-        ]
+        # Sprawdź ścieżki glob
+        from glob import glob
+        search_patterns = self._label_mount_patterns("CIRCUITPY")
         
-        # Dodaj bezpośrednie sprawdzenie /media/tom/CIRCUITPY
-        direct_paths = [
-            "/media/tom/CIRCUITPY",
-            "/media/*/CIRCUITPY",
-            "/mnt/*/CIRCUITPY",
-        ]
+        for pattern in search_patterns:
+            for path in glob(pattern):
+                if self.is_circuitpy_device(Path(path)):
+                    _add_device(path)
         
-        # Sprawdź bezpośrednie ścieżki
-        for pattern in direct_paths:
-            if '*' in pattern:
-                # Użyj glob dla wzorców
-                from glob import glob
-                for path in glob(pattern):
-                    if self.is_circuitpy_device(Path(path)):
-                        devices.append({
-                            'path': path,
-                            'name': Path(path).name,
-                            'detected_at': datetime.now().isoformat()
-                        })
-            else:
-                if self.is_circuitpy_device(Path(pattern)):
-                    devices.append({
-                        'path': pattern,
-                        'name': Path(pattern).name,
-                        'detected_at': datetime.now().isoformat()
-                    })
-        
-        # Sprawdź standardowe mount points
-        for mount_point in mount_points:
-            if os.path.exists(mount_point):
-                try:
-                    for item in os.listdir(mount_point):
-                        item_path = Path(mount_point) / item
-                        if item_path.is_dir():
-                            # Sprawdź czy to urządzenie CircuitPython
-                            if self.is_circuitpy_device(item_path):
-                                devices.append({
-                                    'path': str(item_path),
-                                    'name': item,
-                                    'detected_at': datetime.now().isoformat()
-                                })
-                except PermissionError:
-                    # Pomiń katalogi do których nie mamy dostępu
-                    continue
-                except Exception:
-                    continue
-        
-        # Sprawdź też w /Volumes dla macOS
+        # Sprawdź /Volumes dla macOS
         if os.path.exists("/Volumes"):
             try:
                 for item in os.listdir("/Volumes"):
                     item_path = Path("/Volumes") / item
                     if item_path.is_dir() and self.is_circuitpy_device(item_path):
-                        devices.append({
-                            'path': str(item_path),
-                            'name': item,
-                            'detected_at': datetime.now().isoformat()
-                        })
+                        _add_device(str(item_path), item)
             except Exception:
                 pass
         
@@ -206,14 +312,8 @@ class RP2040Deployer:
         """Wykryj urządzenia w trybie boot (RPI-RP2)."""
         found_paths = set()  # Uniknij duplikatów
         devices = []
-        
-        # Ścieżki do RPI-RP2
-        boot_paths = [
-            "/media/tom/RPI-RP2",
-            "/media/*/RPI-RP2",
-            "/mnt/*/RPI-RP2",
-            "/Volumes/RPI-RP2",
-        ]
+
+        boot_paths = self._label_mount_patterns("RPI-RP2")
         
         for pattern in boot_paths:
             if '*' in pattern:
@@ -249,114 +349,231 @@ class RP2040Deployer:
             print("❌ Nie znaleziono pliku .uf2 w katalogu projektu")
             return False
         
-        # Użyj pierwszego znalezionego UF2 (najnowszego)
-        uf2_file = uf2_files[0]
+        # Preferuj oficjalny plik CircuitPython (en_US) zamiast lokalizacji
+        preferred_uf2 = None
+        official_uf2 = None
+        
+        for uf2_file in uf2_files:
+            if "circuitpython-waveshare_rp2040_one-en_US" in uf2_file.name:
+                official_uf2 = uf2_file
+            elif "circuitpython-waveshare_rp2040_one" in uf2_file.name and "en_US" not in uf2_file.name:
+                preferred_uf2 = uf2_file
+        
+        # Użyj oficjalnego pliku jeśli dostępny
+        uf2_file = official_uf2 or preferred_uf2 or uf2_files[0]
         print(f"📁 Używam: {uf2_file.name}")
         
+        # Sprawdź rozmiar pliku
+        file_size = uf2_file.stat().st_size
+        print(f"📏 Rozmiar: {file_size:,} bytes")
+        
+        # Wyodrębnij wersję z nazwy pliku
+        if "9.2.0" in uf2_file.name:
+            print("🔧 Wersja CircuitPython: 9.2.0 (oficjalna)")
+        elif "10.1.4" in uf2_file.name:
+            print("🔧 Wersja CircuitPython: 10.1.4 (polska)")
+            print("⚠️  Uwaga: polska wersja może mieć problemy z restartem")
+        else:
+            print("🔧 Wersja CircuitPython: nieznana")
+        
+        if file_size < 1000000 or file_size > 3000000:
+            print(f"⚠️  Podejrzany rozmiar pliku: {file_size:,} bytes")
+            print("   Powinien być ~1.7-2.0 MB dla CircuitPython RP2040")
+        
         try:
-            shutil.copy2(uf2_file, Path(device_path) / uf2_file.name)
-            print(f"✅ Skopiowano {uf2_file.name}")
-            print("⏳ Czekam na zrestartowanie do trybu CircuitPython...")
-            print("   (jeśli się nie zrestartuje, odłącz i podłącz ponownie RP2040)")
+            dest_path = Path(device_path) / uf2_file.name
+            print(f"📝 Kopiowanie {uf2_file.name} ({file_size:,} bytes)...")
+            written_size = self._copy_file_verified(uf2_file, dest_path, "UF2")
+            print("💾 Wymuszam zapis na urządzenie USB (sync)...")
+            self._sync_path(dest_path)
+            print(f"✅ Zapis zweryfikowany: {written_size:,} bytes")
             
-            # Czekaj na przełączenie do CIRCUITPY (max 60s)
-            for i in range(60):
-                time.sleep(1)
-                # Próbuj zamontować jeśli nie wykryte
-                if i % 5 == 0:
-                    circuitpy_devices = self.detect_circuitpy_devices()
-                else:
-                    # Szybkie sprawdzenie bez logowania
-                    circuitpy_devices = self._quick_check_circuitpy()
-                
-                if circuitpy_devices:
-                    print(f"✅ Wykryto CIRCUITPY po {i+1}s")
-                    return True
-                if i % 10 == 0 and i > 0:
-                    print(f"   ... czekam ({i}s)")
+            # Czekamy na pełne zakończenie zapisu USB
+            print("⏳ Czekam 5s na zakończenie zapisu USB...")
+            time.sleep(5)
             
-            print("⚠️ Timeout - urządzenie nie przeszło w tryb CircuitPython")
+            # Final sync przed zakończeniem
+            self._sync_path(dest_path)
             
-            # Diagnostyka - sprawdź czy urządzenie jest widoczne
-            print("\n🔍 DIAGNOSTYKA:")
-            self._diagnose_usb_device()
+            # Walidacja - sprawdź czy RP2040 odczytał plik UF2
+            print("🔍 Walidacja odczytu przez RP2040...")
+            time.sleep(2)  # Daj RP2040 czas na odczytanie
             
-            print("\n💡 Spróbuj: odłącz i podłącz ponownie RP2040, potem uruchom deploy")
+            # Sprawdź czy plik UF2 zniknął (dobry znak)
+            uf2_disappeared = False
+            if not dest_path.exists():
+                print("✅ Plik UF2 zniknął - RP2040 odczytał firmware")
+                uf2_disappeared = True
+            else:
+                print(f"⚠️ Plik UF2 nadal widoczny na RPI-RP2")
+                try:
+                    remaining_size = dest_path.stat().st_size
+                    print(f"   Rozmiar: {remaining_size:,} bytes")
+                except:
+                    pass
+            
+            print()
+            print("⏳ Czekam na restart RP2040 do trybu CircuitPython...")
+            print("   RP2040 powinien automatycznie się zrestartować po odczyciu UF2")
+            print()
+
+            if self._wait_for_circuitpy_after_flash(device_path, timeout=60):
+                return True
+
+            if uf2_disappeared:
+                print("⚠️ Timeout, ale plik UF2 zniknął")
+                print("💡 RP2040 odczytał firmware, ale system nie udostępnił jeszcze CIRCUITPY.")
+                print("   Spróbuj ponownie: make deploy")
+            else:
+                print("⚠️ Timeout - RP2040 nie zrestartował się")
+                print("💡 Wymagane działanie:")
+                print("   1. FIZYCZNIE odłącz kabel USB od RP2040")
+                print("   2. Poczekaj 3 sekundy")
+                print("   3. Podłącz ponownie (zwykłe podłączenie)")
+                print("   4. Uruchom: make deploy")
+                print()
+                print("🔍 Diagnostyka:")
+                self._diagnose_usb_device()
+            
             return False
             
         except Exception as e:
             print(f"❌ Błąd flashowania: {e}")
             return False
     
-    def _diagnose_usb_device(self):
-        """Diagnostyka widoczności urządzenia USB w systemie."""
-        # Sprawdź /dev/disk/by-label/
-        by_label = Path("/dev/disk/by-label/")
-        if by_label.exists():
-            labels = [l.name for l in by_label.iterdir()]
-            circuitpy_labels = [l for l in labels if "CIRCUIT" in l.upper()]
-            if circuitpy_labels:
-                print(f"   ✓ Znaleziono etykiety CIRCUITPY: {circuitpy_labels}")
-            else:
-                print(f"   ✗ Brak CIRCUITPY w /dev/disk/by-label/")
-                print(f"     Dostępne etykiety: {labels}")
-        else:
-            print("   ✗ Brak katalogu /dev/disk/by-label/")
-        
-        # Sprawdź lsusb dla RP2040
-        try:
-            result = subprocess.run(
-                ["lsusb"], capture_output=True, text=True, timeout=5
-            )
-            if result.returncode == 0:
-                lines = result.stdout.strip().split('\n')
-                rp2040_lines = [l for l in lines if any(x in l.lower() for x in 
-                    ['rp2040', 'pico', 'wave', '2e8a', '239a', '239b'])]
-                if rp2040_lines:
-                    print(f"   ✓ RP2040 widoczne w USB:")
-                    for line in rp2040_lines:
-                        print(f"     {line}")
-                else:
-                    print("   ✗ RP2040 NIE widoczne w lsusb")
-                    print(f"     Wszystkie urządzenia USB: {len(lines)}")
-        except (FileNotFoundError, subprocess.TimeoutExpired):
-            print("   ⚠️ Nie można uruchomić lsusb")
-        
-        # Sprawdź nowe urządzenia blokowe
-        try:
-            result = subprocess.run(
-                ["lsblk", "-f"], capture_output=True, text=True, timeout=5
-            )
-            if result.returncode == 0:
-                lines = result.stdout.strip().split('\n')
-                # Szukaj urządzeń FAT12/FAT16/FAT32 (typowe dla CIRCUITPY)
-                small_devices = [l for l in lines if any(fs in l for fs in 
-                    ['FAT12', 'FAT16', 'FAT32', 'CIRCUIT', 'RPI-RP2'])]
-                if small_devices:
-                    print(f"   ✓ Znaleziono urządzenia pamięci masowej:")
-                    for line in small_devices:
-                        print(f"     {line}")
-                else:
-                    print("   ✗ Brak nowych urządzeń pamięci masowej")
-        except (FileNotFoundError, subprocess.TimeoutExpired):
-            print("   ⚠️ Nie można uruchomić lsblk")
-    
     def _quick_check_circuitpy(self):
         """Szybkie sprawdzenie bez logowania - używane w pętli oczekiwania."""
-        direct_circuitpy = "/media/tom/CIRCUITPY"
-        if Path(direct_circuitpy).exists():
-            return [{'path': direct_circuitpy, 'name': 'CIRCUITPY'}]
-        
-        # Sprawdź czy jest niezamontowane urządzenie
-        by_label_path = Path("/dev/disk/by-label/")
-        if by_label_path.exists():
-            for link in by_label_path.iterdir():
-                if link.name.upper() == "CIRCUITPY":
-                    # Spróbuj zamontować
-                    mounted = self.mount_circuitpy_device()
-                    if mounted:
-                        return [{'path': mounted, 'name': 'CIRCUITPY'}]
+        for direct_circuitpy in self._find_mounted_label_paths("CIRCUITPY"):
+            if Path(direct_circuitpy).exists():
+                return [{'path': direct_circuitpy, 'name': 'CIRCUITPY'}]
+
+        if self._find_device_by_label("CIRCUITPY"):
+            mounted = self.mount_circuitpy_device()
+            if mounted:
+                return [{'path': mounted, 'name': 'CIRCUITPY'}]
         return []
+    
+    def _diagnose_usb_device(self):
+        """Diagnostyka urządzenia USB - sprawdza fizyczne połączenie."""
+        print("   Sprawdzanie połączenia USB...")
+        
+        # Sprawdź czy RP2040 jest widoczne na USB
+        try:
+            result = subprocess.run(
+                ["lsusb"], 
+                capture_output=True, 
+                text=True, 
+                timeout=5
+            )
+            
+            rp2040_found = False
+            for line in result.stdout.split('\n'):
+                if 'rp2040' in line.lower() or 'waveshare' in line.lower():
+                    print(f"   ✅ Znaleziono urządzenie USB: {line.strip()}")
+                    rp2040_found = True
+                elif 'circuitpython' in line.lower():
+                    print(f"   ✅ Znaleziono CircuitPython: {line.strip()}")
+                    rp2040_found = True
+                elif 'rpi-rp2' in line.lower():
+                    print(f"   ✅ Znaleziono RPI-RP2: {line.strip()}")
+                    rp2040_found = True
+            
+            if not rp2040_found:
+                print("   ❌ Nie znaleziono urządzenia RP2040/CircuitPython na USB")
+                print("   💡 Sprawdź:")
+                print("      - Czy kabel USB jest podłączony?")
+                print("      - Czy dioda na RP2040 świeci?")
+                print("      - Czy port USB działa (spróbuj inny port/kabel)?")
+                print("      - Czy RP2040 jest uszkodzone?")
+                
+                # Pokaż ostatnie urządzenia USB dla diagnostyki
+                print("\n   Ostatnie urządzenia USB:")
+                for line in result.stdout.split('\n')[-5:]:
+                    if line.strip():
+                        print(f"      {line.strip()}")
+        
+        except Exception as e:
+            print(f"   ⚠️ Błąd sprawdzania USB: {e}")
+        
+        # Sprawdź urządzenia blokowe
+        print("\n   Sprawdzanie urządzeń blokowych...")
+        try:
+            result = subprocess.run(
+                ["lsblk", "-f"], 
+                capture_output=True, 
+                text=True, 
+                timeout=5
+            )
+            
+            circuitpy_found = False
+            for line in result.stdout.split('\n'):
+                if 'circuitpy' in line.lower():
+                    print(f"   ✅ Znaleziono CIRCUITPY: {line.strip()}")
+                    circuitpy_found = True
+                elif 'rpi-rp2' in line.lower():
+                    print(f"   ✅ Znaleziono RPI-RP2: {line.strip()}")
+                    circuitpy_found = True
+            
+            if not circuitpy_found:
+                print("   ❌ Nie znaleziono CIRCUITPY/RPI-RP2 w systemie plików")
+                
+                # Sprawdź etykietyty dysków
+                try:
+                    label_result = subprocess.run(
+                        ["ls", "-la", "/dev/disk/by-label/"],
+                        capture_output=True,
+                        text=True,
+                        timeout=5
+                    )
+                    
+                    labels = []
+                    for line in label_result.stdout.split('\n'):
+                        if 'circuitpy' in line.lower() or 'rpi-rp2' in line.lower():
+                            labels.append(line.strip())
+                    
+                    if labels:
+                        print("   🔍 Znaleziono etykietyty (ale nie zamontowane):")
+                        for label in labels:
+                            print(f"      {label}")
+                    else:
+                        print("   ❌ Brak etykiet CIRCUITPY/RPI-RP2")
+                        
+                except Exception:
+                    pass
+        
+        except Exception as e:
+            print(f"   ⚠️ Błąd sprawdzania urządzeń blokowych: {e}")
+        
+        # Sprawdź procesy systemowe
+        print("\n   Sprawdzanie procesów systemowych...")
+        try:
+            result = subprocess.run(
+                ["ps", "aux"], 
+                capture_output=True, 
+                text=True, 
+                timeout=5
+            )
+            
+            usb_processes = []
+            for line in result.stdout.split('\n'):
+                if 'usb' in line.lower() and ('storage' in line.lower() or 'mount' in line.lower()):
+                    usb_processes.append(line.strip())
+            
+            if usb_processes:
+                print("   🔍 Procesy USB/storage:")
+                for proc in usb_processes[:3]:  # Pokaż max 3
+                    print(f"      {proc}")
+            else:
+                print("   ℹ️  Brak widocznych procesów USB/storage")
+        
+        except Exception:
+            pass
+        
+        print("\n   📋 PODSUMOWANIE DIAGNOZY:")
+        print("   1. Jeśli nie widzisz RP2040 w lsusb → problem fizyczny (kabel/port/urządzenie)")
+        print("   2. Jeśli widzisz RP2040 ale nie ma CIRCUITPY → problem z firmware")
+        print("   3. Jeśli widzisz RPI-RP2 → urządzenie w trybie BOOT, potrzebuje wgrania UF2")
+        print("   4. Jeśli widzisz CIRCUITPY ale nie jest zamontowane → problem z montowaniem")
     
     def is_circuitpy_device(self, path):
         """Sprawdź czy ścieżka to urządzenie CircuitPython."""
@@ -461,6 +678,7 @@ class RP2040Deployer:
         print(f"🚀 Deployment na: {device_path}")
         
         device_path = Path(device_path)
+        self._ensure_target_ready(device_path, 4096)
         
         # Synchronizuj konfigurację HAL przed deploymentem
         if self.config.get('SYNC_HAL_BEFORE_DEPLOY', 'true').lower() == 'true':
@@ -475,6 +693,7 @@ class RP2040Deployer:
         # Utwórz katalog lib jeśli nie istnieje
         lib_dir = device_path / "lib"
         lib_dir.mkdir(exist_ok=True)
+        self._sync_path(lib_dir)
         
         # Skopiuj biblioteki
         cache_dir = Path(self.config.get('LIBRARY_CACHE_DIR', './lib_cache'))
@@ -487,6 +706,7 @@ class RP2040Deployer:
                 if hid_dest.exists():
                     shutil.rmtree(hid_dest)
                 shutil.copytree(hid_files[0], hid_dest)
+                self._sync_path(hid_dest)
                 print(f"✓ Skopiowano adafruit_hid")
         
         # rotaryio jest wbudowane w CircuitPython, nie trzeba kopiować
@@ -512,13 +732,16 @@ class RP2040Deployer:
             generated_boot = BOOT_PY.strip()
             
             # Zapisz wygenerowane pliki
-            with open(device_path / "code.py", 'w') as f:
-                f.write(generated_code)
+            self._write_text_verified(device_path / "code.py", generated_code, "code.py")
             print(f"✓ Wygenerowano code.py z konfiguracji HAL")
             
-            with open(device_path / "boot.py", 'w') as f:
-                f.write(generated_boot)
+            self._write_text_verified(device_path / "boot.py", generated_boot, "boot.py")
             print(f"✓ Wygenerowano boot.py")
+            
+            # Wymusz zapis na dysk USB
+            self._sync_path(device_path / "boot.py")
+            self._sync_path(device_path / "code.py")
+            print(f"✓ Zsynchronizowano zapis na urządzenie")
             
         except Exception as e:
             print(f"⚠️ Błąd generowania firmware: {e}")
@@ -536,13 +759,15 @@ class RP2040Deployer:
                     start = boot_content.find("BOOT_PY = '''") + 12
                     end = boot_content.find("'''", start)
                     boot_code = boot_content[start:end]
-                    with open(device_path / "boot.py", 'w') as f:
-                        f.write(boot_code)
+                    self._write_text_verified(device_path / "boot.py", boot_code, "boot.py")
                     print(f"✓ Skopiowano boot.py")
             
             if code_src.exists():
-                shutil.copy2(code_src, device_path / "code.py")
+                self._copy_file_verified(code_src, device_path / "code.py", "code.py")
                 print(f"✓ Skopiowano code.py")
+
+            self._sync_path(device_path / "boot.py")
+            self._sync_path(device_path / "code.py")
         
         print(f"🎉 Deployment zakończony!")
         return True
@@ -591,14 +816,16 @@ class RP2040Deployer:
             
             for device in boot_devices:
                 print(f"🔥 Flashowanie {device['name']}...")
-                if self.flash_uf2(device['path']):
-                    print("✅ Firmware wgrany!")
+                flash_result = self.flash_uf2(device['path'])
+                if flash_result:
+                    # True = RP2040 zrestartował się do CIRCUITPY, kontynuuj deployment
+                    print("✅ Firmware wgrany i RP2040 zrestartowany!")
                     print()
-                    print("⏳ Czekam na zainicjalizowanie systemu plików CIRCUITPY...")
-                    time.sleep(3)  # Poczekaj na pełne zamontowanie
-                    print()
+                    # Nie kończ tutaj - kontynuuj do detekcji CIRCUITPY poniżej
+                    break
                 else:
-                    print("❌ Błąd flashowania")
+                    # False = wymaga fizycznego odłączenia lub błąd
+                    print("❌ Wymagane fizyczne odłączenie/podłączenie RP2040")
                     return False
         
         # Teraz sprawdź tryb CircuitPython
@@ -620,19 +847,16 @@ class RP2040Deployer:
                 print("🔍 DIAGNOSTYKA SYSTEMU:")
                 self._diagnose_usb_device()
             else:
-                # Był w trybie boot, został wgrany UF2, ale nie pojawił się CIRCUITPY
-                print("⚠️  Firmware wgrany, ale CIRCUITPY się nie pojawił")
+                # Był w trybie boot, został wgrany UF2 - to jest oczekiwane!
+                print("✅ Firmware wgrany pomyślnie!")
                 print()
-                print("🔍 DIAGNOSTYKA:")
-                self._diagnose_usb_device()
-                print()
-                print("💡 NASTĘPNY KROK (wymagany!):")
-                print("   Po wgraniu firmware UF2, RP2040 wymaga FIZYCZNEGO odłączenia:")
-                print()
-                print("   1. Odłącz kabel USB od RP2040")
+                print("🔧 WYMAGANE DZIAŁANIE:")
+                print("   1. FIZYCZNIE odłącz kabel USB od RP2040")
                 print("   2. Poczekaj 3 sekundy")
-                print("   3. Podłącz ponownie (zwykłe podłączenie, bez BOOT)")
+                print("   3. Podłącz ponownie (zwykłe podłączenie, BEZ trzymania BOOT)")
                 print("   4. Uruchom: make deploy")
+                print()
+                print("💡 RP2040 NIE restartuje automatycznie - wymaga fizycznego odłączenia!")
                 print()
             return False
         

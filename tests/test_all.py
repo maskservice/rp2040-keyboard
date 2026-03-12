@@ -146,8 +146,8 @@ def test_generate_code_basic(valid_config):
     assert "import board" in code
     assert "import digitalio" in code
     assert "import rotaryio" in code
-    assert "Keyboard()" in code
-    assert "Mouse()" in code
+    assert "Keyboard(usb_hid.devices)" in code
+    assert "Mouse(usb_hid.devices)" in code
 
 def test_generate_code_keys_section(valid_config):
     """Test sekcji konfiguracji przycisków."""
@@ -180,7 +180,7 @@ def test_generate_code_without_encoder():
     code = generate_code_py(config)
     assert "rotaryio" not in code
     assert "encoder" not in code
-    assert "mouse" in code  # Still imported for consistency
+    assert "Keyboard(usb_hid.devices)" in code
 
 def test_generate_code_syntax_valid(valid_config):
     """Test czy wygenerowany kod ma poprawną składnię Python."""
@@ -217,8 +217,8 @@ def test_boot_py_constant():
     assert isinstance(BOOT_PY, str)
     assert len(BOOT_PY) > 0
     assert "usb_hid" in BOOT_PY
-    assert "Keyboard" in BOOT_PY
-    assert "Mouse" in BOOT_PY
+    assert "KEYBOARD" in BOOT_PY
+    assert "MOUSE" in BOOT_PY
 
 # ============================================================================
 # TESTY INTEGRACYJNE

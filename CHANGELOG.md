@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.8] - 2026-03-12
+
+### Docs
+- Update FIRST_TIME_SETUP.md
+
+### Test
+- Update tests/test_all.py
+
+### Other
+- Update Makefile
+- Update adafruit-circuitpython-waveshare_rp2040_one-pl-10.1.4.uf2.backup
+- Update circuitpython-waveshare_rp2040_one-en_US-9.2.0.uf2
+- Update deploy.py
+- Update requirements.txt
+- Update rp2040_keyboard/firmware/boot_template.py
+- Update rp2040_keyboard/firmware/generator.py
+- Update rp2040_keyboard/web/app.py
+
 ## [0.0.7] - 2026-03-12
 
 ### Docs

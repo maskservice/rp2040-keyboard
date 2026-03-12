@@ -30,7 +30,7 @@ from ..hal_manager import HALConfigManager
 app = FastAPI(
     title="RP2040-One Keypad Configurator",
     description="Visual pin editor and code generator for RP2040-One HID keypad",
-    version="0.0.2"
+    version="0.0.6"
 )
 
 # ============================================================================

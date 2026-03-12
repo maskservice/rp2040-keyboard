@@ -87,24 +87,23 @@ def generate_code_py(config: PadConfig) -> str:
 import board
 import digitalio
 import time
-from adafruit_hid.keyboard import Keyboard'''
+import usb_hid
+from adafruit_hid.keyboard import Keyboard
+from adafruit_hid.keycode import Keycode'''
     
     if config.encoder:
         imports += '''
 import rotaryio
 from adafruit_hid.mouse import Mouse'''
-    else:
-        imports += '''
-from adafruit_hid.mouse import Mouse'''
     
     imports += '''
 
 # Inicjalizacja HID (boot.py już włączył urządzenia)
-keyboard = Keyboard()
+keyboard = Keyboard(usb_hid.devices)
 '''
     
     if config.encoder:
-        imports += '''mouse = Mouse()
+        imports += '''mouse = Mouse(usb_hid.devices)
 '''
     
     # Konfiguracja pinów przycisków
@@ -122,9 +121,6 @@ key_{i}_pin.pull = digitalio.Pull.UP
     if config.encoder:
         encoder_code = f'''
 # Enkoder obrotowy - zoptymalizowany debouncing
-import rotaryio
-import time
-
 encoder = rotaryio.IncrementalEncoder(board.GP{config.encoder.clk_gpio}, board.GP{config.encoder.dt_gpio})
 encoder_button = digitalio.DigitalInOut(board.GP{config.encoder.sw_gpio})
 encoder_button.direction = digitalio.Direction.INPUT
@@ -146,11 +142,12 @@ encoder_last_count = 0
 '''
     
     if config.keys:
-        main_loop += '''last_positions = [None] * len(key_pins)
+        main_loop += f'''last_positions = [None] * {len(config.keys)}
 '''
     
     if config.encoder:
-        main_loop += '''encoder_last_pos = encoder.position if 'encoder' in locals() else 0
+        main_loop += '''encoder_button_pressed = None
+encoder_last_pos = encoder.position
 '''
     
     main_loop += '''

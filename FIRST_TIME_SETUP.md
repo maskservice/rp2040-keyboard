@@ -123,7 +123,10 @@ make deploy
 
 ### Problem: Nie wykrywa urządzenia
 ```bash
-# Sprawdź fizycznie:
+# Automatyczna diagnostyka USB
+make deploy-diagnose
+
+# Lub ręcznie
 lsusb | grep -i rp2040
 ls /media/*/CIRCUITPY 2>/dev/null || echo "Brak CIRCUITPY"
 

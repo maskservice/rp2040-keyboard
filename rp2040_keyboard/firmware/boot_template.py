@@ -8,12 +8,11 @@ placed in the root directory of the CircuitPython drive.
 
 BOOT_PY = '''
 import usb_hid
-import time
-from adafruit_hid.keyboard import Keyboard
-from adafruit_hid.mouse import Mouse
 
-# Enable USB HID devices
-time.sleep(1)  # Wait for USB enumeration
-keyboard = Keyboard(usb_hid.devices)
-mouse = Mouse(usb_hid.devices)
+# Enable USB HID devices (keyboard + mouse + consumer control)
+usb_hid.enable(
+    (usb_hid.Device.KEYBOARD,
+     usb_hid.Device.MOUSE,
+     usb_hid.Device.CONSUMER_CONTROL)
+)
 '''

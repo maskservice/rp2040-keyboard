@@ -3,16 +3,16 @@
 # Softreck / Prototypowanie.pl
 # ============================================================================
 
-.PHONY: help install web dev test test-docker lint flash clean dist
+.PHONY: help install web dev test test-docker lint flash clean dist deploy deploy-monitor deploy-setup deploy-detect deploy-diagnose hal-sync hal-save hal-validate hal-show hal-profiles hal-apply hal-backup
 
-PYTHON       ?= python3
-PIP          ?= pip3
+PYTHON       ?= .venv/bin/python3
+PIP          ?= .venv/bin/pip3
 PORT         ?= 8080
 CIRCUITPY    ?= /media/$(USER)/CIRCUITPY
 UF2_URL      := https://downloads.circuitpython.org/bin/waveshare_rp2040_one/en_US/adafruit-circuitpython-waveshare_rp2040_one-en_US-9.2.0.uf2
 HID_BUNDLE   := https://github.com/adafruit/Adafruit_CircuitPython_Bundle/releases/latest
 DOCKER_IMG   := rp2040-keypad-test
-VERSION      := 1.0.0
+VERSION      := 0.0.6
 
 # ── Kolory ──────────────────────────────────────────────────────────────────
 C_GREEN  := \033[1;32m
@@ -37,9 +37,9 @@ help: ## Pokaż tę pomoc
 # ============================================================================
 
 install: ## Zainstaluj zależności Python (FastAPI, pytest, etc.)
-	$(PIP) install --break-system-packages -q \
+	$(PIP) install -q \
 		fastapi uvicorn jinja2 python-multipart \
-		pytest pytest-asyncio httpx aiofiles
+		pytest pytest-asyncio httpx aiofiles toml
 
 requirements.txt: ## Wygeneruj requirements.txt
 	@echo "fastapi>=0.110.0" > requirements.txt
@@ -47,6 +47,7 @@ requirements.txt: ## Wygeneruj requirements.txt
 	@echo "jinja2>=3.1.0" >> requirements.txt
 	@echo "python-multipart>=0.0.9" >> requirements.txt
 	@echo "aiofiles>=23.0" >> requirements.txt
+	@echo "toml>=0.10.2" >> requirements.txt
 	@echo "pytest>=8.0" >> requirements.txt
 	@echo "pytest-asyncio>=0.23" >> requirements.txt
 	@echo "httpx>=0.27" >> requirements.txt
@@ -151,51 +152,55 @@ clean: ## Wyczyść pliki tymczasowe
 # Deployment targets
 deploy: ## Deploy firmware to RP2040 device
 	@echo "🚀 Deploying to RP2040..."
-	python3 deploy.py deploy
+	$(PYTHON) deploy.py deploy
 
 deploy-monitor: ## Monitor for device connection and auto-deploy
 	@echo "👀 Monitoring for RP2040 device..."
-	python3 deploy.py monitor
+	$(PYTHON) deploy.py monitor
 
 deploy-setup: ## Download required libraries
 	@echo "📚 Setting up libraries..."
-	python3 deploy.py setup
+	$(PYTHON) deploy.py setup
 
 deploy-detect: ## Detect connected CircuitPython devices
 	@echo "🔍 Detecting devices..."
-	python3 deploy.py detect
+	$(PYTHON) deploy.py detect
+
+deploy-diagnose: ## Diagnose USB connection and device status
+	@echo "🔍 Diagnosing USB connection..."
+	$(PYTHON) -c "from deploy import RP2040Deployer; RP2040Deployer()._diagnose_usb_device()"
 
 # HAL Configuration targets
 hal-sync: ## Sync configuration from HAL files
 	@echo "🔄 Syncing from HAL..."
-	python3 -m rp2040_keyboard.hal_manager sync-from-hal
+	$(PYTHON) -m rp2040_keyboard.hal_manager sync-from-hal
 
 hal-save: ## Save current configuration to HAL files
 	@echo "💾 Saving to HAL..."
-	python3 -m rp2040_keyboard.hal_manager sync-to-hal
+	$(PYTHON) -m rp2040_keyboard.hal_manager sync-to-hal
 
 hal-validate: ## Validate HAL configuration
 	@echo "✅ Validating HAL..."
-	python3 -m rp2040_keyboard.hal_manager validate
+	$(PYTHON) -m rp2040_keyboard.hal_manager validate
 
 hal-show: ## Show current HAL configuration
 	@echo "📋 HAL Configuration:"
-	python3 -m rp2040_keyboard.hal_manager show
+	$(PYTHON) -m rp2040_keyboard.hal_manager show
 
 hal-profiles: ## List available HAL profiles
 	@echo "📋 HAL Profiles:"
-	python3 -m rp2040_keyboard.hal_manager profiles
+	$(PYTHON) -m rp2040_keyboard.hal_manager profiles
 
 hal-apply: ## Apply HAL profile (usage: make hal-apply PROFILE=default)
 	@if [ -n "$(PROFILE)" ]; then \
 		echo "🔄 Applying profile: $(PROFILE)"; \
-		python3 -m rp2040_keyboard.hal_manager apply-profile $(PROFILE); \
+		$(PYTHON) -m rp2040_keyboard.hal_manager apply-profile $(PROFILE); \
 	else \
 		echo "Usage: make hal-apply PROFILE=<profile_name>"; \
 		echo "Available profiles:"; \
-		python3 -m rp2040_keyboard.hal_manager profiles; \
+		$(PYTHON) -m rp2040_keyboard.hal_manager profiles; \
 	fi
 
 hal-backup: ## Create backup of current HAL configuration
 	@echo "💾 Creating HAL backup..."
-	python3 -m rp2040_keyboard.hal_manager backup
+	$(PYTHON) -m rp2040_keyboard.hal_manager backup
