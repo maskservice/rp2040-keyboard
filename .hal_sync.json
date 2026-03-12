@@ -1,7 +1,7 @@
 {
-  "last_hal_sync": "2026-03-12T18:48:30.753043",
-  "sync_direction": "firmware_to_hal",
-  "sync_time": "2026-03-12T18:48:30.753330",
+  "last_hal_sync": "2026-03-12T19:09:00.000000",
+  "sync_direction": "hal_to_firmware",
+  "sync_time": "2026-03-12T19:12:57.439781",
   "last_applied_profile": "default",
   "profile_applied_at": "2026-03-12T17:02:29.709666"
 }

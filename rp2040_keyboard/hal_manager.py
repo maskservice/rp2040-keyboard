@@ -25,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 class KeyConfig:
     gpio: int
     keycode: str
-    modifier: str = "Keycode.CONTROL"
+    modifier: str = "Keycode.CONTROL+Keycode.SHIFT"
     label: str = ""
 
 @dataclass 
@@ -51,7 +51,7 @@ class HALSwitchConfig:
     """Konfiguracja przełącznika w formacie HAL."""
     gpio: int
     keycode: str
-    modifier: str = "Keycode.CONTROL"
+    modifier: str = "Keycode.CONTROL+Keycode.SHIFT"
     label: str = ""
     pull: str = "up"
     debounce: int = 10
@@ -309,15 +309,15 @@ class HALConfigManager:
         
         # Użyj domyślnej konfiguracji
         default_keys = [
-            KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL", label="Ctrl+1"),
-            KeyConfig(gpio=2, keycode="Keycode.TWO", modifier="Keycode.CONTROL", label="Ctrl+2"),
-            KeyConfig(gpio=3, keycode="Keycode.THREE", modifier="Keycode.CONTROL", label="Ctrl+3"),
-            KeyConfig(gpio=4, keycode="Keycode.FOUR", modifier="Keycode.CONTROL", label="Ctrl+4"),
-            KeyConfig(gpio=5, keycode="Keycode.FIVE", modifier="Keycode.CONTROL", label="Ctrl+5"),
-            KeyConfig(gpio=6, keycode="Keycode.SIX", modifier="Keycode.CONTROL", label="Ctrl+6"),
-            KeyConfig(gpio=7, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL", label="Ctrl+7"),
-            KeyConfig(gpio=8, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL", label="Ctrl+8"),
-            KeyConfig(gpio=9, keycode="Keycode.NINE", modifier="Keycode.CONTROL", label="Ctrl+9"),
+            KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+1"),
+            KeyConfig(gpio=2, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+2"),
+            KeyConfig(gpio=3, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+3"),
+            KeyConfig(gpio=4, keycode="Keycode.FOUR", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+4"),
+            KeyConfig(gpio=5, keycode="Keycode.FIVE", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+5"),
+            KeyConfig(gpio=6, keycode="Keycode.SIX", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+6"),
+            KeyConfig(gpio=7, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+7"),
+            KeyConfig(gpio=8, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+8"),
+            KeyConfig(gpio=9, keycode="Keycode.NINE", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+9"),
         ]
         
         default_encoder = EncoderConfig(

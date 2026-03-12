@@ -13,15 +13,15 @@ description = "Standard 9-key layout with encoder"
 
 [switches]
 # Default switch configuration
-switch_1 = {gpio = 1, keycode = "Keycode.ONE", modifier = "Keycode.CONTROL", label = "Ctrl+1", pull = "up", debounce = 10}
-switch_2 = {gpio = 2, keycode = "Keycode.TWO", modifier = "Keycode.CONTROL", label = "Ctrl+2", pull = "up", debounce = 10}
-switch_3 = {gpio = 3, keycode = "Keycode.THREE", modifier = "Keycode.CONTROL", label = "Ctrl+3", pull = "up", debounce = 10}
-switch_4 = {gpio = 4, keycode = "Keycode.FOUR", modifier = "Keycode.CONTROL", label = "Ctrl+4", pull = "up", debounce = 10}
-switch_5 = {gpio = 5, keycode = "Keycode.FIVE", modifier = "Keycode.CONTROL", label = "Ctrl+5", pull = "up", debounce = 10}
-switch_6 = {gpio = 6, keycode = "Keycode.SIX", modifier = "Keycode.CONTROL", label = "Ctrl+6", pull = "up", debounce = 10}
-switch_7 = {gpio = 7, keycode = "Keycode.SEVEN", modifier = "Keycode.CONTROL", label = "Ctrl+7", pull = "up", debounce = 10}
-switch_8 = {gpio = 8, keycode = "Keycode.EIGHT", modifier = "Keycode.CONTROL", label = "Ctrl+8", pull = "up", debounce = 10}
-switch_9 = {gpio = 9, keycode = "Keycode.NINE", modifier = "Keycode.CONTROL", label = "Ctrl+9", pull = "up", debounce = 10}
+switch_1 = {gpio = 1, keycode = "Keycode.ONE", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+1", pull = "up", debounce = 10}
+switch_2 = {gpio = 2, keycode = "Keycode.TWO", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+2", pull = "up", debounce = 10}
+switch_3 = {gpio = 3, keycode = "Keycode.THREE", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+3", pull = "up", debounce = 10}
+switch_4 = {gpio = 4, keycode = "Keycode.FOUR", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+4", pull = "up", debounce = 10}
+switch_5 = {gpio = 5, keycode = "Keycode.FIVE", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+5", pull = "up", debounce = 10}
+switch_6 = {gpio = 6, keycode = "Keycode.SIX", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+6", pull = "up", debounce = 10}
+switch_7 = {gpio = 7, keycode = "Keycode.SEVEN", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+7", pull = "up", debounce = 10}
+switch_8 = {gpio = 8, keycode = "Keycode.EIGHT", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+8", pull = "up", debounce = 10}
+switch_9 = {gpio = 9, keycode = "Keycode.NINE", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+9", pull = "up", debounce = 10}
 
 [encoder]
 enabled = true

@@ -46,11 +46,13 @@ MODIFIERS = {
     "GUI": "Keycode.GUI",
 }
 
+VALID_MODIFIER_VALUES = set(MODIFIERS.values())
+
 @dataclass
 class KeyConfig:
     gpio: int
     keycode: str
-    modifier: str = "CTRL"
+    modifier: str = ""
     label: str = ""
 
 @dataclass 
@@ -78,6 +80,21 @@ class PadConfig:
         if data.get('encoder'):
             encoder = EncoderConfig(**data['encoder'])
         return cls(keys=keys, encoder=encoder)
+
+
+def normalize_modifiers(modifier: str | list[str] | tuple[str, ...] | None) -> list[str]:
+    if not modifier:
+        return []
+
+    if isinstance(modifier, (list, tuple)):
+        raw_modifiers = list(modifier)
+    else:
+        # Usuń "Keycode." jeśli istnieje, podziel po "+", a następnie dodaj z powrotem
+        cleaned = modifier.replace("Keycode.", "")
+        raw_modifiers = [f"Keycode.{part.strip()}" for part in cleaned.split("+") if part.strip()]
+
+    # Filtruj tylko prawidłowe modyfikatory
+    return [part for part in raw_modifiers if part in VALID_MODIFIER_VALUES]
 
 def generate_code_py(config: PadConfig) -> str:
     """Generuje plik code.py na podstawie konfiguracji."""
@@ -159,11 +176,13 @@ while True:
         main_loop += '''    # Obsługa przycisków
 '''
         for i, key in enumerate(config.keys, 1):
+            modifiers = normalize_modifiers(key.modifier)
+            press_args = ", ".join(modifiers + [key.keycode]) if modifiers else key.keycode
             main_loop += f'''
     if not key_{i}_pin.value and last_positions[{i-1}] is None:
-        keyboard.press({key.modifier}, {key.keycode})
+        keyboard.press({press_args})
         time.sleep(0.1)  # Debounce
-        keyboard.release({key.modifier}, {key.keycode})
+        keyboard.release({press_args})
         last_positions[{i-1}] = False
     elif key_{i}_pin.value and last_positions[{i-1}] is False:
         last_positions[{i-1}] = None
@@ -239,5 +258,7 @@ __all__ = [
     "EncoderConfig",
     "KEYCODES",
     "MODIFIERS",
+    "VALID_MODIFIER_VALUES",
+    "normalize_modifiers",
     "AVAILABLE_GPIOS",
 ]

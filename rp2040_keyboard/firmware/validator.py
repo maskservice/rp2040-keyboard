@@ -5,7 +5,7 @@ Configuration validator for RP2040-One HID Keypad
 Validates GPIO conflicts and parameter ranges.
 """
 
-from .generator import AVAILABLE_GPIOS, KEYCODES, MODIFIERS, PadConfig
+from .generator import AVAILABLE_GPIOS, KEYCODES, VALID_MODIFIER_VALUES, PadConfig, normalize_modifiers
 
 def validate_config(config: PadConfig) -> tuple[bool, list[str]]:
     """Waliduje konfigurację pod kątem konfliktów GPIO i poprawności parametrów."""
@@ -24,8 +24,9 @@ def validate_config(config: PadConfig) -> tuple[bool, list[str]]:
         if key.keycode not in KEYCODES.values():
             errors.append(f"Nieznany keycode: {key.keycode}")
             
-        if key.modifier not in MODIFIERS.values():
-            errors.append(f"Nieznany modifier: {key.modifier}")
+        invalid_modifiers = [modifier for modifier in normalize_modifiers(key.modifier) if modifier not in VALID_MODIFIER_VALUES]
+        if invalid_modifiers:
+            errors.append(f"Nieznany modifier: {', '.join(invalid_modifiers)}")
     
     # Sprawdź enkoder
     if config.encoder:

@@ -35,9 +35,9 @@ from rp2040_keyboard.firmware import (
 def valid_config():
     """Poprawna konfiguracja testowa."""
     keys = [
-        KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL"),
-        KeyConfig(gpio=2, keycode="Keycode.TWO", modifier="Keycode.CONTROL"),
-        KeyConfig(gpio=3, keycode="Keycode.THREE", modifier="Keycode.CONTROL"),
+        KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.SHIFT"),
+        KeyConfig(gpio=2, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.SHIFT"),
+        KeyConfig(gpio=3, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.SHIFT"),
     ]
     encoder = EncoderConfig(clk_gpio=9, dt_gpio=10, sw_gpio=11, scroll_speed=2, debounce_ms=3)
     return PadConfig(keys=keys, encoder=encoder)
@@ -46,9 +46,9 @@ def valid_config():
 def invalid_config():
     """Niepoprawna konfiguracja testowa (konflikty GPIO)."""
     keys = [
-        KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL"),
-        KeyConfig(gpio=1, keycode="Keycode.TWO", modifier="Keycode.CONTROL"),  # Konflikt
-        KeyConfig(gpio=50, keycode="Keycode.THREE", modifier="Keycode.CONTROL"),  # Nieprawidłowy GPIO
+        KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.SHIFT"),
+        KeyConfig(gpio=1, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.SHIFT"),  # Konflikt
+        KeyConfig(gpio=50, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.SHIFT"),  # Nieprawidłowy GPIO
     ]
     return PadConfig(keys=keys, encoder=None)
 
@@ -74,10 +74,10 @@ def test_pad_config_from_dict(valid_config):
 
 def test_key_config_creation():
     """Test tworzenia KeyConfig."""
-    key = KeyConfig(gpio=5, keycode="Keycode.A", modifier="Keycode.ALT")
+    key = KeyConfig(gpio=5, keycode="Keycode.A", modifier="Keycode.CONTROL+Keycode.SHIFT")
     assert key.gpio == 5
     assert key.keycode == "Keycode.A"
-    assert key.modifier == "Keycode.ALT"
+    assert key.modifier == "Keycode.CONTROL+Keycode.SHIFT"
 
 def test_encoder_config_creation():
     """Test tworzenia EncoderConfig."""
@@ -108,7 +108,7 @@ def test_validate_invalid_config(invalid_config):
 
 def test_validate_encoder_gpio_conflicts():
     """Test konfliktów GPIO w enkoderze."""
-    keys = [KeyConfig(gpio=9, keycode="Keycode.ONE", modifier="Keycode.CONTROL")]
+    keys = [KeyConfig(gpio=9, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.SHIFT")]
     encoder = EncoderConfig(clk_gpio=9, dt_gpio=10, sw_gpio=11, debounce_ms=3)  # Konflikt z przyciskiem
     config = PadConfig(keys=keys, encoder=encoder)
     
@@ -156,6 +156,7 @@ def test_generate_code_keys_section(valid_config):
     assert "key_2_pin = digitalio.DigitalInOut(board.GP2)" in code
     assert "key_3_pin = digitalio.DigitalInOut(board.GP3)" in code
     assert "digitalio.Pull.UP" in code
+    assert "keyboard.press(Keycode.CONTROL, Keycode.SHIFT, Keycode.ONE)" in code
 
 def test_generate_code_encoder_section(valid_config):
     """Test sekcji konfiguracji enkodera."""
@@ -174,7 +175,7 @@ def test_generate_code_main_loop(valid_config):
 
 def test_generate_code_without_encoder():
     """Test generacji kodu bez enkodera."""
-    keys = [KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL")]
+    keys = [KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.SHIFT")]
     config = PadConfig(keys=keys, encoder=None)
     
     code = generate_code_py(config)
@@ -273,7 +274,7 @@ def test_maximum_keys_configuration():
     keycodes = ["Keycode.ONE", "Keycode.TWO", "Keycode.THREE", "Keycode.FOUR", 
                 "Keycode.FIVE", "Keycode.SIX", "Keycode.SEVEN", "Keycode.EIGHT", "Keycode.NINE"]
     for i, (gpio, keycode) in enumerate(zip([1, 2, 3, 4, 5, 6, 7, 8, 29], keycodes), 1):
-        keys.append(KeyConfig(gpio=gpio, keycode=keycode, modifier="Keycode.CONTROL"))
+        keys.append(KeyConfig(gpio=gpio, keycode=keycode, modifier="Keycode.CONTROL+Keycode.SHIFT"))
     
     config = PadConfig(keys=keys, encoder=None)
     is_valid, errors = validate_config(config)
@@ -288,7 +289,7 @@ def test_maximum_keys_configuration():
 
 def test_minimum_configuration():
     """Test minimalnej konfiguracji (jeden przycisk)."""
-    keys = [KeyConfig(gpio=1, keycode="Keycode.A", modifier="Keycode.CONTROL")]
+    keys = [KeyConfig(gpio=1, keycode="Keycode.A", modifier="Keycode.CONTROL+Keycode.SHIFT")]
     config = PadConfig(keys=keys, encoder=None)
     
     is_valid, errors = validate_config(config)
@@ -347,7 +348,7 @@ def test_validation_performance():
     # Duża konfiguracja
     keys = []
     for i in range(20):  # Więcej niż maksymalna liczba, aby testować walidację
-        keys.append(KeyConfig(gpio=i, keycode="Keycode.A", modifier="Keycode.CONTROL"))
+        keys.append(KeyConfig(gpio=i, keycode="Keycode.A", modifier="Keycode.CONTROL+Keycode.SHIFT"))
     
     config = PadConfig(keys=keys, encoder=None)
     
@@ -448,7 +449,7 @@ async def test_api_keycodes():
 def test_regression_gpio_range_check():
     """Test regresji - sprawdzanie zakresu GPIO."""
     # Test z GPIO poza zakresem
-    keys = [KeyConfig(gpio=100, keycode="Keycode.A", modifier="Keycode.CONTROL")]
+    keys = [KeyConfig(gpio=100, keycode="Keycode.A", modifier="Keycode.CONTROL+Keycode.SHIFT")]
     config = PadConfig(keys=keys, encoder=None)
     
     is_valid, errors = validate_config(config)

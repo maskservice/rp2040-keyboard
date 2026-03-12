@@ -21,7 +21,7 @@ Projekt makro-klawiatury 9-przyciskowej z enkoderem obrotowym opartej na **Waves
 
 | Element | Funkcja | Akcja HID |
 |---------|---------|-----------|
-| 9 przycisków switch | Skróty klawiaturowe | Ctrl+1, Ctrl+2, ... Ctrl+9 |
+| 9 przycisków switch | Skróty klawiaturowe | Ctrl+Shift+1, Ctrl+Shift+2, ... Ctrl+Shift+9 |
 | Enkoder — obrót CW | Scroll w górę | Mouse wheel up |
 | Enkoder — obrót CCW | Scroll w dół | Mouse wheel down |
 | Enkoder — wciśnięcie | **Lewy klik myszy** | Mouse left button |
@@ -369,15 +369,15 @@ sudo dmesg | tail -20
 
 | Przycisk | GPIO | Akcja | Typowe zastosowanie |
 |----------|------|-------|---------------------|
-| 1 | GP1 | Ctrl+1 | Zakładka 1 w przeglądarce |
-| 2 | GP2 | Ctrl+2 | Zakładka 2 |
-| 3 | GP3 | Ctrl+3 | Zakładka 3 |
-| 4 | GP4 | Ctrl+4 | Zakładka 4 |
-| 5 | GP5 | Ctrl+5 | Zakładka 5 |
-| 6 | GP6 | Ctrl+6 | Zakładka 6 |
-| 7 | GP7 | Ctrl+7 | Zakładka 7 |
-| 8 | GP8 | Ctrl+8 | Zakładka 8 |
-| 9 | GP29 | Ctrl+9 | Ostatnia zakładka |
+| 1 | GP1 | Ctrl+Shift+1 | Globalne makro 1 |
+| 2 | GP2 | Ctrl+Shift+2 | Globalne makro 2 |
+| 3 | GP3 | Ctrl+Shift+3 | Globalne makro 3 |
+| 4 | GP4 | Ctrl+Shift+4 | Globalne makro 4 |
+| 5 | GP5 | Ctrl+Shift+5 | Globalne makro 5 |
+| 6 | GP6 | Ctrl+Shift+6 | Globalne makro 6 |
+| 7 | GP7 | Ctrl+Shift+7 | Globalne makro 7 |
+| 8 | GP8 | Ctrl+Shift+8 | Globalne makro 8 |
+| 9 | GP9 | Ctrl+Shift+9 | Globalne makro 9 |
 
 | Enkoder | GPIO | Akcja |
 |---------|------|-------|
@@ -399,10 +399,12 @@ KEY_PINS = [
 ]
 ```
 
-Aby zmienić modyfikator (np. Alt zamiast Ctrl), zmień linię w pętli głównej:
+Aktualne domyślne mapowanie używa `Ctrl+Shift+1..9`, aby ograniczyć kolizje z typowymi skrótami przeglądarki.
+
+Aby zmienić modyfikator (np. Alt zamiast Ctrl+Shift), zmień linię w pętli głównej:
 
 ```python
-# Zamień Ctrl na Alt:
+# Zamień Ctrl+Shift na Alt:
 keyboard.press(Keycode.ALT, key['keycode'])
 # ...
 keyboard.release(Keycode.ALT, key['keycode'])

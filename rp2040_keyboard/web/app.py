@@ -92,15 +92,15 @@ async def get_default_config():
         print(f"⚠️ Błąd HAL, używam domyślnej konfiguracji: {e}")
         # Fallback do domyślnej konfiguracji
     default_keys = [
-        KeyConfig(gpio=1, keycode="Keycode.F1", modifier="", label="F1"),
-        KeyConfig(gpio=2, keycode="Keycode.F2", modifier="", label="F2"),
-        KeyConfig(gpio=3, keycode="Keycode.F3", modifier="", label="F3"),
-        KeyConfig(gpio=4, keycode="Keycode.F4", modifier="", label="F4"),
-        KeyConfig(gpio=5, keycode="Keycode.F5", modifier="", label="F5"),
-        KeyConfig(gpio=6, keycode="Keycode.F6", modifier="", label="F6"),
-        KeyConfig(gpio=7, keycode="Keycode.F7", modifier="", label="F7"),
-        KeyConfig(gpio=8, keycode="Keycode.F8", modifier="", label="F8"),
-        KeyConfig(gpio=9, keycode="Keycode.F9", modifier="", label="F9"),  # Zmiana z GP29 na GP9
+        KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+1"),
+        KeyConfig(gpio=2, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+2"),
+        KeyConfig(gpio=3, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+3"),
+        KeyConfig(gpio=4, keycode="Keycode.FOUR", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+4"),
+        KeyConfig(gpio=5, keycode="Keycode.FIVE", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+5"),
+        KeyConfig(gpio=6, keycode="Keycode.SIX", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+6"),
+        KeyConfig(gpio=7, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+7"),
+        KeyConfig(gpio=8, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+8"),
+        KeyConfig(gpio=9, keycode="Keycode.NINE", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+9"),
     ]
     
     default_encoder = EncoderConfig(
@@ -227,10 +227,21 @@ HTML_RESPONSE = '''
         /* Test Section */
         .test-area { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
         .test-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 400px; margin: 20px auto; }
-        .test-key { padding: 30px; border: 2px solid #007bff; border-radius: 8px; text-align: center; cursor: pointer; background: white; transition: all 0.2s; }
+        .test-key { padding: 30px; border: 2px solid #007bff; border-radius: 8px; text-align: center; cursor: pointer; background: white; transition: all 0.2s; position: relative; }
         .test-key:hover { background: #e3f2fd; }
         .test-key:active { background: #007bff; color: white; }
+        .test-key.pressed { background: #28a745; color: white; border-color: #28a745; transform: scale(0.95); }
+        .test-key .status { position: absolute; top: 5px; right: 5px; font-size: 10px; background: rgba(0,0,0,0.1); padding: 2px 4px; border-radius: 3px; }
+        .test-key .timing { position: absolute; bottom: 5px; left: 5px; right: 5px; font-size: 9px; text-align: center; opacity: 0.8; }
         .test-encoder { margin-top: 20px; padding: 20px; border: 2px dashed #28a745; border-radius: 8px; text-align: center; }
+        .test-log { background: #f8f9fa; padding: 15px; border-radius: 4px; margin: 20px 0; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; }
+        .test-log .log-entry { margin: 2px 0; padding: 2px 5px; border-radius: 2px; }
+        .test-log .press { background: #d4edda; color: #155724; }
+        .test-log .release { background: #f8d7da; color: #721c24; }
+        .test-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 20px 0; }
+        .test-stat { background: #e9ecef; padding: 10px; border-radius: 4px; text-align: center; }
+        .test-stat .value { font-size: 18px; font-weight: bold; color: #007bff; }
+        .test-stat .label { font-size: 12px; color: #666; }
         
         /* Status indicators */
         .status { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
@@ -279,15 +290,15 @@ HTML_RESPONSE = '''
                 <h3>Przyciski (9 sztuk) → Emulacja klawiatury</h3>
                 <table class="pin-table">
                     <tr><th>Przycisk</th><th>GPIO</th><th>Akcja</th><th>Opis</th></tr>
-                    <tr><td>Btn 1</td><td>GP1</td><td>F1</td><td>Klawisz funkcyjny F1</td></tr>
-                    <tr><td>Btn 2</td><td>GP2</td><td>F2</td><td>Klawisz funkcyjny F2</td></tr>
-                    <tr><td>Btn 3</td><td>GP3</td><td>F3</td><td>Klawisz funkcyjny F3</td></tr>
-                    <tr><td>Btn 4</td><td>GP4</td><td>F4</td><td>Klawisz funkcyjny F4</td></tr>
-                    <tr><td>Btn 5</td><td>GP5</td><td>F5</td><td>Klawisz funkcyjny F5</td></tr>
-                    <tr><td>Btn 6</td><td>GP6</td><td>F6</td><td>Klawisz funkcyjny F6</td></tr>
-                    <tr><td>Btn 7</td><td>GP7</td><td>F7</td><td>Klawisz funkcyjny F7</td></tr>
-                    <tr><td>Btn 8</td><td>GP8</td><td>F8</td><td>Klawisz funkcyjny F8</td></tr>
-                    <tr><td>Btn 9</td><td>GP9</td><td>F9</td><td>Klawisz funkcyjny F9</td></tr>
+                    <tr><td>Btn 1</td><td>GP1</td><td>Ctrl+Shift+1</td><td>Globalne makro 1</td></tr>
+                    <tr><td>Btn 2</td><td>GP2</td><td>Ctrl+Shift+2</td><td>Globalne makro 2</td></tr>
+                    <tr><td>Btn 3</td><td>GP3</td><td>Ctrl+Shift+3</td><td>Globalne makro 3</td></tr>
+                    <tr><td>Btn 4</td><td>GP4</td><td>Ctrl+Shift+4</td><td>Globalne makro 4</td></tr>
+                    <tr><td>Btn 5</td><td>GP5</td><td>Ctrl+Shift+5</td><td>Globalne makro 5</td></tr>
+                    <tr><td>Btn 6</td><td>GP6</td><td>Ctrl+Shift+6</td><td>Globalne makro 6</td></tr>
+                    <tr><td>Btn 7</td><td>GP7</td><td>Ctrl+Shift+7</td><td>Globalne makro 7</td></tr>
+                    <tr><td>Btn 8</td><td>GP8</td><td>Ctrl+Shift+8</td><td>Globalne makro 8</td></tr>
+                    <tr><td>Btn 9</td><td>GP9</td><td>Ctrl+Shift+9</td><td>Globalne makro 9</td></tr>
                 </table>
                 
                 <h3>Enkoder obrotowy (KY-040) → Emulacja myszki</h3>
@@ -346,18 +357,41 @@ HTML_RESPONSE = '''
         <div id="test" class="tab-content">
             <div class="test-area">
                 <h2>🧪 Testowanie klawiszy</h2>
-                <p>Kliknij przyciski poniżej aby przetestować działanie (wymaga połączenia z RP2040):</p>
+                <p>Wykrywanie naciśnięć klawiszy RP2040 w czasie rzeczywistym:</p>
+                
+                <div class="test-stats">
+                    <div class="test-stat">
+                        <div class="value" id="totalPresses">0</div>
+                        <div class="label">Liczba naciśnięć</div>
+                    </div>
+                    <div class="test-stat">
+                        <div class="value" id="avgDuration">0ms</div>
+                        <div class="label">Średni czas trwania</div>
+                    </div>
+                    <div class="test-stat">
+                        <div class="value" id="lastReaction">0ms</div>
+                        <div class="label">Ostatni czas reakcji</div>
+                    </div>
+                    <div class="test-stat">
+                        <div class="value" id="activeKeys">0</div>
+                        <div class="label">Aktywne klawisze</div>
+                    </div>
+                </div>
                 
                 <div class="test-grid">
-                    <div class="test-key" onclick="testKey(1)">1<br><small>F1</small></div>
-                    <div class="test-key" onclick="testKey(2)">2<br><small>F2</small></div>
-                    <div class="test-key" onclick="testKey(3)">3<br><small>F3</small></div>
-                    <div class="test-key" onclick="testKey(4)">4<br><small>F4</small></div>
-                    <div class="test-key" onclick="testKey(5)">5<br><small>F5</small></div>
-                    <div class="test-key" onclick="testKey(6)">6<br><small>F6</small></div>
-                    <div class="test-key" onclick="testKey(7)">7<br><small>F7</small></div>
-                    <div class="test-key" onclick="testKey(8)">8<br><small>F8</small></div>
-                    <div class="test-key" onclick="testKey(9)">9<br><small>F9</small></div>
+                    <div class="test-key" data-key="1">1<br><small>Ctrl+Shift+1</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="2">2<br><small>Ctrl+Shift+2</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="3">3<br><small>Ctrl+Shift+3</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="4">4<br><small>Ctrl+Shift+4</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="5">5<br><small>Ctrl+Shift+5</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="6">6<br><small>Ctrl+Shift+6</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="7">7<br><small>Ctrl+Shift+7</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="8">8<br><small>Ctrl+Shift+8</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="9">9<br><small>Ctrl+Shift+9</small><div class="status"></div><div class="timing"></div></div>
+                </div>
+                
+                <div class="test-log" id="testLog">
+                    <div style="text-align: center; color: #666;">Oczekiwanie na naciśnięcia klawiszy...</div>
                 </div>
                 
                 <div class="test-encoder">
@@ -368,6 +402,9 @@ HTML_RESPONSE = '''
                 
                 <div class="info" style="margin-top: 20px;">
                     <strong>ℹ️ Uwaga:</strong> Testowanie wymaga podłączonego urządzenia RP2040 z wgranym firmware.
+                    <br><strong>ℹ️ Zmiana:</strong> Klawisze używają teraz mapowania Ctrl+Shift+1..9 dla makr globalnych.
+                    <br><strong>💡 Podpowiedź:</strong> Taki układ ogranicza kolizje z typowymi skrótami przeglądarki opartymi o same cyfry i klawisze funkcyjne.
+                    <br><strong>🔧 Tryb testu:</strong> Symuluje wykrywanie naciśnięć - kliknij klawisz aby przetestować wizualizację.
                 </div>
             </div>
         </div>
@@ -378,7 +415,7 @@ HTML_RESPONSE = '''
         let generatedCode = '';
         let generatedBoot = '';
         const KEYCODES = ['ONE','TWO','THREE','FOUR','FIVE','SIX','SEVEN','EIGHT','NINE','ZERO','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','ENTER','SPACE','TAB','ESCAPE','BACKSPACE','DELETE','UP_ARROW','DOWN_ARROW','LEFT_ARROW','RIGHT_ARROW','HOME','END','PAGE_UP','PAGE_DOWN'];
-        const MODIFIERS = ['CONTROL', 'ALT', 'SHIFT', 'GUI'];
+        const MODIFIERS = ['CONTROL', 'SHIFT', 'CONTROL+SHIFT', 'ALT', 'GUI'];
 
         function showTab(evt, tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -442,7 +479,7 @@ HTML_RESPONSE = '''
                         <label>Modyfikator:</label>
                         <select id="key-${index}-modifier" onchange="updateConfig(${index})">
                             <option value="">Brak</option>
-                            ${MODIFIERS.map(m => `<option value="Keycode.${m}" ${key.modifier === `Keycode.${m}` ? 'selected' : ''}>${m}</option>`).join('')}
+                            ${MODIFIERS.map(m => `<option value="${m.split('+').map(part => `Keycode.${part}`).join('+')}" ${key.modifier === m.split('+').map(part => `Keycode.${part}`).join('+') ? 'selected' : ''}>${m}</option>`).join('')}
                         </select>
                     </div>
                     <div class="form-group">

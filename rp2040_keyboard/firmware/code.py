@@ -1,11 +1,11 @@
 """
 RP2040-One HID Keypad + Encoder Mouse
 ======================================
-9 klawiszy (Ctrl+1..Ctrl+9) + enkoder obrotowy (scroll myszki + middle-click)
+9 klawiszy (Ctrl+Shift+1..Ctrl+Shift+9) + enkoder obrotowy (scroll myszki + middle-click)
 
 Hardware:
-  - Waveshare RP2040-One
-  - 9x switch buttons → GP1-GP8, GP29
+  - Waveshare RP2040-One / RP2040-Zero
+  - 9x switch buttons → GP1-GP9
   - 1x rotary encoder z przyciskiem → GP11 (CLK), GP12 (DT), GP13 (SW)
 
 Firmware: CircuitPython 9.x + adafruit_hid
@@ -25,17 +25,17 @@ from adafruit_hid.mouse import Mouse
 # KONFIGURACJA PINÓW
 # =============================================================================
 
-# Mapowanie klawiszy: (pin GPIO, klawisz numeryczny dla Ctrl+N)
+# Mapowanie klawiszy: (pin GPIO, klawisz numeryczny dla Ctrl+Shift+N)
 KEY_PINS = [
-    (board.GP1, Keycode.ONE),       # Przycisk 1 → Ctrl+1
-    (board.GP2, Keycode.TWO),       # Przycisk 2 → Ctrl+2
-    (board.GP3, Keycode.THREE),     # Przycisk 3 → Ctrl+3
-    (board.GP4, Keycode.FOUR),      # Przycisk 4 → Ctrl+4
-    (board.GP5, Keycode.FIVE),      # Przycisk 5 → Ctrl+5
-    (board.GP6, Keycode.SIX),       # Przycisk 6 → Ctrl+6
-    (board.GP7, Keycode.SEVEN),     # Przycisk 7 → Ctrl+7
-    (board.GP8, Keycode.EIGHT),     # Przycisk 8 → Ctrl+8
-    (board.GP29, Keycode.NINE),     # Przycisk 9 → Ctrl+9
+    (board.GP1, Keycode.ONE),       # Przycisk 1 → Ctrl+Shift+1
+    (board.GP2, Keycode.TWO),       # Przycisk 2 → Ctrl+Shift+2
+    (board.GP3, Keycode.THREE),     # Przycisk 3 → Ctrl+Shift+3
+    (board.GP4, Keycode.FOUR),      # Przycisk 4 → Ctrl+Shift+4
+    (board.GP5, Keycode.FIVE),      # Przycisk 5 → Ctrl+Shift+5
+    (board.GP6, Keycode.SIX),       # Przycisk 6 → Ctrl+Shift+6
+    (board.GP7, Keycode.SEVEN),     # Przycisk 7 → Ctrl+Shift+7
+    (board.GP8, Keycode.EIGHT),     # Przycisk 8 → Ctrl+Shift+8
+    (board.GP9, Keycode.NINE),      # Przycisk 9 → Ctrl+Shift+9
 ]
 
 # Enkoder obrotowy
@@ -95,14 +95,14 @@ encoder_sw_last_change = 0
 # GŁÓWNA PĘTLA
 # =============================================================================
 
-print("RP2040-One HID Keypad + Mouse aktywny!")
-print(f"Klawisze: 9x (Ctrl+1..Ctrl+9)")
+print("RP2040 HID Keypad + Mouse aktywny!")
+print(f"Klawisze: 9x (Ctrl+Shift+1..Ctrl+Shift+9)")
 print(f"Enkoder: scroll góra/dół + middle-click")
 
 while True:
     now = time.monotonic() * 1000  # Czas w ms
 
-    # --- Obsługa 9 klawiszy (Ctrl+1..Ctrl+9) ---
+    # --- Obsługa 9 klawiszy (Ctrl+Shift+1..Ctrl+Shift+9) ---
     for key in keys:
         current = key['pin'].value  # False = wciśnięty (zwarte do GND)
 
@@ -112,9 +112,9 @@ while True:
                 key['last_state'] = current
 
                 if not current:  # Wciśnięcie (falling edge)
-                    keyboard.press(Keycode.CONTROL, key['keycode'])
+                    keyboard.press(Keycode.CONTROL, Keycode.SHIFT, key['keycode'])
                 else:            # Zwolnienie (rising edge)
-                    keyboard.release(Keycode.CONTROL, key['keycode'])
+                    keyboard.release(Keycode.CONTROL, Keycode.SHIFT, key['keycode'])
 
     # --- Obsługa enkodera obrotowego (scroll myszki) ---
     clk_val = encoder_clk.value

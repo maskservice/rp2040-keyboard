@@ -20,9 +20,9 @@ SHUTDOWN_TIMEOUT = 10.0
 def valid_payload():
     return {
         "keys": [
-            {"gpio": 1, "keycode": "Keycode.ONE", "modifier": "Keycode.CONTROL", "label": "Ctrl+1"},
-            {"gpio": 2, "keycode": "Keycode.TWO", "modifier": "Keycode.CONTROL", "label": "Ctrl+2"},
-            {"gpio": 3, "keycode": "Keycode.THREE", "modifier": "Keycode.CONTROL", "label": "Ctrl+3"},
+            {"gpio": 1, "keycode": "Keycode.ONE", "modifier": "Keycode.CONTROL+Keycode.SHIFT", "label": "Ctrl+Shift+1"},
+            {"gpio": 2, "keycode": "Keycode.TWO", "modifier": "Keycode.CONTROL+Keycode.SHIFT", "label": "Ctrl+Shift+2"},
+            {"gpio": 3, "keycode": "Keycode.THREE", "modifier": "Keycode.CONTROL+Keycode.SHIFT", "label": "Ctrl+Shift+3"},
         ],
         "encoder": {
             "clk_gpio": 9,
@@ -39,16 +39,15 @@ def valid_payload():
 def invalid_payload():
     return {
         "keys": [
-            {"gpio": 1, "keycode": "Keycode.ONE", "modifier": "Keycode.CONTROL", "label": "Ctrl+1"},
-            {"gpio": 1, "keycode": "Keycode.TWO", "modifier": "Keycode.CONTROL", "label": "Ctrl+2"},
-            {"gpio": 50, "keycode": "Keycode.THREE", "modifier": "Keycode.CONTROL", "label": "Ctrl+3"},
+            {"gpio": 1, "keycode": "Keycode.ONE", "modifier": "Keycode.CONTROL+Keycode.SHIFT", "label": "Ctrl+Shift+1"},
+            {"gpio": 1, "keycode": "Keycode.TWO", "modifier": "Keycode.CONTROL+Keycode.SHIFT", "label": "Ctrl+Shift+2"},
+            {"gpio": 50, "keycode": "Keycode.THREE", "modifier": "Keycode.CONTROL+Keycode.SHIFT", "label": "Ctrl+Shift+3"},
         ],
         "encoder": None,
     }
 
 
-@pytest.fixture(scope="session")
-def free_port():
+def find_free_port():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.bind((HOST, 0))
         sock.listen(1)
@@ -128,8 +127,8 @@ class UvicornServer:
 
 
 @pytest.fixture(scope="module")
-def web_server(free_port):
-    server = UvicornServer(port=free_port, reload_enabled=False).start()
+def web_server():
+    server = UvicornServer(port=find_free_port(), reload_enabled=False).start()
     try:
         yield server.base_url
     finally:
@@ -137,8 +136,8 @@ def web_server(free_port):
 
 
 @pytest.fixture(scope="module")
-def dev_server(free_port):
-    server = UvicornServer(port=free_port + 1, reload_enabled=True).start()
+def dev_server():
+    server = UvicornServer(port=find_free_port(), reload_enabled=True).start()
     try:
         yield server.base_url
     finally:
