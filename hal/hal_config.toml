@@ -1,0 +1,63 @@
+# RP2040-One HAL Configuration
+# ===========================
+# Hardware Abstraction Layer - konfiguracja sprzętowa
+# Format typowy dla systemów embedded/elektronicznych
+
+[device]
+name = "RP2040-One-Keypad"
+version = "1.0"
+description = "9-key keypad with rotary encoder"
+created = "2026-03-12"
+modified = "2026-03-12"
+
+[pins]
+# Dostępne piny GPIO na RP2040-One
+available = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+
+[switches]
+# Konfiguracja przełączników
+# Format: switch_<id> = {gpio, keycode, modifier, label, pull, debounce}
+switch_1 = {gpio = 1, keycode = "Keycode.ONE", modifier = "Keycode.CONTROL", label = "Ctrl+1", pull = "up", debounce = 10}
+switch_2 = {gpio = 2, keycode = "Keycode.TWO", modifier = "Keycode.CONTROL", label = "Ctrl+2", pull = "up", debounce = 10}
+switch_3 = {gpio = 3, keycode = "Keycode.THREE", modifier = "Keycode.CONTROL", label = "Ctrl+3", pull = "up", debounce = 10}
+switch_4 = {gpio = 4, keycode = "Keycode.FOUR", modifier = "Keycode.CONTROL", label = "Ctrl+4", pull = "up", debounce = 10}
+switch_5 = {gpio = 5, keycode = "Keycode.FIVE", modifier = "Keycode.CONTROL", label = "Ctrl+5", pull = "up", debounce = 10}
+switch_6 = {gpio = 6, keycode = "Keycode.SIX", modifier = "Keycode.CONTROL", label = "Ctrl+6", pull = "up", debounce = 10}
+switch_7 = {gpio = 7, keycode = "Keycode.SEVEN", modifier = "Keycode.CONTROL", label = "Ctrl+7", pull = "up", debounce = 10}
+switch_8 = {gpio = 8, keycode = "Keycode.EIGHT", modifier = "Keycode.CONTROL", label = "Ctrl+8", pull = "up", debounce = 10}
+switch_9 = {gpio = 9, keycode = "Keycode.NINE", modifier = "Keycode.CONTROL", label = "Ctrl+9", pull = "up", debounce = 10}
+
+[encoder]
+# Konfiguracja enkodera obrotowego
+enabled = true
+clk_gpio = 11
+dt_gpio = 12
+sw_gpio = 13
+pull = "up"              # Pull-up dla CLK i DT
+debounce = 3            # Debounce w ms
+scroll_speed = 2
+middle_click = true
+steps_per_revolution = 24
+
+[hardware]
+# Ustawienia sprzętowe
+vcc = 3.3
+logic_level = "3.3V"
+max_current = 50         # mA na pin
+encoder_type = "incremental"
+switch_type = "tactile"
+
+[timing]
+# Czasy w milisekundach
+debounce_switch = 10
+debounce_encoder = 3
+scan_interval = 1
+debounce_button = 10
+
+[features]
+# Włączone funkcje
+keyboard_enabled = true
+mouse_enabled = true
+encoder_scroll = true
+encoder_middle_click = true
+debounce_enabled = true

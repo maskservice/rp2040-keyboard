@@ -6,7 +6,7 @@ RP2040-One HID Keypad + Encoder Mouse
 Hardware:
   - Waveshare RP2040-One
   - 9x switch buttons → GP1-GP8, GP29
-  - 1x rotary encoder z przyciskiem → GP9 (CLK), GP10 (DT), GP11 (SW)
+  - 1x rotary encoder z przyciskiem → GP11 (CLK), GP12 (DT), GP13 (SW)
 
 Firmware: CircuitPython 9.x + adafruit_hid
 
@@ -39,9 +39,9 @@ KEY_PINS = [
 ]
 
 # Enkoder obrotowy
-ENCODER_CLK_PIN = board.GP9    # Encoder A (CLK)
-ENCODER_DT_PIN = board.GP10   # Encoder B (DT)
-ENCODER_SW_PIN = board.GP11   # Encoder push button (SW)
+ENCODER_CLK_PIN = board.GP11    # Encoder A (CLK)
+ENCODER_DT_PIN = board.GP12   # Encoder B (DT)
+ENCODER_SW_PIN = board.GP13   # Encoder push button (SW)
 
 # Parametry scroll
 SCROLL_SPEED = 2              # Ilość kroków scrolla na tick enkodera

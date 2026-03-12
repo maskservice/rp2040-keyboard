@@ -147,4 +147,37 @@ clean: ## Wyczyść pliki tymczasowe
 	rm -rf __pycache__ .pytest_cache tests/__pycache__
 	rm -rf web/__pycache__ output/ dist/
 	rm -f firmware.uf2
-	@echo "$(C_GREEN)✓ Czysto$(C_RESET)"
+
+# Deployment targets
+deploy: ## Deploy firmware to RP2040 device
+	@echo "🚀 Deploying to RP2040..."
+	python3 deploy.py deploy
+
+deploy-monitor: ## Monitor for device connection and auto-deploy
+	@echo "👀 Monitoring for RP2040 device..."
+	python3 deploy.py monitor
+
+deploy-setup: ## Download required libraries
+	@echo "📚 Setting up libraries..."
+	python3 deploy.py setup
+
+deploy-detect: ## Detect connected CircuitPython devices
+	@echo "🔍 Detecting devices..."
+	python3 deploy.py detect
+
+# HAL Configuration targets
+hal-sync: ## Sync configuration from HAL files
+	@echo "🔄 Syncing from HAL..."
+	python3 hal_manager.py sync-from-hal
+
+hal-save: ## Save current configuration to HAL files
+	@echo "💾 Saving to HAL..."
+	python3 hal_manager.py sync-to-hal
+
+hal-validate: ## Validate HAL configuration
+	@echo "✅ Validating HAL..."
+	python3 hal_manager.py validate
+
+hal-show: ## Show current HAL configuration
+	@echo "📋 HAL Configuration:"
+	python3 hal_manager.py show

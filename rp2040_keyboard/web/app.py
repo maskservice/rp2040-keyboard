@@ -20,6 +20,9 @@ from ..firmware import (
     KEYCODES, MODIFIERS, AVAILABLE_GPIOS
 )
 
+# Import HAL manager
+from ..hal_manager import HALConfigManager
+
 # ============================================================================
 # APLIKACJA FASTAPI
 # ============================================================================
@@ -80,7 +83,14 @@ async def generate_code_endpoint(config: dict):
 
 @app.get("/api/default")
 async def get_default_config():
-    """Zwraca domyślną konfigurację."""
+    """Zwraca domyślną konfigurację z HAL lub standardową."""
+    hal_manager = HALConfigManager()
+    try:
+        config = hal_manager.get_current_config()
+        return config.to_dict()
+    except Exception as e:
+        print(f"⚠️ Błąd HAL, używam domyślnej konfiguracji: {e}")
+        # Fallback do domyślnej konfiguracji
     default_keys = [
         KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL", label="Ctrl+1"),
         KeyConfig(gpio=2, keycode="Keycode.TWO", modifier="Keycode.CONTROL", label="Ctrl+2"),
@@ -104,6 +114,45 @@ async def get_default_config():
     
     config = PadConfig(keys=default_keys, encoder=default_encoder)
     return config.to_dict()
+
+@app.get("/api/hal/sync")
+async def sync_hal_config(direction: str = "from-hal"):
+    """Synchronizuj konfigurację HAL."""
+    hal_manager = HALConfigManager()
+    try:
+        if direction == "from-hal":
+            config = hal_manager.sync_from_hal()
+            return {
+                "success": True,
+                "message": "Zsynchronizowano z HAL",
+                "config": config.to_dict()
+            }
+        elif direction == "to-hal":
+            # Pobierz aktualną konfigurację i zapisz do HAL
+            config = hal_manager.get_current_config()
+            hal_manager.sync_to_hal(config)
+            return {
+                "success": True,
+                "message": "Zapisano do HAL"
+            }
+        else:
+            return {"success": False, "message": "Nieprawidłowy kierunek"}
+    except Exception as e:
+        return {"success": False, "message": str(e)}
+
+@app.get("/api/hal/validate")
+async def validate_hal_config():
+    """Waliduj konfigurację HAL."""
+    hal_manager = HALConfigManager()
+    try:
+        hal_config = hal_manager.load_hal_config()
+        is_valid, errors = hal_manager.validate_hal_config(hal_config)
+        return {
+            "valid": is_valid,
+            "errors": errors
+        }
+    except Exception as e:
+        return {"valid": False, "errors": [str(e)]}
 
 def create_app():
     """Create and configure FastAPI application."""

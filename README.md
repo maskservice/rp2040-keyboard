@@ -19,6 +19,36 @@ Projekt makro-klawiatury 9-przyciskowej z enkoderem obrotowym opartej na Wavesha
 
 ---
 
+## 🚀 Auto-Deployment System
+
+Automatyczny system pobierania bibliotek i deploymentu firmware na RP2040-One:
+
+### Szybki start
+```bash
+# Podłącz RP2040-One i uruchom
+make deploy
+
+# Lub monitoruj w tle (auto-deployment przy podłączeniu)
+make deploy-monitor
+```
+
+### Funkcje
+- ✅ **Automatyczne pobieranie** bibliotek `adafruit_hid`
+- ✅ **Detekcja urządzeń** CircuitPython 
+- ✅ **Auto-deployment** firmware przy podłączeniu
+- ✅ **Backup** istniejących plików
+- ✅ **Monitorowanie** w tle
+
+### Konfiguracja
+```bash
+cp .env.example .env  # Dostosuj ustawienia
+make deploy-setup     # Pobierz biblioteki (jednorazowo)
+```
+
+**Szczegóły:** zobacz [DEPLOYMENT.md](DEPLOYMENT.md)
+
+---
+
 ## Sprzęt
 
 ### Waveshare RP2040-One

@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.5] - 2026-03-12
+
+### Docs
+- Update DEPLOYMENT.md
+- Update README.md
+- Update hal/README.md
+
+### Other
+- Update .hal_sync.json
+- Update Makefile
+- Update auto-deploy.sh
+- Update boot-monitor.py
+- Update deploy.py
+- Update firmware/boot.py
+- Update firmware/code.py
+- Update hal/hal_config.toml
+- Update hal/hardware_pins.toml
+- Update hal_manager.py
+- ... and 2 more files
+
 ## [0.0.4] - 2026-03-12
 
 ### Docs

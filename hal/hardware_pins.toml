@@ -1,0 +1,92 @@
+# RP2040-One Hardware Pin Mapping
+# ===============================
+# Szczegółowy mapping pinów dla elektroniki
+# Format typowy dla dokumentacji sprzętowej
+
+# Pin Configuration Matrix
+# =======================
+
+[global]
+vcc = 3.3V
+gnd = 0V
+max_gpio_voltage = 3.3V
+total_gpio_count = 29
+
+[pin_mapping]
+# Physical pin → GPIO mapping dla RP2040-One
+# Format: pin_<physical> = {gpio, function, description}
+
+# Edge connector pins
+pin_1 = {gpio = 1, function = "digital", description = "Switch 1 input", pull = "up"}
+pin_2 = {gpio = 2, function = "digital", description = "Switch 2 input", pull = "up"}
+pin_3 = {gpio = 3, function = "digital", description = "Switch 3 input", pull = "up"}
+pin_4 = {gpio = 4, function = "digital", description = "Switch 4 input", pull = "up"}
+pin_5 = {gpio = 5, function = "digital", description = "Switch 5 input", pull = "up"}
+pin_6 = {gpio = 6, function = "digital", description = "Switch 6 input", pull = "up"}
+pin_7 = {gpio = 7, function = "digital", description = "Switch 7 input", pull = "up"}
+pin_8 = {gpio = 8, function = "digital", description = "Switch 8 input", pull = "up"}
+pin_9 = {gpio = 9, function = "digital", description = "Switch 9 input", pull = "up"}
+
+# Encoder pins
+pin_11 = {gpio = 11, function = "encoder_clk", description = "Encoder CLK (A)", pull = "up"}
+pin_12 = {gpio = 12, function = "encoder_dt", description = "Encoder DT (B)", pull = "up"}
+pin_13 = {gpio = 13, function = "encoder_sw", description = "Encoder switch", pull = "up"}
+
+# Available pins for expansion
+pin_14 = {gpio = 14, function = "free", description = "Available GPIO"}
+pin_15 = {gpio = 15, function = "free", description = "Available GPIO"}
+pin_16 = {gpio = 16, function = "free", description = "Available GPIO"}
+pin_17 = {gpio = 17, function = "free", description = "Available GPIO"}
+pin_18 = {gpio = 18, function = "free", description = "Available GPIO"}
+pin_19 = {gpio = 19, function = "free", description = "Available GPIO"}
+pin_20 = {gpio = 20, function = "free", description = "Available GPIO"}
+
+# Power and control pins
+pin_23 = {gpio = 23, function = "power", description = "Power control"}
+pin_24 = {gpio = 24, function = "led", description = "Status LED"}
+pin_25 = {gpio = 25, function = "led", description = "Onboard LED"}
+
+[switch_matrix]
+# Konfiguracja macierzy przełączników
+rows = 1
+columns = 9
+diodes_required = false
+scanning_method = "direct"
+
+[encoder_specification]
+# Specyfikacja enkodera
+type = "incremental_quadrature"
+pulses_per_revolution = 24
+detent = true
+switch_type = "tactile"
+voltage_rating = "5V@10mA"
+contact_resistance = "<100mΩ"
+life_cycles = "100,000"
+
+[switch_specification]
+# Specyfikacja przełączników
+type = "tactile_momentary"
+actuation_force = "2.0N ± 0.5N"
+travel_distance = "2.0mm ± 0.3mm"
+rating = "50mA @ 30VDC"
+life_cycles = "100,000"
+contact_resistance = "<50mΩ"
+
+[electrical_characteristics]
+# Charakterystyki elektryczne
+input_voltage_high = "2.0V min"
+input_voltage_low = "0.8V max"
+output_voltage_high = "3.0V min"
+output_voltage_low = "0.6V max"
+pullup_resistance = "50kΩ typ"
+pulldown_resistance = "50kΩ typ"
+
+[pcb_layout]
+# Zalecenia PCB
+trace_width = "0.2mm min"
+via_size = "0.6mm"
+clearance = "0.15mm"
+solder_mask = "green"
+silkscreen = "white"
+pcb_thickness = "1.6mm"
+copper_thickness = "1oz (35μm)"

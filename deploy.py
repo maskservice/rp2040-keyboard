@@ -11,16 +11,22 @@ import time
 import json
 import shutil
 import zipfile
-import requests
+import urllib.request
 import subprocess
 from pathlib import Path
 from datetime import datetime
+
+# Dodaj ścieżkę do projektu
+sys.path.insert(0, str(Path(__file__).parent))
+
+from hal_manager import HALConfigManager
 
 class RP2040Deployer:
     def __init__(self):
         self.project_root = Path(__file__).parent
         self.env_file = self.project_root / ".env"
         self.config = self.load_config()
+        self.hal_manager = HALConfigManager(self.project_root)
         
     def load_config(self):
         """Wczytaj konfigurację z .env pliku."""
@@ -53,29 +59,66 @@ class RP2040Deployer:
             os.path.expanduser("~/Desktop/"),  # macOS/Windows
         ]
         
+        # Dodaj bezpośrednie sprawdzenie /media/tom/CIRCUITPY
+        direct_paths = [
+            "/media/tom/CIRCUITPY",
+            "/media/*/CIRCUITPY",
+            "/mnt/*/CIRCUITPY",
+        ]
+        
+        # Sprawdź bezpośrednie ścieżki
+        for pattern in direct_paths:
+            if '*' in pattern:
+                # Użyj glob dla wzorców
+                from glob import glob
+                for path in glob(pattern):
+                    if self.is_circuitpy_device(Path(path)):
+                        devices.append({
+                            'path': path,
+                            'name': Path(path).name,
+                            'detected_at': datetime.now().isoformat()
+                        })
+            else:
+                if self.is_circuitpy_device(Path(pattern)):
+                    devices.append({
+                        'path': pattern,
+                        'name': Path(pattern).name,
+                        'detected_at': datetime.now().isoformat()
+                    })
+        
+        # Sprawdź standardowe mount points
         for mount_point in mount_points:
             if os.path.exists(mount_point):
-                for item in os.listdir(mount_point):
-                    item_path = Path(mount_point) / item
-                    if item_path.is_dir():
-                        # Sprawdź czy to urządzenie CircuitPython
-                        if self.is_circuitpy_device(item_path):
-                            devices.append({
-                                'path': str(item_path),
-                                'name': item,
-                                'detected_at': datetime.now().isoformat()
-                            })
+                try:
+                    for item in os.listdir(mount_point):
+                        item_path = Path(mount_point) / item
+                        if item_path.is_dir():
+                            # Sprawdź czy to urządzenie CircuitPython
+                            if self.is_circuitpy_device(item_path):
+                                devices.append({
+                                    'path': str(item_path),
+                                    'name': item,
+                                    'detected_at': datetime.now().isoformat()
+                                })
+                except PermissionError:
+                    # Pomiń katalogi do których nie mamy dostępu
+                    continue
+                except Exception:
+                    continue
         
         # Sprawdź też w /Volumes dla macOS
         if os.path.exists("/Volumes"):
-            for item in os.listdir("/Volumes"):
-                item_path = Path("/Volumes") / item
-                if item_path.is_dir() and self.is_circuitpy_device(item_path):
-                    devices.append({
-                        'path': str(item_path),
-                        'name': item,
-                        'detected_at': datetime.now().isoformat()
-                    })
+            try:
+                for item in os.listdir("/Volumes"):
+                    item_path = Path("/Volumes") / item
+                    if item_path.is_dir() and self.is_circuitpy_device(item_path):
+                        devices.append({
+                            'path': str(item_path),
+                            'name': item,
+                            'detected_at': datetime.now().isoformat()
+                        })
+            except Exception:
+                pass
         
         return devices
     
@@ -87,6 +130,16 @@ class RP2040Deployer:
             code_py = path / "code.py"
             boot_py = path / "boot.py"
             lib_dir = path / "lib"
+            boot_out_txt = path / "boot_out.txt"
+            
+            # Jeśli istnieje boot_out.txt z CircuitPython - to pewne
+            if boot_out_txt.exists():
+                try:
+                    content = boot_out_txt.read_text().lower()
+                    if "circuitpython" in content:
+                        return True
+                except:
+                    pass
             
             # Jeśli istnieje code.py lub boot.py, to prawdopodobnie CircuitPython
             if code_py.exists() or boot_py.exists():
@@ -111,13 +164,14 @@ class RP2040Deployer:
         print(f"📥 Pobieranie: {url}")
         
         try:
-            response = requests.get(url)
-            response.raise_for_status()
+            # Pobierz plik używając urllib
+            with urllib.request.urlopen(url) as response:
+                zip_data = response.read()
             
             # Zapisz zip
             zip_path = extract_to / "temp.zip"
             with open(zip_path, 'wb') as f:
-                f.write(response.content)
+                f.write(zip_data)
             
             # Rozpakuj
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
@@ -143,8 +197,7 @@ class RP2040Deployer:
         libraries = {
             'hid': self.config.get('HID_LIBRARY_URL', 
                 'https://github.com/adafruit/Adafruit_CircuitPython_HID/archive/refs/heads/main.zip'),
-            'rotaryio': self.config.get('ROTARYIO_LIBRARY_URL',
-                'https://github.com/adafruit/Adafruit_CircuitPython_RotaryIO/archive/refs/heads/main.zip')
+            # rotaryio jest wbudowane w CircuitPython, nie trzeba pobierać
         }
         
         for lib_name, url in libraries.items():
@@ -163,6 +216,16 @@ class RP2040Deployer:
         
         device_path = Path(device_path)
         
+        # Synchronizuj konfigurację HAL przed deploymentem
+        if self.config.get('SYNC_HAL_BEFORE_DEPLOY', 'true').lower() == 'true':
+            print("🔄 Synchronizacja konfiguracji HAL...")
+            try:
+                config = self.hal_manager.get_current_config()
+                self.hal_manager.sync_to_hal(config)
+                print("✅ Konfiguracja HAL zsynchronizowana")
+            except Exception as e:
+                print(f"⚠️ Błąd synchronizacji HAL: {e}")
+        
         # Utwórz katalog lib jeśli nie istnieje
         lib_dir = device_path / "lib"
         lib_dir.mkdir(exist_ok=True)
@@ -180,18 +243,11 @@ class RP2040Deployer:
                 shutil.copytree(hid_files[0], hid_dest)
                 print(f"✓ Skopiowano adafruit_hid")
         
-        if (cache_dir / "rotaryio").exists():
-            rotary_src = cache_dir / "rotaryio"
-            rotary_files = list(rotary_src.glob("Adafruit_CircuitPython_RotaryIO-*/adafruit_rotaryio"))
-            if rotary_files:
-                rotary_dest = lib_dir / "adafruit_rotaryio"
-                if rotary_dest.exists():
-                    shutil.rmtree(rotary_dest)
-                shutil.copytree(rotary_files[0], rotary_dest)
-                print(f"✓ Skopiowano adafruit_rotaryio")
+        # rotaryio jest wbudowane w CircuitPython, nie trzeba kopiować
+        print(f"✓ rotaryio jest wbudowane w CircuitPython")
         
         # Skopiuj firmware
-        firmware_dir = self.project_root / "firmware"
+        firmware_dir = self.project_root / "rp2040_keyboard" / "firmware"
         
         # Backup istniejących plików
         if self.config.get('BACKUP_EXISTING_FILES', 'true').lower() == 'true':
