@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.3] - 2026-03-12
+
+### Test
+- Update tests/test_all.py
+
+### Other
+- Update rp2040_keyboard/__init__.py
+- Update rp2040_keyboard/firmware/__init__.py
+- Update rp2040_keyboard/firmware/boot.py
+- Update rp2040_keyboard/firmware/boot_template.py
+- Update rp2040_keyboard/firmware/code.py
+- Update rp2040_keyboard/firmware/generator.py
+- Update rp2040_keyboard/firmware/validator.py
+- Update rp2040_keyboard/web/__init__.py
+- Update rp2040_keyboard/web/app.py
+- Update web/app.py
+
 ## [0.0.2] - 2026-03-12
 
 ### Docs

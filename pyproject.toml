@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rp2040-keyboard"
+version = "0.0.3"
+description = "Complete solution for RP2040-One based USB HID keypad with rotary encoder"
+readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    {name = "Tom Sapletta", email = "tom@sapletta.com"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Embedded Systems",
+    "Topic :: System :: Hardware",
+]
+keywords = ["rp2040", "circuitpython", "hid", "keypad", "encoder", "usb"]
+requires-python = ">=3.8"
+
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.29.0",
+    "jinja2>=3.1.0",
+    "python-multipart>=0.0.9",
+    "aiofiles>=23.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "httpx>=0.27",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "httpx>=0.27",
+    "black>=23.0",
+    "ruff>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/maskservice/rp2040-keyboard"
+Repository = "https://github.com/maskservice/rp2040-keyboard.git"
+Issues = "https://github.com/maskservice/rp2040-keyboard/issues"
+
+[project.scripts]
+rp2040-keyboard-web = "rp2040_keyboard.web.app:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rp2040_keyboard*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.black]
+line-length = 100
+target-version = ['py38']
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+select = ["E", "F", "W", "I", "N", "B", "C90"]
