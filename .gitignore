@@ -1,3 +1,24 @@
+.idea
+session.json
+screenshots/
+fixPI/.env
+fixPI/.venv/
+/logs
+logs/
+.zip
+Cargo.lock
+backups/
+frontend/playwright-report/
+frontend/test-results/
+venv
+frontend/.lint-backup
+node_modules
+package-lock.json
+# package-lock.json is committed for reproducible Docker builds (npm ci)
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

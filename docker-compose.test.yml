@@ -1,0 +1,29 @@
+services:
+  # Web configurator service
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Test runner — uruchamia się PO web
+  tests:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.test
+    depends_on:
+      web:
+        condition: service_healthy
+    environment:
+      - TEST_BASE_URL=http://web:8080
+    command: >
+      python -m pytest tests/ -v --tb=short -x
+      --junitxml=/app/output/test-results.xml
+    volumes:
+      - ../output:/app/output
