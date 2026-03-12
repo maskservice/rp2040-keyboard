@@ -108,7 +108,7 @@ async def get_default_config():
         dt_gpio=12,       # WE B = GP12  
         sw_gpio=13,       # PUSH = GP13
         scroll_speed=2,
-        middle_click=True,
+        middle_click=False,  # Zmienione na left click
         debounce_ms=3  # Debouncing inspirowane Arduino
     )
     

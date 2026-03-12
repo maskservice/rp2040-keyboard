@@ -8,7 +8,9 @@ Synchronizacja z plikami TOML i generowanie konfiguracji dla firmware.
 
 import os
 import sys
+import time
 import json
+import shutil
 import toml
 from pathlib import Path
 from datetime import datetime
@@ -71,10 +73,18 @@ class HALConfigManager:
     """Menadżer konfiguracji HAL."""
     
     def __init__(self, project_root: Optional[Path] = None):
-        self.project_root = project_root or Path(__file__).parent
-        self.hal_config_file = self.project_root / "hal_config.toml"
-        self.hardware_pins_file = self.project_root / "hardware_pins.toml"
+        self.project_root = project_root or Path(__file__).parent.parent
+        self.hal_dir = self.project_root / "hal"
+        self.hal_config_file = self.hal_dir / "hal_config.toml"
+        self.hardware_pins_file = self.hal_dir / "hardware_pins.toml"
+        self.profiles_dir = self.hal_dir / "profiles"
+        self.backups_dir = self.hal_dir / "backups"
         self.sync_file = self.project_root / ".hal_sync.json"
+        
+        # Upewnij się że katalogi istnieją
+        self.hal_dir.mkdir(exist_ok=True)
+        self.profiles_dir.mkdir(exist_ok=True)
+        self.backups_dir.mkdir(exist_ok=True)
         
     def load_hal_config(self) -> Dict[str, Any]:
         """Wczytaj konfigurację HAL z pliku TOML."""
@@ -355,6 +365,104 @@ class HALConfigManager:
                     errors.append(f"GPIO {gpio} enkodera koliduje z innym pinem")
         
         return len(errors) == 0, errors
+    
+    def list_profiles(self) -> List[str]:
+        """Lista dostępnych profili HAL."""
+        if not self.profiles_dir.exists():
+            return []
+        
+        profiles = []
+        for file in self.profiles_dir.glob("*.toml"):
+            profiles.append(file.stem)
+        
+        return sorted(profiles)
+    
+    def load_profile(self, profile_name: str) -> Dict[str, Any]:
+        """Wczytaj profil HAL."""
+        profile_file = self.profiles_dir / f"{profile_name}.toml"
+        
+        if not profile_file.exists():
+            raise FileNotFoundError(f"Profile {profile_name} not found")
+        
+        try:
+            with open(profile_file, 'r', encoding='utf-8') as f:
+                return toml.load(f)
+        except Exception as e:
+            raise ValueError(f"Error loading profile {profile_name}: {e}")
+    
+    def save_profile(self, profile_name: str, config: Dict[str, Any]):
+        """Zapisz profil HAL."""
+        profile_file = self.profiles_dir / f"{profile_name}.toml"
+        
+        try:
+            with open(profile_file, 'w', encoding='utf-8') as f:
+                toml.dump(config, f)
+            print(f"✅ Zapisano profil {profile_name}")
+        except Exception as e:
+            print(f"❌ Błąd zapisu profilu {profile_name}: {e}")
+    
+    def apply_profile(self, profile_name: str):
+        """Zastosuj profil HAL."""
+        print(f"🔄 Applying profile: {profile_name}")
+        
+        # Backup current config
+        backup_file = self.backups_dir / f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.toml"
+        if self.hal_config_file.exists():
+            shutil.copy2(self.hal_config_file, backup_file)
+            print(f"✅ Backup zapisany: {backup_file.name}")
+        
+        # Load and apply profile
+        profile_config = self.load_profile(profile_name)
+        
+        # Merge with base config if specified
+        if "base" in profile_config:
+            base_file = self.hal_dir / profile_config["base"]
+            if base_file.exists():
+                base_config = self.load_hal_config()
+                # Deep merge profile over base
+                merged_config = self.merge_configs(base_config, profile_config)
+                profile_config = merged_config
+        
+        # Save as current config
+        self.save_hal_config(profile_config)
+        
+        # Update sync state
+        sync_state = self.load_sync_state()
+        sync_state["last_applied_profile"] = profile_name
+        sync_state["profile_applied_at"] = datetime.now().isoformat()
+        self.save_sync_state(sync_state)
+        
+        print(f"✅ Profil {profile_name} zastosowany")
+    
+    def merge_configs(self, base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
+        """Głębokie scalanie konfiguracji."""
+        result = base.copy()
+        
+        for key, value in override.items():
+            if key == "base":
+                continue  # Skip base reference
+            
+            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+                result[key] = self.merge_configs(result[key], value)
+            else:
+                result[key] = value
+        
+        return result
+    
+    def create_backup(self, name: Optional[str] = None):
+        """Stwórz backup aktualnej konfiguracji HAL."""
+        if not name:
+            name = f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        backup_file = self.backups_dir / f"{name}.toml"
+        
+        if self.hal_config_file.exists():
+            shutil.copy2(self.hal_config_file, backup_file)
+            print(f"✅ Backup utworzony: {backup_file}")
+        else:
+            print(f"⚠️ Brak pliku konfiguracyjnego do backupu")
+        
+        return backup_file
 
 def main():
     """Main entry point."""
@@ -387,12 +495,34 @@ def main():
             print("Aktualna konfiguracja HAL:")
             print(json.dumps(hal_config, indent=2, ensure_ascii=False))
         
+        elif command == "profiles":
+            profiles = manager.list_profiles()
+            print("Dostępne profile:")
+            for profile in profiles:
+                print(f"  - {profile}")
+        
+        elif command == "apply-profile" and len(sys.argv) > 2:
+            profile_name = sys.argv[2]
+            manager.apply_profile(profile_name)
+        
+        elif command == "save-profile" and len(sys.argv) > 2:
+            profile_name = sys.argv[2]
+            hal_config = manager.load_hal_config()
+            manager.save_profile(profile_name, hal_config)
+        
+        elif command == "backup":
+            manager.create_backup()
+        
         else:
             print("Dostępne komendy:")
-            print("  sync-from-hal - Synchronizuj HAL → Firmware")
-            print("  sync-to-hal   - Synchronizuj Firmware → HAL")
-            print("  validate      - Waliduj konfigurację HAL")
-            print("  show          - Pokaż konfigurację HAL")
+            print("  sync-from-hal   - Synchronizuj HAL → Firmware")
+            print("  sync-to-hal     - Synchronizuj Firmware → HAL")
+            print("  validate        - Waliduj konfigurację HAL")
+            print("  show            - Pokaż konfigurację HAL")
+            print("  profiles        - Lista dostępnych profili")
+            print("  apply-profile X - Zastosuj profil X")
+            print("  save-profile X  - Zapisz aktualną konfigurację jako profil X")
+            print("  backup          - Stwórz backup konfiguracji")
     else:
         # Domyślnie - pokaż aktualną konfigurację
         config = manager.get_current_config()

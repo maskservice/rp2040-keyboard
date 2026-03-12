@@ -1,0 +1,41 @@
+# RP2040-One Gaming Profile
+# ========================
+# Gaming-oriented configuration with game keys
+
+# Import base configuration
+base = "../hal_config.toml"
+
+# Profile-specific overrides
+[device]
+name = "RP2040-One-Keypad-Gaming"
+profile = "gaming"
+description = "Gaming-focused layout with WASD + functions"
+
+[switches]
+# Gaming switch configuration
+switch_w = {gpio = 1, keycode = "Keycode.W", modifier = "", label = "W", pull = "up", debounce = 5}
+switch_a = {gpio = 2, keycode = "Keycode.A", modifier = "", label = "A", pull = "up", debounce = 5}
+switch_s = {gpio = 3, keycode = "Keycode.S", modifier = "", label = "S", pull = "up", debounce = 5}
+switch_d = {gpio = 4, keycode = "Keycode.D", modifier = "", label = "D", pull = "up", debounce = 5}
+switch_space = {gpio = 5, keycode = "Keycode.SPACE", modifier = "", label = "Space", pull = "up", debounce = 5}
+switch_shift = {gpio = 6, keycode = "Keycode.SHIFT", modifier = "", label = "Shift", pull = "up", debounce = 5}
+switch_ctrl = {gpio = 7, keycode = "Keycode.CONTROL", modifier = "", label = "Ctrl", pull = "up", debounce = 5}
+switch_r = {gpio = 8, keycode = "Keycode.R", modifier = "", label = "R", pull = "up", debounce = 5}
+switch_tab = {gpio = 9, keycode = "Keycode.TAB", modifier = "", label = "Tab", pull = "up", debounce = 5}
+
+[encoder]
+enabled = true
+clk_gpio = 11
+dt_gpio = 12
+sw_gpio = 13
+pull = "up"
+debounce = 2  # Faster for gaming
+scroll_speed = 4
+middle_click = false
+steps_per_revolution = 24
+
+[timing]
+# Faster timing for gaming
+debounce_switch = 5
+debounce_encoder = 2
+scan_interval = 1

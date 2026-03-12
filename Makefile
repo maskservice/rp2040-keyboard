@@ -168,16 +168,34 @@ deploy-detect: ## Detect connected CircuitPython devices
 # HAL Configuration targets
 hal-sync: ## Sync configuration from HAL files
 	@echo "🔄 Syncing from HAL..."
-	python3 hal_manager.py sync-from-hal
+	python3 -m rp2040_keyboard.hal_manager sync-from-hal
 
 hal-save: ## Save current configuration to HAL files
 	@echo "💾 Saving to HAL..."
-	python3 hal_manager.py sync-to-hal
+	python3 -m rp2040_keyboard.hal_manager sync-to-hal
 
 hal-validate: ## Validate HAL configuration
 	@echo "✅ Validating HAL..."
-	python3 hal_manager.py validate
+	python3 -m rp2040_keyboard.hal_manager validate
 
 hal-show: ## Show current HAL configuration
 	@echo "📋 HAL Configuration:"
-	python3 hal_manager.py show
+	python3 -m rp2040_keyboard.hal_manager show
+
+hal-profiles: ## List available HAL profiles
+	@echo "📋 HAL Profiles:"
+	python3 -m rp2040_keyboard.hal_manager profiles
+
+hal-apply: ## Apply HAL profile (usage: make hal-apply PROFILE=default)
+	@if [ -n "$(PROFILE)" ]; then \
+		echo "🔄 Applying profile: $(PROFILE)"; \
+		python3 -m rp2040_keyboard.hal_manager apply-profile $(PROFILE); \
+	else \
+		echo "Usage: make hal-apply PROFILE=<profile_name>"; \
+		echo "Available profiles:"; \
+		python3 -m rp2040_keyboard.hal_manager profiles; \
+	fi
+
+hal-backup: ## Create backup of current HAL configuration
+	@echo "💾 Creating HAL backup..."
+	python3 -m rp2040_keyboard.hal_manager backup

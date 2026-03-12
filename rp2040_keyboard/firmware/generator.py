@@ -207,9 +207,19 @@ while True:
 '''
         
         if config.encoder.middle_click:
-            main_loop += '''    # Przycisk enkodera - debouncing
+            main_loop += '''    # Przycisk enkodera - debouncing (middle click)
     if not encoder_button.value and encoder_button_pressed is None:
         mouse.click(Mouse.MIDDLE_BUTTON)
+        encoder_button_pressed = False
+        time.sleep(0.01)  # Krótki debounce dla przycisku
+    elif encoder_button.value and encoder_button_pressed is False:
+        encoder_button_pressed = None
+
+'''
+        else:
+            main_loop += '''    # Przycisk enkodera - debouncing (left click)
+    if not encoder_button.value and encoder_button_pressed is None:
+        mouse.click(Mouse.LEFT_BUTTON)
         encoder_button_pressed = False
         time.sleep(0.01)  # Krótki debounce dla przycisku
     elif encoder_button.value and encoder_button_pressed is False:

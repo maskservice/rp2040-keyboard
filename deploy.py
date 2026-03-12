@@ -19,7 +19,7 @@ from datetime import datetime
 # Dodaj ścieżkę do projektu
 sys.path.insert(0, str(Path(__file__).parent))
 
-from hal_manager import HALConfigManager
+from rp2040_keyboard.hal_manager import HALConfigManager
 
 class RP2040Deployer:
     def __init__(self):
@@ -253,17 +253,50 @@ class RP2040Deployer:
         if self.config.get('BACKUP_EXISTING_FILES', 'true').lower() == 'true':
             self.backup_device_files(device_path)
         
-        # Skopiuj boot.py i code.py
-        boot_src = firmware_dir / "boot.py"
-        code_src = firmware_dir / "code.py"
-        
-        if boot_src.exists():
-            shutil.copy2(boot_src, device_path / "boot.py")
-            print(f"✓ Skopiowano boot.py")
-        
-        if code_src.exists():
-            shutil.copy2(code_src, device_path / "code.py")
-            print(f"✓ Skopiowano code.py")
+        # Wygeneruj firmware z aktualnej konfiguracji HAL
+        try:
+            from rp2040_keyboard.firmware import generate_code_py
+            from rp2040_keyboard.firmware import BOOT_PY
+            
+            # Pobierz aktualną konfigurację z HAL
+            config = self.hal_manager.get_current_config()
+            
+            # Wygeneruj kod
+            generated_code = generate_code_py(config)
+            generated_boot = BOOT_PY.strip()
+            
+            # Zapisz wygenerowane pliki
+            with open(device_path / "code.py", 'w') as f:
+                f.write(generated_code)
+            print(f"✓ Wygenerowano code.py z konfiguracji HAL")
+            
+            with open(device_path / "boot.py", 'w') as f:
+                f.write(generated_boot)
+            print(f"✓ Wygenerowano boot.py")
+            
+        except Exception as e:
+            print(f"⚠️ Błąd generowania firmware: {e}")
+            print("Kopiuję statyczne pliki firmware...")
+            
+            # Fallback do statycznych plików
+            boot_src = firmware_dir / "boot_template.py"
+            code_src = firmware_dir / "code.py"
+            
+            if boot_src.exists():
+                with open(boot_src, 'r') as f:
+                    boot_content = f.read()
+                # Wyodrębnij BOOT_PY z pliku
+                if "BOOT_PY = '''" in boot_content:
+                    start = boot_content.find("BOOT_PY = '''") + 12
+                    end = boot_content.find("'''", start)
+                    boot_code = boot_content[start:end]
+                    with open(device_path / "boot.py", 'w') as f:
+                        f.write(boot_code)
+                    print(f"✓ Skopiowano boot.py")
+            
+            if code_src.exists():
+                shutil.copy2(code_src, device_path / "code.py")
+                print(f"✓ Skopiowano code.py")
         
         print(f"🎉 Deployment zakończony!")
         return True

@@ -15,13 +15,13 @@ Projekt makro-klawiatury 9-przyciskowej z enkoderem obrotowym opartej na Wavesha
 | 9 przycisków switch | Skróty klawiaturowe | Ctrl+1, Ctrl+2, ... Ctrl+9 |
 | Enkoder — obrót CW | Scroll w górę | Mouse wheel up |
 | Enkoder — obrót CCW | Scroll w dół | Mouse wheel down |
-| Enkoder — wciśnięcie | Klik środkowy myszy | Mouse middle button |
+| Enkoder — wciśnięcie | **Lewy klik myszy** | Mouse left button |
 
 ---
 
-## 🚀 Auto-Deployment System
+## 🚀 Auto-Deployment System with HAL
 
-Automatyczny system pobierania bibliotek i deploymentu firmware na RP2040-One:
+Automatyczny system pobierania bibliotek i deploymentu firmware na RP2040-One z **HAL (Hardware Abstraction Layer)**:
 
 ### Szybki start
 ```bash
@@ -32,20 +32,34 @@ make deploy
 make deploy-monitor
 ```
 
-### Funkcje
-- ✅ **Automatyczne pobieranie** bibliotek `adafruit_hid`
-- ✅ **Detekcja urządzeń** CircuitPython 
-- ✅ **Auto-deployment** firmware przy podłączeniu
-- ✅ **Backup** istniejących plików
-- ✅ **Monitorowanie** w tle
+### 🔧 HAL Configuration
+Projekt używa **HAL (Hardware Abstraction Layer)** do oddzielenia konfiguracji sprzętowej:
 
-### Konfiguracja
 ```bash
-cp .env.example .env  # Dostosuj ustawienia
-make deploy-setup     # Pobierz biblioteki (jednorazowo)
+# Główna konfiguracja sprzętowa
+hal/hal_config.toml
+
+# Profile konfiguracyjne
+hal/profiles/default.toml   # Standard 9-key + encoder
+hal/profiles/minimal.toml   # Minimal 4-key + encoder  
+hal/profiles/gaming.toml    # Gaming WASD + fast encoder
 ```
 
-**Szczegóły:** zobacz [DEPLOYMENT.md](DEPLOYMENT.md)
+### Funkcje HAL
+- ✅ **Hardware Abstraction**: Konfiguracja w TOML, oddzielona od kodu
+- ✅ **Profile System**: Szybkie przełączanie między konfiguracjami
+- ✅ **Validation**: Automatyczne sprawdzanie konfliktów GPIO
+- ✅ **Version Control**: Konfiguracja sprzętowa w systemie kontroli wersji
+
+### Komendy HAL
+```bash
+make hal-profiles              # Lista dostępnych profili
+make hal-apply PROFILE=gaming # Zastosuj profil gaming
+make hal-validate            # Waliduj konfigurację
+make hal-show                # Pokaż aktualną konfigurację
+```
+
+**Szczegóły:** zobacz [DEPLOYMENT_HAL.md](DEPLOYMENT_HAL.md)
 
 ---
 
