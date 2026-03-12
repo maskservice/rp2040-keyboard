@@ -21,7 +21,7 @@ Projekt makro-klawiatury 9-przyciskowej z enkoderem obrotowym opartej na **Waves
 
 | Element | Funkcja | Akcja HID |
 |---------|---------|-----------|
-| 9 przycisków switch | Skróty klawiaturowe | Ctrl+Shift+1, Ctrl+Shift+2, ... Ctrl+Shift+9 |
+| 9 przycisków switch | Skróty klawiaturowe | Ctrl+Alt+1, Ctrl+Alt+2, ... Ctrl+Alt+9 |
 | Enkoder — obrót CW | Scroll w górę | Mouse wheel up |
 | Enkoder — obrót CCW | Scroll w dół | Mouse wheel down |
 | Enkoder — wciśnięcie | **Lewy klik myszy** | Mouse left button |
@@ -183,15 +183,15 @@ make deploy-diagnose
 Każdy przycisk podłączony jest jednym pinem do GPIO, drugim do GND. Wewnętrzny pull-up aktywowany programowo — **nie trzeba zewnętrznych rezystorów**.
 
 ```
-Przycisk 1:  GP1  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+1
-Przycisk 2:  GP2  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+2
-Przycisk 3:  GP3  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+3
-Przycisk 4:  GP4  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+4
-Przycisk 5:  GP5  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+5
-Przycisk 6:  GP6  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+6
-Przycisk 7:  GP7  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+7
-Przycisk 8:  GP8  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+8
-Przycisk 9:  GP9  ←→ [SWITCH] ←→ GND    → Ctrl+Shift+9
+Przycisk 1:  GP1  ←→ [SWITCH] ←→ GND    → Ctrl+Alt+1
+Przycisk 2:  GP2  ←→ [SWITCH] ←→ GND    → Ctrl+Alt+2
+Przycisk 3:  GP3  ←→ [SWITCH] ←→ GND    → Ctrl+Alt+3
+Przycisk 4:  GP4  ←→ [SWITCH] ←→ GND    → Ctrl+Alt+4
+Przycisk 5:  GP5  ←→ [SWITCH] ←→ GND    → Ctrl+Alt+5
+Przycisk 6:  GP6  ←→ [SWITCH] ←→ GND    → Ctrl+Alt+6
+Przycisk 7:  GP7  ←→ [SWITCH] ←→ GND    → Ctrl+Alt+7
+Przycisk 8:  GP8  ←→ [SWITCH] ←→ GND    → Ctrl+Alt+8
+Przycisk 9:  GP9  ←→ [SWITCH] ←→ GND    → Ctrl+Alt+9
 ```
 
 ### Enkoder obrotowy (KY-040) → Emulacja myszki
@@ -258,7 +258,7 @@ CIRCUITPY/
 Repozytorium:
 ├── firmware/
 │   ├── boot.py        ← Plik startowy USB HID
-│   └── code.py        ← Domyślny program (Ctrl+Shift+1..9 + scroll)
+│   └── code.py        ← Domyślny program (Ctrl+Alt+1..9 + scroll)
 ├── rp2040-one/        ← Firmware UF2 dla RP2040-One
 │   └── *.uf2
 ├── rp2040-zero/       ← Firmware UF2 dla RP2040-Zero
@@ -368,15 +368,15 @@ sudo dmesg | tail -20
 
 | Przycisk | GPIO | Akcja | Typowe zastosowanie |
 |----------|------|-------|---------------------|
-| 1 | GP1 | Ctrl+Shift+1 | Globalne makro 1 |
-| 2 | GP2 | Ctrl+Shift+2 | Globalne makro 2 |
-| 3 | GP3 | Ctrl+Shift+3 | Globalne makro 3 |
-| 4 | GP4 | Ctrl+Shift+4 | Globalne makro 4 |
-| 5 | GP5 | Ctrl+Shift+5 | Globalne makro 5 |
-| 6 | GP6 | Ctrl+Shift+6 | Globalne makro 6 |
-| 7 | GP7 | Ctrl+Shift+7 | Globalne makro 7 |
-| 8 | GP8 | Ctrl+Shift+8 | Globalne makro 8 |
-| 9 | GP9 | Ctrl+Shift+9 | Globalne makro 9 |
+| 1 | GP1 | Ctrl+Alt+1 | Globalne makro 1 |
+| 2 | GP2 | Ctrl+Alt+2 | Globalne makro 2 |
+| 3 | GP3 | Ctrl+Alt+3 | Globalne makro 3 |
+| 4 | GP4 | Ctrl+Alt+4 | Globalne makro 4 |
+| 5 | GP5 | Ctrl+Alt+5 | Globalne makro 5 |
+| 6 | GP6 | Ctrl+Alt+6 | Globalne makro 6 |
+| 7 | GP7 | Ctrl+Alt+7 | Globalne makro 7 |
+| 8 | GP8 | Ctrl+Alt+8 | Globalne makro 8 |
+| 9 | GP9 | Ctrl+Alt+9 | Globalne makro 9 |
 
 | Enkoder | GPIO | Akcja |
 |---------|------|-------|
@@ -398,12 +398,12 @@ KEY_PINS = [
 ]
 ```
 
-Aktualne domyślne mapowanie używa `Ctrl+Shift+1..9`, aby ograniczyć kolizje z typowymi skrótami przeglądarki.
+Aktualne domyślne mapowanie używa `Ctrl+Alt+1..9`, aby ograniczyć kolizje z typowymi skrótami przeglądarki.
 
-Aby zmienić modyfikator (np. Alt zamiast Ctrl+Shift), zmień linię w pętli głównej:
+Aby zmienić modyfikator (np. Shift zamiast Ctrl+Alt), zmień linię w pętli głównej:
 
 ```python
-# Zamień Ctrl+Shift na Alt:
+# Zamień Ctrl+Alt na Shift:
 keyboard.press(Keycode.ALT, key['keycode'])
 # ...
 keyboard.release(Keycode.ALT, key['keycode'])

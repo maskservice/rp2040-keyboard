@@ -13,10 +13,10 @@ description = "Minimal 4-key layout with encoder"
 
 [switches]
 # Minimal switch configuration
-switch_1 = {gpio = 1, keycode = "Keycode.ONE", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+1", pull = "up", debounce = 10}
-switch_2 = {gpio = 2, keycode = "Keycode.TWO", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+2", pull = "up", debounce = 10}
-switch_3 = {gpio = 3, keycode = "Keycode.THREE", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+3", pull = "up", debounce = 10}
-switch_4 = {gpio = 4, keycode = "Keycode.FOUR", modifier = "Keycode.CONTROL+Keycode.SHIFT", label = "Ctrl+Shift+4", pull = "up", debounce = 10}
+switch_1 = {gpio = 1, keycode = "Keycode.ONE", modifier = "Keycode.CONTROL+Keycode.ALT", label = "Ctrl+Alt+1", pull = "up", debounce = 10}
+switch_2 = {gpio = 2, keycode = "Keycode.TWO", modifier = "Keycode.CONTROL+Keycode.ALT", label = "Ctrl+Alt+2", pull = "up", debounce = 10}
+switch_3 = {gpio = 3, keycode = "Keycode.THREE", modifier = "Keycode.CONTROL+Keycode.ALT", label = "Ctrl+Alt+3", pull = "up", debounce = 10}
+switch_4 = {gpio = 4, keycode = "Keycode.FOUR", modifier = "Keycode.CONTROL+Keycode.ALT", label = "Ctrl+Alt+4", pull = "up", debounce = 10}
 
 [encoder]
 enabled = true

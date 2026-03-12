@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key Scanner - Browser</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .output {
+            background: #0a0a0a;
+            border: 1px solid #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            height: 400px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .key-event {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #00ff00;
+            background: rgba(0, 255, 0, 0.05);
+        }
+        .clear-btn {
+            background: #00ff00;
+            color: #1a1a1a;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 0;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+        .clear-btn:hover {
+            background: #00cc00;
+        }
+        .instructions {
+            background: rgba(0, 255, 0, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .key-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .key-info span {
+            min-width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎹 Key Scanner - Browser</h1>
+            <p>Kliknij w stronę i naciskaj klawisze. Przeglądarka wykrywa kombinacje klawiszy.</p>
+        </div>
+        
+        <div class="instructions">
+            <strong>Testowane kombinacje:</strong><br>
+            • Ctrl+Alt+1, Ctrl+Alt+2, etc.<br>
+            • Ctrl+A, Ctrl+S, Ctrl+C, etc.<br>
+            • Alt+Shift+X, Meta+Shift+X<br>
+            • Strzałki, F1-F12, Home, End, etc.
+        </div>
+
+        <button class="clear-btn" onclick="clearOutput()">Wyczyść wyniki</button>
+        
+        <div class="output" id="output"></div>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        let eventCount = 0;
+
+        function clearOutput() {
+            output.innerHTML = '';
+            eventCount = 0;
+        }
+
+        function formatKeyEvent(e) {
+            const modifiers = [];
+            if (e.ctrlKey) modifiers.push('Ctrl');
+            if (e.shiftKey) modifiers.push('Shift');
+            if (e.altKey) modifiers.push('Alt');
+            if (e.metaKey) modifiers.push('Meta');
+            
+            const keyName = e.key.length === 1 ? e.key.toUpperCase() : e.key;
+            const fullKey = modifiers.length > 0 ? `${modifiers.join('+')}+${keyName}` : keyName;
+            
+            return {
+                fullKey,
+                key: e.key,
+                code: e.code,
+                keyCode: e.keyCode,
+                which: e.which,
+                modifiers,
+                location: e.location,
+                repeat: e.repeat
+            };
+        }
+
+        function addKeyEvent(eventType, e) {
+            eventCount++;
+            const info = formatKeyEvent(e);
+            
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'key-event';
+            
+            const timestamp = new Date().toLocaleTimeString();
+            
+            eventDiv.innerHTML = `
+                <div><strong>#${eventCount} [${timestamp}] ${eventType.toUpperCase()}</strong></div>
+                <div class="key-info">
+                    <span><strong>Klawisz:</strong> ${info.fullKey}</span>
+                    <span><strong>Key:</strong> ${info.key}</span>
+                    <span><strong>Code:</strong> ${info.code}</span>
+                    <span><strong>KeyCode:</strong> ${info.keyCode}</span>
+                    <span><strong>Which:</strong> ${info.which}</span>
+                    <span><strong>Location:</strong> ${info.location}</span>
+                    <span><strong>Repeat:</strong> ${info.repeat}</span>
+                </div>
+            `;
+            
+            output.appendChild(eventDiv);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Event listeners
+        document.addEventListener('keydown', (e) => {
+            addKeyEvent('keydown', e);
+        });
+
+        document.addEventListener('keyup', (e) => {
+            addKeyEvent('keyup', e);
+        });
+
+        // Prevent default behavior for some keys to avoid browser shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Allow Ctrl+Alt+number combinations
+            if (e.ctrlKey && e.altKey && e.key >= '1' && e.key <= '9') {
+                e.preventDefault();
+                return;
+            }
+            
+            // Allow Ctrl+letter combinations (but not Ctrl+C, Ctrl+V, etc.)
+            if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
+                if (e.key >= 'a' && e.key <= 'z') {
+                    e.preventDefault();
+                    return;
+                }
+            }
+        });
+
+        // Focus the page so it can capture keyboard events
+        window.focus();
+        document.body.focus();
+    </script>
+</body>
+</html>

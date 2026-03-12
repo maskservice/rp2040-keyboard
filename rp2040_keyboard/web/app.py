@@ -92,15 +92,15 @@ async def get_default_config():
         print(f"⚠️ Błąd HAL, używam domyślnej konfiguracji: {e}")
         # Fallback do domyślnej konfiguracji
     default_keys = [
-        KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+1"),
-        KeyConfig(gpio=2, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+2"),
-        KeyConfig(gpio=3, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+3"),
-        KeyConfig(gpio=4, keycode="Keycode.FOUR", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+4"),
-        KeyConfig(gpio=5, keycode="Keycode.FIVE", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+5"),
-        KeyConfig(gpio=6, keycode="Keycode.SIX", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+6"),
-        KeyConfig(gpio=7, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+7"),
-        KeyConfig(gpio=8, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+8"),
-        KeyConfig(gpio=9, keycode="Keycode.NINE", modifier="Keycode.CONTROL+Keycode.SHIFT", label="Ctrl+Shift+9"),
+        KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+1"),
+        KeyConfig(gpio=2, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+2"),
+        KeyConfig(gpio=3, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+3"),
+        KeyConfig(gpio=4, keycode="Keycode.FOUR", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+4"),
+        KeyConfig(gpio=5, keycode="Keycode.FIVE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+5"),
+        KeyConfig(gpio=6, keycode="Keycode.SIX", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+6"),
+        KeyConfig(gpio=7, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+7"),
+        KeyConfig(gpio=8, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+8"),
+        KeyConfig(gpio=9, keycode="Keycode.NINE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+9"),
     ]
     
     default_encoder = EncoderConfig(
@@ -290,15 +290,15 @@ HTML_RESPONSE = '''
                 <h3>Przyciski (9 sztuk) → Emulacja klawiatury</h3>
                 <table class="pin-table">
                     <tr><th>Przycisk</th><th>GPIO</th><th>Akcja</th><th>Opis</th></tr>
-                    <tr><td>Btn 1</td><td>GP1</td><td>Ctrl+Shift+1</td><td>Globalne makro 1</td></tr>
-                    <tr><td>Btn 2</td><td>GP2</td><td>Ctrl+Shift+2</td><td>Globalne makro 2</td></tr>
-                    <tr><td>Btn 3</td><td>GP3</td><td>Ctrl+Shift+3</td><td>Globalne makro 3</td></tr>
-                    <tr><td>Btn 4</td><td>GP4</td><td>Ctrl+Shift+4</td><td>Globalne makro 4</td></tr>
-                    <tr><td>Btn 5</td><td>GP5</td><td>Ctrl+Shift+5</td><td>Globalne makro 5</td></tr>
-                    <tr><td>Btn 6</td><td>GP6</td><td>Ctrl+Shift+6</td><td>Globalne makro 6</td></tr>
-                    <tr><td>Btn 7</td><td>GP7</td><td>Ctrl+Shift+7</td><td>Globalne makro 7</td></tr>
-                    <tr><td>Btn 8</td><td>GP8</td><td>Ctrl+Shift+8</td><td>Globalne makro 8</td></tr>
-                    <tr><td>Btn 9</td><td>GP9</td><td>Ctrl+Shift+9</td><td>Globalne makro 9</td></tr>
+                    <tr><td>Btn 1</td><td>GP1</td><td>Ctrl+Alt+1</td><td>Globalne makro 1</td></tr>
+                    <tr><td>Btn 2</td><td>GP2</td><td>Ctrl+Alt+2</td><td>Globalne makro 2</td></tr>
+                    <tr><td>Btn 3</td><td>GP3</td><td>Ctrl+Alt+3</td><td>Globalne makro 3</td></tr>
+                    <tr><td>Btn 4</td><td>GP4</td><td>Ctrl+Alt+4</td><td>Globalne makro 4</td></tr>
+                    <tr><td>Btn 5</td><td>GP5</td><td>Ctrl+Alt+5</td><td>Globalne makro 5</td></tr>
+                    <tr><td>Btn 6</td><td>GP6</td><td>Ctrl+Alt+6</td><td>Globalne makro 6</td></tr>
+                    <tr><td>Btn 7</td><td>GP7</td><td>Ctrl+Alt+7</td><td>Globalne makro 7</td></tr>
+                    <tr><td>Btn 8</td><td>GP8</td><td>Ctrl+Alt+8</td><td>Globalne makro 8</td></tr>
+                    <tr><td>Btn 9</td><td>GP9</td><td>Ctrl+Alt+9</td><td>Globalne makro 9</td></tr>
                 </table>
                 
                 <h3>Enkoder obrotowy (KY-040) → Emulacja myszki</h3>
@@ -387,15 +387,15 @@ HTML_RESPONSE = '''
                 </div>
                 
                 <div class="test-grid">
-                    <div class="test-key" data-key="1">1<br><small>Ctrl+Shift+1</small><div class="status"></div><div class="timing"></div></div>
-                    <div class="test-key" data-key="2">2<br><small>Ctrl+Shift+2</small><div class="status"></div><div class="timing"></div></div>
-                    <div class="test-key" data-key="3">3<br><small>Ctrl+Shift+3</small><div class="status"></div><div class="timing"></div></div>
-                    <div class="test-key" data-key="4">4<br><small>Ctrl+Shift+4</small><div class="status"></div><div class="timing"></div></div>
-                    <div class="test-key" data-key="5">5<br><small>Ctrl+Shift+5</small><div class="status"></div><div class="timing"></div></div>
-                    <div class="test-key" data-key="6">6<br><small>Ctrl+Shift+6</small><div class="status"></div><div class="timing"></div></div>
-                    <div class="test-key" data-key="7">7<br><small>Ctrl+Shift+7</small><div class="status"></div><div class="timing"></div></div>
-                    <div class="test-key" data-key="8">8<br><small>Ctrl+Shift+8</small><div class="status"></div><div class="timing"></div></div>
-                    <div class="test-key" data-key="9">9<br><small>Ctrl+Shift+9</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="1">1<br><small>Ctrl+Alt+1</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="2">2<br><small>Ctrl+Alt+2</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="3">3<br><small>Ctrl+Alt+3</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="4">4<br><small>Ctrl+Alt+4</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="5">5<br><small>Ctrl+Alt+5</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="6">6<br><small>Ctrl+Alt+6</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="7">7<br><small>Ctrl+Alt+7</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="8">8<br><small>Ctrl+Alt+8</small><div class="status"></div><div class="timing"></div></div>
+                    <div class="test-key" data-key="9">9<br><small>Ctrl+Alt+9</small><div class="status"></div><div class="timing"></div></div>
                 </div>
                 
                 <div class="wiring-diagram" style="margin-top: 20px;">
@@ -409,22 +409,18 @@ HTML_RESPONSE = '''
                             <th>Ostatni czas</th>
                             <th>Ostatni status</th>
                         </tr>
-                        <tr data-stat-key="1"><td>Ctrl+Shift+1</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
-                        <tr data-stat-key="2"><td>Ctrl+Shift+2</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
-                        <tr data-stat-key="3"><td>Ctrl+Shift+3</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
-                        <tr data-stat-key="4"><td>Ctrl+Shift+4</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
-                        <tr data-stat-key="5"><td>Ctrl+Shift+5</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
-                        <tr data-stat-key="6"><td>Ctrl+Shift+6</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
-                        <tr data-stat-key="7"><td>Ctrl+Shift+7</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
-                        <tr data-stat-key="8"><td>Ctrl+Shift+8</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
-                        <tr data-stat-key="9"><td>Ctrl+Shift+9</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="1"><td>Ctrl+Alt+1</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="2"><td>Ctrl+Alt+2</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="3"><td>Ctrl+Alt+3</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="4"><td>Ctrl+Alt+4</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="5"><td>Ctrl+Alt+5</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="6"><td>Ctrl+Alt+6</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="7"><td>Ctrl+Alt+7</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="8"><td>Ctrl+Alt+8</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
+                        <tr data-stat-key="9"><td>Ctrl+Alt+9</td><td class="count">0</td><td class="rejected">0</td><td class="avg">0ms</td><td class="last">0ms</td><td class="state">Oczekiwanie</td></tr>
                     </table>
                 </div>
                 
-                <div style="text-align: center; margin: 20px 0;">
-                    <button class="btn btn-primary" onclick="testKeyboardListener()">🧪 Testuj nasłuchiwanie klawiatury</button>
-                    <button class="btn btn-warning" onclick="simulateKeyCombo()">⌨️ Symuluj Ctrl+Shift+1</button>
-                </div>
 
                 <div class="info" style="margin-bottom: 20px;">
                     <strong>🎧 Status nasłuchu:</strong> <span id="listenerStatus">inicjalizacja...</span>
@@ -438,11 +434,11 @@ HTML_RESPONSE = '''
                 
                 <div class="info" style="margin-top: 20px;">
                     <strong>ℹ️ Uwaga:</strong> Testowanie wymaga podłączonego urządzenia RP2040 z wgranym firmware.
-                    <br><strong>ℹ️ Zmiana:</strong> Klawisze używają teraz mapowania Ctrl+Shift+1..9 dla makr globalnych.
+                    <br><strong>ℹ️ Zmiana:</strong> Klawisze używają teraz mapowania Ctrl+Alt+1..9 dla makr globalnych.
                     <br><strong>💡 Podpowiedź:</strong> Taki układ ogranicza kolizje z typowymi skrótami przeglądarki opartymi o same cyfry i klawisze funkcyjne.
-                    <br><strong>🔧 Tryb testu:</strong> Mierzy rzeczywiste naciśnięcia Ctrl+Shift+1..9 z klawiatury, czas trzymania, odstęp między aktywacjami i potencjalne drgania.
+                    <br><strong>🔧 Tryb testu:</strong> Mierzy rzeczywiste naciśnięcia Ctrl+Alt+1..9 z klawiatury, czas trzymania, odstęp między aktywacjami i potencjalne drgania.
                     <br><strong>🛡️ Filtracja:</strong> Zdarzenia krótsze od progu debounce lub zbyt szybkie powtórki są oznaczane jako podejrzane i nie zwiększają licznika zaakceptowanych naciśnięć.
-                    <br><strong>⌨️ Test:</strong> Wciśnij Ctrl+Shift+1..9 na klawiaturze aby obserwować czasy reakcji i ewentualne zakłócenia na żywo.
+                    <br><strong>⌨️ Test:</strong> Wciśnij Ctrl+Alt+1..9 na klawiaturze aby obserwować czasy reakcji i ewentualne zakłócenia na żywo.
                 </div>
             </div>
         </div>
@@ -468,7 +464,7 @@ HTML_RESPONSE = '''
         let keyboardListenerAttached = false;
         
         const KEYCODES = ['ONE','TWO','THREE','FOUR','FIVE','SIX','SEVEN','EIGHT','NINE','ZERO','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12','ENTER','SPACE','TAB','ESCAPE','BACKSPACE','DELETE','UP_ARROW','DOWN_ARROW','LEFT_ARROW','RIGHT_ARROW','HOME','END','PAGE_UP','PAGE_DOWN'];
-        const MODIFIERS = ['CONTROL', 'SHIFT', 'CONTROL+SHIFT', 'ALT', 'GUI'];
+        const MODIFIERS = ['CONTROL', 'SHIFT', 'CONTROL+ALT', 'ALT', 'GUI'];
 
         function showTab(evt, tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -506,6 +502,16 @@ HTML_RESPONSE = '''
             showTabByName(initialTab);
         }
         
+        function addLogEntry(message, type) {
+            const log = document.querySelector('.test-log');
+            if (!log) return;
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + type;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.prepend(entry);
+            while (log.children.length > 50) log.removeChild(log.lastChild);
+        }
+
         // Test functions
         function simulateKeyPress(keyNum) {
             const keyElement = document.querySelector(`[data-key="${keyNum}"]`);
@@ -626,56 +632,13 @@ HTML_RESPONSE = '''
             }
             // Ensure keyboard listener is always active
             setupKeyboardListener();
-            setListenerStatus('aktywny - ciągły nasłuch Ctrl+Shift+1..9');
+            setListenerStatus('aktywny - ciągły nasłuch Ctrl+Alt+1..9');
         }
         
         function testKey(keyNum) {
             simulateKeyPress(keyNum);
         }
         
-        // Test functions for debugging
-        function testKeyboardListener() {
-            armTestListener();
-            setListenerStatus('test nasłuchu uruchomiony');
-            
-            // Test if event listeners are working
-            const testEvent = new KeyboardEvent('keydown', {
-                key: '1',
-                ctrlKey: true,
-                shiftKey: true,
-                bubbles: true
-            });
-            
-            document.dispatchEvent(testEvent);
-            setListenerStatus('wygenerowano zdarzenie testowe Ctrl+Shift+1');
-        }
-        
-        function simulateKeyCombo() {
-            armTestListener();
-            setListenerStatus('symulacja Ctrl+Shift+1 w toku');
-            
-            // Simulate the key combination
-            const keyDownEvent = new KeyboardEvent('keydown', {
-                key: '1',
-                ctrlKey: true,
-                shiftKey: true,
-                bubbles: true
-            });
-            
-            const keyUpEvent = new KeyboardEvent('keyup', {
-                key: '1',
-                ctrlKey: false,
-                shiftKey: false,
-                bubbles: true
-            });
-            
-            document.dispatchEvent(keyDownEvent);
-            
-            setTimeout(() => {
-                document.dispatchEvent(keyUpEvent);
-                setListenerStatus('symulacja Ctrl+Shift+1 zakończona');
-            }, 200);
-        }
 
         document.addEventListener('DOMContentLoaded', () => {
             const testKeys = document.querySelectorAll('.test-key');
@@ -692,7 +655,7 @@ HTML_RESPONSE = '''
             
             // Auto-start continuous listening on test tab
             if (window.location.hash === '#test') {
-                setListenerStatus('aktywny - ciągły nasłuch Ctrl+Shift+1..9');
+                setListenerStatus('aktywny - ciągły nasłuch Ctrl+Alt+1..9');
             }
         });
 
@@ -701,8 +664,8 @@ HTML_RESPONSE = '''
             const keyStates = {};
 
             window.addEventListener('keydown', (e) => {
-                // Only process Ctrl+Shift+1..9 combinations
-                if (e.ctrlKey && e.shiftKey && e.key >= '1' && e.key <= '9') {
+                // Only process Ctrl+Alt+1..9 combinations
+                if (e.ctrlKey && e.altKey && e.key >= '1' && e.key <= '9') {
                     const keyNum = parseInt(e.key);
                     if (!keyStates[keyNum]) {
                         keyStates[keyNum] = performance.now();
@@ -724,7 +687,7 @@ HTML_RESPONSE = '''
                 }
 
                 // Handle modifier key release
-                if (e.key === 'Control' || e.key === 'Shift') {
+                if (e.key === 'Control' || e.key === 'Alt') {
                     Object.keys(keyStates).forEach(keyNum => {
                         const duration = performance.now() - keyStates[keyNum];
                         delete keyStates[keyNum];
@@ -735,16 +698,16 @@ HTML_RESPONSE = '''
 
             // Ensure continuous listener status
             window.addEventListener('focus', () => {
-                setListenerStatus('aktywny - ciągły nasłuch Ctrl+Shift+1..9');
+                setListenerStatus('aktywny - ciągły nasłuch Ctrl+Alt+1..9');
             });
             
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) {
-                    setListenerStatus('aktywny - ciągły nasłuch Ctrl+Shift+1..9');
+                    setListenerStatus('aktywny - ciągły nasłuch Ctrl+Alt+1..9');
                 }
             });
             
-            setListenerStatus('aktywny - ciągły nasłuch Ctrl+Shift+1..9');
+            setListenerStatus('aktywny - ciągły nasłuch Ctrl+Alt+1..9');
         }
         
         function handleRealKeyPress(keyNum, isPressed, duration = 0, eventTimestamp = 0) {
@@ -932,10 +895,6 @@ HTML_RESPONSE = '''
             codeLink.click();
             
             showMessage('✅ Pliki pobrane!', 'success');
-        }
-
-        function testKey(keyNum) {
-            showMessage(`🔘 Test przycisku ${keyNum} - wciśnij fizyczny przycisk na płytce`, 'info');
         }
 
         function showMessage(message, type) {

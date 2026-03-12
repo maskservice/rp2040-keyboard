@@ -20,9 +20,9 @@ SHUTDOWN_TIMEOUT = 10.0
 def valid_payload():
     return {
         "keys": [
-            {"gpio": 1, "keycode": "Keycode.ONE", "modifier": "Keycode.CONTROL+Keycode.SHIFT", "label": "Ctrl+Shift+1"},
-            {"gpio": 2, "keycode": "Keycode.TWO", "modifier": "Keycode.CONTROL+Keycode.SHIFT", "label": "Ctrl+Shift+2"},
-            {"gpio": 3, "keycode": "Keycode.THREE", "modifier": "Keycode.CONTROL+Keycode.SHIFT", "label": "Ctrl+Shift+3"},
+            {"gpio": 1, "keycode": "Keycode.ONE", "modifier": "Keycode.CONTROL+Keycode.ALT", "label": "Ctrl+Alt+1"},
+            {"gpio": 2, "keycode": "Keycode.TWO", "modifier": "Keycode.CONTROL+Keycode.ALT", "label": "Ctrl+Alt+2"},
+            {"gpio": 3, "keycode": "Keycode.THREE", "modifier": "Keycode.CONTROL+Keycode.ALT", "label": "Ctrl+Alt+3"},
         ],
         "encoder": {
             "clk_gpio": 9,
@@ -39,9 +39,9 @@ def valid_payload():
 def invalid_payload():
     return {
         "keys": [
-            {"gpio": 1, "keycode": "Keycode.ONE", "modifier": "Keycode.CONTROL+Keycode.SHIFT", "label": "Ctrl+Shift+1"},
-            {"gpio": 1, "keycode": "Keycode.TWO", "modifier": "Keycode.CONTROL+Keycode.SHIFT", "label": "Ctrl+Shift+2"},
-            {"gpio": 50, "keycode": "Keycode.THREE", "modifier": "Keycode.CONTROL+Keycode.SHIFT", "label": "Ctrl+Shift+3"},
+            {"gpio": 1, "keycode": "Keycode.ONE", "modifier": "Keycode.CONTROL+Keycode.ALT", "label": "Ctrl+Alt+1"},
+            {"gpio": 1, "keycode": "Keycode.TWO", "modifier": "Keycode.CONTROL+Keycode.ALT", "label": "Ctrl+Alt+2"},
+            {"gpio": 50, "keycode": "Keycode.THREE", "modifier": "Keycode.CONTROL+Keycode.ALT", "label": "Ctrl+Alt+3"},
         ],
         "encoder": None,
     }

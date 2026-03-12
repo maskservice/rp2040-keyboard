@@ -1,7 +1,7 @@
 """
 RP2040-One HID Keypad + Encoder Mouse
 ======================================
-9 klawiszy (Ctrl+Shift+1..Ctrl+Shift+9) + enkoder obrotowy (scroll myszki + middle-click)
+9 klawiszy (Ctrl+Alt+1..Ctrl+Alt+9) + enkoder obrotowy (scroll myszki + middle-click)
 
 Hardware:
   - Waveshare RP2040-One / RP2040-Zero
@@ -25,17 +25,17 @@ from adafruit_hid.mouse import Mouse
 # KONFIGURACJA PINÓW
 # =============================================================================
 
-# Mapowanie klawiszy: (pin GPIO, klawisz numeryczny dla Ctrl+Shift+N)
+# Mapowanie klawiszy: (pin GPIO, klawisz numeryczny dla Ctrl+Alt+N)
 KEY_PINS = [
-    (board.GP1, Keycode.ONE),       # Przycisk 1 → Ctrl+Shift+1
-    (board.GP2, Keycode.TWO),       # Przycisk 2 → Ctrl+Shift+2
-    (board.GP3, Keycode.THREE),     # Przycisk 3 → Ctrl+Shift+3
-    (board.GP4, Keycode.FOUR),      # Przycisk 4 → Ctrl+Shift+4
-    (board.GP5, Keycode.FIVE),      # Przycisk 5 → Ctrl+Shift+5
-    (board.GP6, Keycode.SIX),       # Przycisk 6 → Ctrl+Shift+6
-    (board.GP7, Keycode.SEVEN),     # Przycisk 7 → Ctrl+Shift+7
-    (board.GP8, Keycode.EIGHT),     # Przycisk 8 → Ctrl+Shift+8
-    (board.GP9, Keycode.NINE),      # Przycisk 9 → Ctrl+Shift+9
+    (board.GP1, Keycode.ONE),       # Przycisk 1 → Ctrl+Alt+1
+    (board.GP2, Keycode.TWO),       # Przycisk 2 → Ctrl+Alt+2
+    (board.GP3, Keycode.THREE),     # Przycisk 3 → Ctrl+Alt+3
+    (board.GP4, Keycode.FOUR),      # Przycisk 4 → Ctrl+Alt+4
+    (board.GP5, Keycode.FIVE),      # Przycisk 5 → Ctrl+Alt+5
+    (board.GP6, Keycode.SIX),       # Przycisk 6 → Ctrl+Alt+6
+    (board.GP7, Keycode.SEVEN),     # Przycisk 7 → Ctrl+Alt+7
+    (board.GP8, Keycode.EIGHT),     # Przycisk 8 → Ctrl+Alt+8
+    (board.GP9, Keycode.NINE),      # Przycisk 9 → Ctrl+Alt+9
 ]
 
 # Enkoder obrotowy
@@ -96,13 +96,13 @@ encoder_sw_last_change = 0
 # =============================================================================
 
 print("RP2040 HID Keypad + Mouse aktywny!")
-print(f"Klawisze: 9x (Ctrl+Shift+1..Ctrl+Shift+9)")
+print(f"Klawisze: 9x (Ctrl+Alt+1..Ctrl+Alt+9)")
 print(f"Enkoder: scroll góra/dół + middle-click")
 
 while True:
     now = time.monotonic() * 1000  # Czas w ms
 
-    # --- Obsługa 9 klawiszy (Ctrl+Shift+1..Ctrl+Shift+9) ---
+    # --- Obsługa 9 klawiszy (Ctrl+Alt+1..Ctrl+Alt+9) ---
     for key in keys:
         current = key['pin'].value  # False = wciśnięty (zwarte do GND)
 
@@ -112,7 +112,7 @@ while True:
                 key['last_state'] = current
 
                 if not current:  # Wciśnięcie (falling edge)
-                    keyboard.press(Keycode.CONTROL, Keycode.SHIFT, key['keycode'])
+                    keyboard.press(Keycode.CONTROL, Keycode.ALT, key['keycode'])
                 else:            # Zwolnienie (rising edge)
                     keyboard.release_all()
 

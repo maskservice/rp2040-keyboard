@@ -13,12 +13,12 @@ key_pin = digitalio.DigitalInOut(board.GP1)
 key_pin.direction = digitalio.Direction.INPUT
 key_pin.pull = digitalio.Pull.UP
 
-print("Test klawiszy Ctrl+Shift+1...")
+print("Test klawiszy Ctrl+Alt+1...")
 
 while True:
     if not key_pin.value:
-        print("Wciśnięto przycisk - wysyłanie Ctrl+Shift+1")
-        keyboard.press(Keycode.CONTROL, Keycode.SHIFT, Keycode.ONE)
+        print("Wciśnięto przycisk - wysyłanie Ctrl+Alt+1")
+        keyboard.press(Keycode.CONTROL, Keycode.ALT, Keycode.ONE)
         time.sleep(0.1)
         keyboard.release_all()
         time.sleep(0.3)  # Dłuższy debounce

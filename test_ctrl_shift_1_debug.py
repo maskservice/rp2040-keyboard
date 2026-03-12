@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test skrypt do diagnostyki problemu z Ctrl+Shift+1
+Test skrypt do diagnostyki problemu z Ctrl+Alt+1
 Uruchom na komputerze (nie na RP2040) do testowania HID
 """
 
@@ -19,7 +19,7 @@ key_pin = digitalio.DigitalInOut(board.GP1)
 key_pin.direction = digitalio.Direction.INPUT
 key_pin.pull = digitalio.Pull.UP
 
-print("=== DEBUG Ctrl+Shift+1 ===")
+print("=== DEBUG Ctrl+Alt+1 ===")
 print("Testowanie różnych metod wysyłania klawiszy...")
 print("Wciśnij przycisk GP1 aby testować")
 
@@ -30,24 +30,24 @@ DEBOUNCE_MS = 20
 
 def test_method_1():
     """Metoda 1: press() z pojedynczym release()"""
-    print("Metoda 1: press(CONTROL, SHIFT, ONE) + release(CONTROL, SHIFT, ONE)")
-    keyboard.press(Keycode.CONTROL, Keycode.SHIFT, Keycode.ONE)
+    print("Metoda 1: press(CONTROL, ALT, ONE) + release(CONTROL, ALT, ONE)")
+    keyboard.press(Keycode.CONTROL, Keycode.ALT, Keycode.ONE)
     time.sleep(0.05)
-    keyboard.release(Keycode.CONTROL, Keycode.SHIFT, Keycode.ONE)
+    keyboard.release(Keycode.CONTROL, Keycode.ALT, Keycode.ONE)
 
 def test_method_2():
     """Metoda 2: press() z release_all()"""
-    print("Metoda 2: press(CONTROL, SHIFT, ONE) + release_all()")
-    keyboard.press(Keycode.CONTROL, Keycode.SHIFT, Keycode.ONE)
+    print("Metoda 2: press(CONTROL, ALT, ONE) + release_all()")
+    keyboard.press(Keycode.CONTROL, Keycode.ALT, Keycode.ONE)
     time.sleep(0.05)
     keyboard.release_all()
 
 def test_method_3():
     """Metoda 3: press() individualnych klawiszy"""
-    print("Metoda 3: press(CONTROL) + press(SHIFT) + press(ONE) + release_all()")
+    print("Metoda 3: press(CONTROL) + press(ALT) + press(ONE) + release_all()")
     keyboard.press(Keycode.CONTROL)
     time.sleep(0.01)
-    keyboard.press(Keycode.SHIFT)
+    keyboard.press(Keycode.ALT)
     time.sleep(0.01)
     keyboard.press(Keycode.ONE)
     time.sleep(0.05)
@@ -56,7 +56,7 @@ def test_method_3():
 def test_method_4():
     """Metoda 4: Z dodatkowym opóźnieniem przed release"""
     print("Metoda 4: Dłuższe przytrzymanie przed release")
-    keyboard.press(Keycode.CONTROL, Keycode.SHIFT, Keycode.ONE)
+    keyboard.press(Keycode.CONTROL, Keycode.ALT, Keycode.ONE)
     time.sleep(0.1)  # Dłuższe przytrzymanie
     keyboard.release_all()
 
