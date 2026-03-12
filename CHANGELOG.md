@@ -7,17 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.7] - 2026-03-12
+
+### Docs
+- Update CHANGELOG.md
+- Update DEPLOYMENT.md
+- Update FIRST_TIME_SETUP.md
+- Update README.md
+
+### Other
+- Update deploy.py
+- Update web/__init__.py
+- Update web/app.py
+
 ## [0.0.6] - 2026-03-12
+
+### Added
+- **Intelligent device detection**: Automatic BOOT/CIRCUITPY mode recognition
+- **Auto-flashing firmware**: Automatic CircuitPython installation for fresh devices
+- **Auto-mounting system**: System-level device mounting with udisksctl
+- **One-command setup**: `make deploy` handles everything automatically
+- **First-time setup guide**: Complete guide for new RP2040 devices
+
+### Changed
+- **GP13 button action**: Changed from middle click to left click mouse button
+- **Deployment system**: Enhanced with smart device detection
+- **HAL integration**: Web configurator uses HAL as source of truth
+- **Firmware generation**: Now generates from HAL configuration instead of static files
 
 ### Docs
 - Update DEPLOYMENT_HAL.md
-- Update PROJECT_STRUCTURE.md
+- Update PROJECT_STRUCTURE.md  
 - Update README.md
+- Add FIRST_TIME_SETUP.md
+- Add DEPLOYMENT_V2.md
 
 ### Other
 - Update .hal_sync.json
 - Update Makefile
-- Update deploy.py
+- Update deploy.py with new mounting and flashing functions
+- Update hal_manager.py with new directory structure
 - Update hal/hal_config.toml
 - Update hal/profiles/default.toml
 - Update hal/profiles/gaming.toml

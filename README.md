@@ -51,6 +51,12 @@ hal/profiles/gaming.toml    # Gaming WASD + fast encoder
 - ✅ **Validation**: Automatyczne sprawdzanie konfliktów GPIO
 - ✅ **Version Control**: Konfiguracja sprzętowa w systemie kontroli wersji
 
+### Nowe Funkcje v0.0.6
+- 🧠 **Inteligentna detekcja**: Automatyczne rozpoznawanie trybu BOOT/CIRCUITPY
+- 🔥 **Auto-flashing**: Wgrywanie firmware CircuitPython dla świeżych urządzeń
+- 🔄 **Auto-mounting**: Systemowe montowanie urządzeń CIRCUITPY
+- 📦 **One-command setup**: `make deploy` zajmuje się wszystkim
+
 ### Komendy HAL
 ```bash
 make hal-profiles              # Lista dostępnych profili
@@ -59,7 +65,7 @@ make hal-validate            # Waliduj konfigurację
 make hal-show                # Pokaż aktualną konfigurację
 ```
 
-**Szczegóły:** zobacz [DEPLOYMENT_HAL.md](DEPLOYMENT_HAL.md)
+**Szczegóły:** zobacz [DEPLOYMENT_V2.md](DEPLOYMENT_V2.md) | [FIRST_TIME_SETUP.md](FIRST_TIME_SETUP.md) | [DEPLOYMENT_HAL.md](DEPLOYMENT_HAL.md)
 
 ---
 
