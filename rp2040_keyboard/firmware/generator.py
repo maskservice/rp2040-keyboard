@@ -94,7 +94,14 @@ def normalize_modifiers(modifier: str | list[str] | tuple[str, ...] | None) -> l
         raw_modifiers = [f"Keycode.{part.strip()}" for part in cleaned.split("+") if part.strip()]
 
     # Filtruj tylko prawidłowe modyfikatory
-    return [part for part in raw_modifiers if part in VALID_MODIFIER_VALUES]
+    valid_modifiers = []
+    for part in raw_modifiers:
+        if part in VALID_MODIFIER_VALUES:
+            valid_modifiers.append(part)
+        else:
+            print(f"⚠️ Nieznany modyfikator: {part}")
+    
+    return valid_modifiers
 
 def generate_code_py(config: PadConfig) -> str:
     """Generuje plik code.py na podstawie konfiguracji."""
@@ -178,12 +185,24 @@ while True:
         for i, key in enumerate(config.keys, 1):
             modifiers = normalize_modifiers(key.modifier)
             press_args = ", ".join(modifiers + [key.keycode]) if modifiers else key.keycode
-            main_loop += f'''
+            
+            # Debug info for key 7 (Ctrl+Alt+7)
+            debug_comment = ""
+            if i == 7:
+                debug_comment = f"""
+    # DEBUG: Przycisk 7 -> {key.modifier} + {key.keycode}
+    # DEBUG: Modifiers: {modifiers}
+    # DEBUG: Press args: {press_args}
+"""
+            
+            main_loop += f'''{debug_comment}
+    # Przycisk {i} -> {key.modifier} + {key.keycode}
     if not key_{i}_pin.value and last_positions[{i-1}] is None:
+        print(f"DEBUG: Wciśnięto przycisk {i}")
         keyboard.press({press_args})
-        time.sleep(0.1)  # Debounce
-        keyboard.release({press_args})
+        keyboard.release_all()  # Natychmiastowe zwolnienie jak w oryginalnym code.py
         last_positions[{i-1}] = False
+        print(f"DEBUG: Zwolniono przycisk {i}")
     elif key_{i}_pin.value and last_positions[{i-1}] is False:
         last_positions[{i-1}] = None
 '''

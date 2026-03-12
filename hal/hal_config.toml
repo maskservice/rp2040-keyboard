@@ -4,7 +4,7 @@ base = "../hal_config.toml"
 name = "RP2040-One-Keypad-Default"
 profile = "default"
 description = "Standard 9-key layout with encoder"
-modified = "2026-03-12T19:20:18.890294"
+modified = "2026-03-12T20:23:12.781136"
 
 [encoder]
 enabled = true
@@ -82,7 +82,7 @@ pull = "up"
 debounce = 10
 
 [switches.switch_9]
-gpio = 9
+gpio = 29
 keycode = "Keycode.NINE"
 modifier = "Keycode.CONTROL+Keycode.ALT"
 label = "Ctrl+Alt+9"

@@ -6,7 +6,7 @@ Complete solution for RP2040-One based USB HID keypad with rotary encoder.
 Includes firmware generator, web configurator, and comprehensive test suite.
 """
 
-__version__ = "0.0.12"
+__version__ = "0.0.13"
 __author__ = "Tom Sapletta"
 __email__ = "tom@sapletta.com"
 

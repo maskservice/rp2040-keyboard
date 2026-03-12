@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.13] - 2026-03-12
+
+### Test
+- Update test_key29_simple.py
+- Update test_key7_simple.py
+- Update test_keyseq.py
+
+### Other
+- Update .hal_sync.json
+- Update debug_ctrl_alt_7.py
+- Update gp29_test.py
+- Update hal/hal_config.toml
+- Update keyscan.py
+- Update rp2040_keyboard/firmware/code.py
+- Update rp2040_keyboard/firmware/generator.py
+
 ## [0.0.12] - 2026-03-12
 
 ### Docs
