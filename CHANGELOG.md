@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4] - 2026-03-12
+
+### Docs
+- Update docs/ec12.pdf
+- Update docs/enkoder-24-imp-l15mm-z-przyc-ec12-145.pdf
+- Update docs/enkoder-24-impulsy-przycisk-ec12-l-20-356.pdf
+- Update docs/enkoder-30-imp-l15mm-z-przyc-ec12.pdf
+- Update docs/iduino_rotary_sensor.ino
+
+### Test
+- Update tests/test_all.py
+
+### Other
+- Update .gitignore
+- Update Rotation_Sensor.ino
+- Update adafruit-circuitpython-waveshare_rp2040_one-pl-10.1.4.uf2
+- Update deploy.py
+- Update rp2040_keyboard/firmware/generator.py
+- Update rp2040_keyboard/firmware/validator.py
+- Update rp2040_keyboard/web/app.py
+- Update web/app.py
+
 ## [0.0.3] - 2026-03-12
 
 ### Test

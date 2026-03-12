@@ -60,6 +60,7 @@ class EncoderConfig:
     sw_gpio: int
     scroll_speed: int = 2
     middle_click: bool = True
+    debounce_ms: int = 3  # Debouncing time in milliseconds (inspirowane Arduino)
 
 @dataclass
 class PadConfig:
@@ -120,14 +121,23 @@ key_{i}_pin.pull = digitalio.Pull.UP
     encoder_code = ""
     if config.encoder:
         encoder_code = f'''
-# Enkoder obrotowy
+# Enkoder obrotowy - zoptymalizowany debouncing
+import rotaryio
+import time
+
 encoder = rotaryio.IncrementalEncoder(board.GP{config.encoder.clk_gpio}, board.GP{config.encoder.dt_gpio})
 encoder_button = digitalio.DigitalInOut(board.GP{config.encoder.sw_gpio})
 encoder_button.direction = digitalio.Direction.INPUT
 encoder_button.pull = digitalio.Pull.UP
 
-encoder_last_pos = 0
+# Ustawienia debouncing inspirowane Arduino
+ENCODER_DEBOUNCE_MS = {config.encoder.debounce_ms}
 SCROLL_SPEED = {config.encoder.scroll_speed}
+
+# Zmienne do śledzenia stanu
+encoder_last_pos = 0
+encoder_last_time = time.monotonic()
+encoder_last_count = 0
 '''
     
     # Główna pętla
@@ -165,26 +175,43 @@ while True:
     # Dodaj obsługę enkodera
     if config.encoder:
         main_loop += '''
-    # Obsługa enkodera
+    # Obsługa enkodera - zoptymalizowana pętla inspirowana Arduino
     current_pos = encoder.position
-    if current_pos != encoder_last_pos:
-        steps = current_pos - encoder_last_pos
-        if steps > 0:
-            for _ in range(abs(steps) * SCROLL_SPEED):
-                mouse.move(wheel=1)
-        else:
-            for _ in range(abs(steps) * SCROLL_SPEED):
-                mouse.move(wheel=-1)
-        encoder_last_pos = current_pos
+    current_time = time.monotonic()
+    
+    # Debouncing - sprawdzaj tylko jeśli minął wystarczający czas
+    if (current_time - encoder_last_time) >= (ENCODER_DEBOUNCE_MS / 1000.0):
+        if current_pos != encoder_last_pos:
+            # Wykryj kierunek i kroki (jak w Arduino)
+            steps = current_pos - encoder_last_pos
+            
+            # Ogranicz maksymalne kroki dla uniknięcia "skakania"
+            if abs(steps) <= 10:
+                if steps > 0:
+                    # Obrót w prawo (CW) - scroll w górę
+                    for _ in range(abs(steps) * SCROLL_SPEED):
+                        mouse.move(wheel=1)
+                else:
+                    # Obrót w lewo (CCW) - scroll w dół  
+                    for _ in range(abs(steps) * SCROLL_SPEED):
+                        mouse.move(wheel=-1)
+                
+                encoder_last_count += steps
+            else:
+                # Zbyt duża zmiana - zresetuj pozycję
+                encoder.position = encoder_last_pos
+            
+            encoder_last_pos = current_pos
+            encoder_last_time = current_time
     
 '''
         
         if config.encoder.middle_click:
-            main_loop += '''    # Przycisk enkodera
+            main_loop += '''    # Przycisk enkodera - debouncing
     if not encoder_button.value and encoder_button_pressed is None:
         mouse.click(Mouse.MIDDLE_BUTTON)
-        time.sleep(0.1)
         encoder_button_pressed = False
+        time.sleep(0.01)  # Krótki debounce dla przycisku
     elif encoder_button.value and encoder_button_pressed is False:
         encoder_button_pressed = None
 

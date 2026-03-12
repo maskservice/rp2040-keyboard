@@ -39,7 +39,7 @@ def valid_config():
         KeyConfig(gpio=2, keycode="Keycode.TWO", modifier="Keycode.CONTROL"),
         KeyConfig(gpio=3, keycode="Keycode.THREE", modifier="Keycode.CONTROL"),
     ]
-    encoder = EncoderConfig(clk_gpio=9, dt_gpio=10, sw_gpio=11, scroll_speed=2)
+    encoder = EncoderConfig(clk_gpio=9, dt_gpio=10, sw_gpio=11, scroll_speed=2, debounce_ms=3)
     return PadConfig(keys=keys, encoder=encoder)
 
 @pytest.fixture
@@ -81,7 +81,7 @@ def test_key_config_creation():
 
 def test_encoder_config_creation():
     """Test tworzenia EncoderConfig."""
-    encoder = EncoderConfig(clk_gpio=6, dt_gpio=7, sw_gpio=8, scroll_speed=5)
+    encoder = EncoderConfig(clk_gpio=6, dt_gpio=7, sw_gpio=8, scroll_speed=5, debounce_ms=3)
     assert encoder.clk_gpio == 6
     assert encoder.dt_gpio == 7
     assert encoder.sw_gpio == 8
@@ -109,7 +109,7 @@ def test_validate_invalid_config(invalid_config):
 def test_validate_encoder_gpio_conflicts():
     """Test konfliktów GPIO w enkoderze."""
     keys = [KeyConfig(gpio=9, keycode="Keycode.ONE", modifier="Keycode.CONTROL")]
-    encoder = EncoderConfig(clk_gpio=9, dt_gpio=10, sw_gpio=11)  # Konflikt z przyciskiem
+    encoder = EncoderConfig(clk_gpio=9, dt_gpio=10, sw_gpio=11, debounce_ms=3)  # Konflikt z przyciskiem
     config = PadConfig(keys=keys, encoder=encoder)
     
     is_valid, errors = validate_config(config)
@@ -118,7 +118,7 @@ def test_validate_encoder_gpio_conflicts():
 
 def test_validate_encoder_same_clk_dt():
     """Test tej samej wartości CLK i DT."""
-    encoder = EncoderConfig(clk_gpio=9, dt_gpio=9, sw_gpio=10)
+    encoder = EncoderConfig(clk_gpio=9, dt_gpio=9, sw_gpio=10, debounce_ms=3)
     config = PadConfig(keys=[], encoder=encoder)
     
     is_valid, errors = validate_config(config)
@@ -127,7 +127,7 @@ def test_validate_encoder_same_clk_dt():
 
 def test_validate_scroll_speed_range():
     """Test zakresu prędkości scrolla."""
-    encoder = EncoderConfig(clk_gpio=9, dt_gpio=10, sw_gpio=11, scroll_speed=15)
+    encoder = EncoderConfig(clk_gpio=9, dt_gpio=10, sw_gpio=11, scroll_speed=15, debounce_ms=3)
     config = PadConfig(keys=[], encoder=encoder)
     
     is_valid, errors = validate_config(config)
@@ -300,7 +300,7 @@ def test_minimum_configuration():
 
 def test_encoder_only_configuration():
     """Test konfiguracji tylko z enkoderem."""
-    encoder = EncoderConfig(clk_gpio=9, dt_gpio=10, sw_gpio=11, scroll_speed=3, middle_click=False)
+    encoder = EncoderConfig(clk_gpio=9, dt_gpio=10, sw_gpio=11, scroll_speed=3, middle_click=False, debounce_ms=3)
     config = PadConfig(keys=[], encoder=encoder)
     
     is_valid, errors = validate_config(config)
@@ -366,7 +366,7 @@ def test_validation_performance():
 @pytest.mark.asyncio
 async def test_api_default_config():
     """Test API - domyślna konfiguracja."""
-    from web.app import app
+    from rp2040_keyboard.web.app import app
     from fastapi.testclient import TestClient
     
     client = TestClient(app)
@@ -381,7 +381,7 @@ async def test_api_default_config():
 @pytest.mark.asyncio
 async def test_api_validate_valid(valid_config):
     """Test API - walidacja poprawnej konfiguracji."""
-    from web.app import app
+    from rp2040_keyboard.web.app import app
     from fastapi.testclient import TestClient
     
     client = TestClient(app)
@@ -395,7 +395,7 @@ async def test_api_validate_valid(valid_config):
 @pytest.mark.asyncio
 async def test_api_validate_invalid(invalid_config):
     """Test API - walidacja niepoprawnej konfiguracji."""
-    from web.app import app
+    from rp2040_keyboard.web.app import app
     from fastapi.testclient import TestClient
     
     client = TestClient(app)
@@ -409,7 +409,7 @@ async def test_api_validate_invalid(invalid_config):
 @pytest.mark.asyncio
 async def test_api_generate_code(valid_config):
     """Test API - generowanie kodu."""
-    from web.app import app
+    from rp2040_keyboard.web.app import app
     from fastapi.testclient import TestClient
     
     client = TestClient(app)
@@ -426,7 +426,7 @@ async def test_api_generate_code(valid_config):
 @pytest.mark.asyncio
 async def test_api_keycodes():
     """Test API - pobieranie dostępnych kodów."""
-    from web.app import app
+    from rp2040_keyboard.web.app import app
     from fastapi.testclient import TestClient
     
     client = TestClient(app)
@@ -467,7 +467,7 @@ def test_regression_empty_config():
 
 def test_regression_encoder_middle_click_false():
     """Test regresji - enkoder bez middle click."""
-    encoder = EncoderConfig(clk_gpio=9, dt_gpio=10, sw_gpio=11, middle_click=False)
+    encoder = EncoderConfig(clk_gpio=9, dt_gpio=10, sw_gpio=11, middle_click=False, debounce_ms=3)
     config = PadConfig(keys=[], encoder=encoder)
     
     code = generate_code_py(config)

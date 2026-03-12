@@ -43,6 +43,9 @@ def validate_config(config: PadConfig) -> tuple[bool, list[str]]:
             
         if not (1 <= config.encoder.scroll_speed <= 10):
             errors.append("Scroll speed musi być między 1 a 10")
+            
+        if not (1 <= config.encoder.debounce_ms <= 50):
+            errors.append("Debounce time musi być między 1 a 50 ms")
     
     return len(errors) == 0, errors
 

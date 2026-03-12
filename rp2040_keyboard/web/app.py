@@ -90,15 +90,16 @@ async def get_default_config():
         KeyConfig(gpio=6, keycode="Keycode.SIX", modifier="Keycode.CONTROL", label="Ctrl+6"),
         KeyConfig(gpio=7, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL", label="Ctrl+7"),
         KeyConfig(gpio=8, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL", label="Ctrl+8"),
-        KeyConfig(gpio=29, keycode="Keycode.NINE", modifier="Keycode.CONTROL", label="Ctrl+9"),
+        KeyConfig(gpio=9, keycode="Keycode.NINE", modifier="Keycode.CONTROL", label="Ctrl+9"),  # Zmiana z GP29 na GP9
     ]
     
     default_encoder = EncoderConfig(
-        clk_gpio=9,
-        dt_gpio=10, 
-        sw_gpio=11,
+        clk_gpio=11,      # WE A = GP11
+        dt_gpio=12,       # WE B = GP12  
+        sw_gpio=13,       # PUSH = GP13
         scroll_speed=2,
-        middle_click=True
+        middle_click=True,
+        debounce_ms=3  # Debouncing inspirowane Arduino
     )
     
     config = PadConfig(keys=default_keys, encoder=default_encoder)

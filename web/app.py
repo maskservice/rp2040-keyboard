@@ -380,6 +380,49 @@ HTML_RESPONSE = '''
         .wiring-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         .wiring-table th, .wiring-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         .wiring-table th { background: #f8f9fa; }
+
+        /* ── TEST PAGE ── */
+        .test-hint { text-align:center; padding:12px 16px; font-size:14px; color:#666; background:#e8f4f8; border-radius:8px; margin-bottom:20px; border:1px solid #b8daff; }
+        .test-hint kbd { background:#fff; padding:2px 8px; border-radius:3px; font-family:monospace; font-size:13px; border:1px solid #ccc; box-shadow:0 1px 2px rgba(0,0,0,.1); }
+        .test-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
+        .stat-card { background:#fff; border:1px solid #ddd; border-radius:8px; padding:16px; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,.05); }
+        .stat-card .val { font-size:28px; font-weight:800; font-family:monospace; color:#007bff; }
+        .stat-card .lbl { font-size:11px; color:#888; text-transform:uppercase; letter-spacing:.06em; margin-top:4px; }
+        .stat-card.enc-stat .val { color:#17a2b8; }
+        .stat-card.total-stat .val { color:#ffc107; }
+        .test-grid-layout { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+        @media(max-width:768px) { .test-grid-layout { grid-template-columns:1fr; } }
+        .test-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:360px; margin:0 auto; }
+        .test-btn { aspect-ratio:1; border:2px solid #ddd; border-radius:12px; background:#f8f9fa; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; transition:.15s; cursor:default; user-select:none; }
+        .test-btn .combo { font-size:11px; color:#888; font-weight:600; }
+        .test-btn .num { font-size:32px; font-weight:800; color:#333; }
+        .test-btn .label { font-size:10px; color:#aaa; }
+        .test-btn.active { border-color:#28a745; background:#d4edda; transform:scale(.95); box-shadow:0 0 16px rgba(40,167,69,.3); }
+        .test-btn.active .num { color:#28a745; }
+        .test-btn.active .combo { color:#28a745; }
+        .encoder-vis { display:flex; align-items:center; justify-content:center; gap:24px; padding:20px; }
+        .enc-wheel { width:100px; height:100px; border-radius:50%; border:3px solid #ddd; position:relative; display:flex; align-items:center; justify-content:center; background:conic-gradient(from 0deg,#f0f0f0 0%,#ddd 25%,#f0f0f0 50%,#ddd 75%,#f0f0f0 100%); transition:transform .15s ease-out, border-color .2s, box-shadow .2s; }
+        .enc-wheel .knob { width:12px; height:12px; border-radius:50%; background:#999; position:absolute; top:6px; }
+        .enc-wheel.scroll-up { border-color:#28a745; box-shadow:0 0 12px rgba(40,167,69,.3); }
+        .enc-wheel.scroll-down { border-color:#17a2b8; box-shadow:0 0 12px rgba(23,162,184,.3); }
+        .enc-wheel.btn-press { border-color:#ffc107; box-shadow:0 0 12px rgba(255,193,7,.3); transform:scale(.92) !important; }
+        .enc-info { text-align:left; }
+        .enc-info .dir { font-size:22px; font-weight:800; font-family:monospace; min-height:30px; }
+        .enc-info .dir.up { color:#28a745; }
+        .enc-info .dir.down { color:#17a2b8; }
+        .enc-info .clicks { font-size:13px; color:#888; font-family:monospace; }
+        .enc-info .delta { font-size:12px; color:#aaa; margin-top:4px; }
+        .event-log { background:#1e1e1e; border-radius:8px; padding:12px; max-height:400px; overflow-y:auto; font-family:'Courier New',monospace; font-size:12px; line-height:1.7; color:#d4d4d4; }
+        .event-log::-webkit-scrollbar { width:4px; }
+        .event-log::-webkit-scrollbar-thumb { background:#555; border-radius:2px; }
+        .event-log .ev { padding:3px 8px; border-radius:4px; margin-bottom:3px; display:flex; align-items:center; gap:8px; }
+        .event-log .ev.key-ev { background:rgba(40,167,69,.1); border-left:2px solid #28a745; }
+        .event-log .ev.enc-ev { background:rgba(23,162,184,.1); border-left:2px solid #17a2b8; }
+        .event-log .ev.btn-ev { background:rgba(255,193,7,.1); border-left:2px solid #ffc107; }
+        .event-log .ts { color:#888; min-width:85px; font-size:11px; }
+        .event-log .msg { color:#d4d4d4; }
+        .log-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+        .log-header h3 { margin:0; }
     </style>
 </head>
 <body>
@@ -394,6 +437,7 @@ HTML_RESPONSE = '''
             <button class="tab" onclick="showTab('wiring')">🔌 Schemat Podłączeń</button>
             <button class="tab" onclick="showTab('code')">👨‍💻 Kod</button>
             <button class="tab" onclick="showTab('flash')">💾 Flashowanie</button>
+            <button class="tab" onclick="showTab('test')">🎮 Test</button>
         </div>
 
         <div id="editor" class="tab-content active">
@@ -445,6 +489,59 @@ HTML_RESPONSE = '''
                 <li><strong>Skopiuj code.py:</strong> Do głównego katalogu CIRCUITPY</li>
                 <li><strong>Odłącz i podłącz USB:</strong> Urządzenie powinno działać jako klawiatura + mysz</li>
             </ol>
+        </div>
+
+        <div id="test" class="tab-content">
+            <h2>🎮 Test klawiatury RP2040</h2>
+            <div class="test-hint">
+                Naciśnij <kbd>Ctrl</kbd> + <kbd>1</kbd>…<kbd>9</kbd> aby przetestować klawisze &nbsp;|&nbsp; Obróć kółkiem myszy aby przetestować enkoder &nbsp;|&nbsp; Środkowy klik = przycisk enkodera
+            </div>
+
+            <div class="test-stats">
+                <div class="stat-card">
+                    <div class="val" id="statKeys">0</div>
+                    <div class="lbl">Klawisze</div>
+                </div>
+                <div class="stat-card enc-stat">
+                    <div class="val" id="statScroll">0</div>
+                    <div class="lbl">Scroll ticks</div>
+                </div>
+                <div class="stat-card total-stat">
+                    <div class="val" id="statTotal">0</div>
+                    <div class="lbl">Łącznie</div>
+                </div>
+            </div>
+
+            <div class="test-grid-layout">
+                <div>
+                    <h3 style="margin-bottom:12px">Klawisze Ctrl+1…9</h3>
+                    <div class="test-grid" id="testGrid"></div>
+
+                    <h3 style="margin:20px 0 12px">Enkoder (Scroll / Middle-click)</h3>
+                    <div style="background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.05)">
+                        <div class="encoder-vis">
+                            <div class="enc-wheel" id="encWheel">
+                                <div class="knob"></div>
+                            </div>
+                            <div class="enc-info">
+                                <div class="dir" id="encDir">—</div>
+                                <div class="clicks">Scroll: <span id="encCount">0</span> ticks</div>
+                                <div class="delta">Ostatni: <span id="encDelta">—</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="log-header">
+                        <h3>Event Log</h3>
+                        <button class="btn" onclick="clearTestLog()" style="font-size:12px;padding:4px 12px">Wyczyść</button>
+                    </div>
+                    <div class="event-log" id="eventLog">
+                        <div class="ev" style="color:#888;border:none">Oczekiwanie na zdarzenia...</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -784,6 +881,143 @@ HTML_RESPONSE = '''
 
         // Inicjalizacja
         init();
+
+        // ══════════════ TEST PAGE ══════════════
+
+        // Build test grid
+        (function buildTestGrid() {
+            const grid = document.getElementById('testGrid');
+            if (!grid) return;
+            const labels = ['Tab 1','Tab 2','Tab 3','Tab 4','Tab 5','Tab 6','Tab 7','Tab 8','Tab 9'];
+            for (let i = 1; i <= 9; i++) {
+                const btn = document.createElement('div');
+                btn.className = 'test-btn';
+                btn.id = 'test-key-' + i;
+                btn.innerHTML = `<span class="combo">Ctrl +</span><span class="num">${i}</span><span class="label">${labels[i-1]}</span>`;
+                grid.appendChild(btn);
+            }
+        })();
+
+        // Test state
+        let testKeyCount = 0, testScrollCount = 0, testTotalCount = 0;
+        let encRotation = 0;
+        const eventLogEl = document.getElementById('eventLog');
+        const encWheelEl = document.getElementById('encWheel');
+        let logStarted = false;
+
+        function testTs() {
+            const d = new Date();
+            return d.toLocaleTimeString('pl-PL', {hour:'2-digit',minute:'2-digit',second:'2-digit'}) + '.' + String(d.getMilliseconds()).padStart(3,'0');
+        }
+
+        function addLogEntry(msg, type) {
+            if (!logStarted) { eventLogEl.innerHTML = ''; logStarted = true; }
+            const ev = document.createElement('div');
+            ev.className = 'ev ' + type;
+            ev.innerHTML = `<span class="ts">${testTs()}</span><span class="msg">${msg}</span>`;
+            eventLogEl.prepend(ev);
+            while (eventLogEl.children.length > 200) eventLogEl.removeChild(eventLogEl.lastChild);
+            testTotalCount++;
+            document.getElementById('statTotal').textContent = testTotalCount;
+        }
+
+        function clearTestLog() {
+            eventLogEl.innerHTML = '<div class="ev" style="color:#888;border:none">Oczekiwanie na zdarzenia...</div>';
+            logStarted = false;
+            testKeyCount = 0; testScrollCount = 0; testTotalCount = 0;
+            document.getElementById('statKeys').textContent = '0';
+            document.getElementById('statScroll').textContent = '0';
+            document.getElementById('statTotal').textContent = '0';
+            document.getElementById('encCount').textContent = '0';
+            encRotation = 0;
+            if (encWheelEl) encWheelEl.style.transform = '';
+        }
+
+        // Keyboard event detection (Ctrl+1..9)
+        const activeTestKeys = new Set();
+
+        document.addEventListener('keydown', function(e) {
+            if (!e.ctrlKey && !e.metaKey) return;
+            const digit = (e.key >= '1' && e.key <= '9') ? parseInt(e.key) : null;
+            if (!digit) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (activeTestKeys.has(digit)) return;
+            activeTestKeys.add(digit);
+
+            const btn = document.getElementById('test-key-' + digit);
+            if (btn) btn.classList.add('active');
+
+            testKeyCount++;
+            document.getElementById('statKeys').textContent = testKeyCount;
+            addLogEntry(`Ctrl+${digit} ▼ wciśnięty`, 'key-ev');
+        });
+
+        document.addEventListener('keyup', function(e) {
+            const digit = (e.key >= '1' && e.key <= '9') ? parseInt(e.key) : null;
+            if (!digit) return;
+
+            activeTestKeys.delete(digit);
+            const btn = document.getElementById('test-key-' + digit);
+            if (btn) btn.classList.remove('active');
+            addLogEntry(`Ctrl+${digit} ▲ zwolniony`, 'key-ev');
+        });
+
+        // Scroll wheel detection (encoder)
+        let scrollTimeout;
+        document.addEventListener('wheel', function(e) {
+            const testTab = document.getElementById('test');
+            if (!testTab || !testTab.classList.contains('active')) return;
+
+            e.preventDefault();
+
+            const direction = e.deltaY < 0 ? 'up' : 'down';
+            const delta = Math.round(e.deltaY);
+
+            encRotation += direction === 'up' ? -15 : 15;
+            if (encWheelEl) encWheelEl.style.transform = `rotate(${encRotation}deg)`;
+
+            if (encWheelEl) {
+                encWheelEl.classList.remove('scroll-up', 'scroll-down');
+                encWheelEl.classList.add(direction === 'up' ? 'scroll-up' : 'scroll-down');
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    encWheelEl.classList.remove('scroll-up', 'scroll-down');
+                }, 300);
+            }
+
+            const dirEl = document.getElementById('encDir');
+            if (dirEl) {
+                dirEl.textContent = direction === 'up' ? '↑ CW' : '↓ CCW';
+                dirEl.className = 'dir ' + direction;
+            }
+
+            document.getElementById('encDelta').textContent = `deltaY: ${delta}`;
+            testScrollCount++;
+            document.getElementById('statScroll').textContent = testScrollCount;
+            document.getElementById('encCount').textContent = testScrollCount;
+
+            addLogEntry(`Scroll ${direction === 'up' ? '↑ CW (góra)' : '↓ CCW (dół)'} Δ${delta}`, 'enc-ev');
+        }, { passive: false });
+
+        // Middle-click detection (encoder button)
+        document.addEventListener('mousedown', function(e) {
+            if (e.button !== 1) return;
+            const testTab = document.getElementById('test');
+            if (!testTab || !testTab.classList.contains('active')) return;
+
+            e.preventDefault();
+            if (encWheelEl) encWheelEl.classList.add('btn-press');
+            addLogEntry('Middle-click ▼ (enkoder SW)', 'btn-ev');
+        });
+
+        document.addEventListener('mouseup', function(e) {
+            if (e.button !== 1) return;
+            if (encWheelEl) encWheelEl.classList.remove('btn-press');
+            addLogEntry('Middle-click ▲ zwolniony', 'btn-ev');
+        });
     </script>
 </body>
 </html>
