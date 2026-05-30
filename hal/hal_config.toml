@@ -4,7 +4,7 @@ base = "../hal_config.toml"
 name = "RP2040-One-Keypad-Default"
 profile = "default"
 description = "Standard 9-key layout with encoder"
-modified = "2026-03-12T20:23:12.781136"
+modified = "2026-05-30T15:45:45.709663"
 
 [encoder]
 enabled = true
@@ -19,46 +19,46 @@ steps_per_revolution = 24
 
 [switches.switch_1]
 gpio = 1
-keycode = "Keycode.ONE"
+keycode = "Keycode.NINE"
 modifier = "Keycode.CONTROL+Keycode.ALT"
-label = "Ctrl+Alt+1"
+label = "Ctrl+Alt+9"
 pull = "up"
 debounce = 10
 
 [switches.switch_2]
 gpio = 2
-keycode = "Keycode.TWO"
+keycode = "Keycode.EIGHT"
 modifier = "Keycode.CONTROL+Keycode.ALT"
-label = "Ctrl+Alt+2"
+label = "Ctrl+Alt+8"
 pull = "up"
 debounce = 10
 
 [switches.switch_3]
 gpio = 3
-keycode = "Keycode.THREE"
-modifier = "Keycode.CONTROL+Keycode.ALT"
-label = "Ctrl+Alt+3"
-pull = "up"
-debounce = 10
-
-[switches.switch_4]
-gpio = 4
-keycode = "Keycode.FOUR"
-modifier = "Keycode.CONTROL+Keycode.ALT"
-label = "Ctrl+Alt+4"
-pull = "up"
-debounce = 10
-
-[switches.switch_5]
-gpio = 5
 keycode = "Keycode.FIVE"
 modifier = "Keycode.CONTROL+Keycode.ALT"
 label = "Ctrl+Alt+5"
 pull = "up"
 debounce = 10
 
+[switches.switch_4]
+gpio = 29
+keycode = "Keycode.ONE"
+modifier = "Keycode.CONTROL+Keycode.ALT"
+label = "Ctrl+Alt+1"
+pull = "up"
+debounce = 10
+
+[switches.switch_5]
+gpio = 4
+keycode = "Keycode.SEVEN"
+modifier = "Keycode.CONTROL+Keycode.ALT"
+label = "Ctrl+Alt+7"
+pull = "up"
+debounce = 10
+
 [switches.switch_6]
-gpio = 6
+gpio = 5
 keycode = "Keycode.SIX"
 modifier = "Keycode.CONTROL+Keycode.ALT"
 label = "Ctrl+Alt+6"
@@ -66,25 +66,25 @@ pull = "up"
 debounce = 10
 
 [switches.switch_7]
-gpio = 7
-keycode = "Keycode.SEVEN"
+gpio = 6
+keycode = "Keycode.FOUR"
 modifier = "Keycode.CONTROL+Keycode.ALT"
-label = "Ctrl+Alt+7"
+label = "Ctrl+Alt+4"
 pull = "up"
 debounce = 10
 
 [switches.switch_8]
-gpio = 8
-keycode = "Keycode.EIGHT"
+gpio = 7
+keycode = "Keycode.TWO"
 modifier = "Keycode.CONTROL+Keycode.ALT"
-label = "Ctrl+Alt+8"
+label = "Ctrl+Alt+2"
 pull = "up"
 debounce = 10
 
 [switches.switch_9]
-gpio = 29
-keycode = "Keycode.NINE"
+gpio = 8
+keycode = "Keycode.THREE"
 modifier = "Keycode.CONTROL+Keycode.ALT"
-label = "Ctrl+Alt+9"
+label = "Ctrl+Alt+3"
 pull = "up"
 debounce = 10

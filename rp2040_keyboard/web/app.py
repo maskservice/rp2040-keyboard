@@ -381,8 +381,8 @@ HTML_RESPONSE = '''
                         <div class="label">Podejrzane drgania</div>
                     </div>
                     <div class="test-stat">
-                        <div class="value" id="debounceThreshold">35ms</div>
-                        <div class="label">Próg filtracji</div>
+                        <div class="value" id="debounceThreshold">100ms</div>
+                        <div class="label">Próg zwolnienia (release)</div>
                     </div>
                 </div>
                 
@@ -437,7 +437,7 @@ HTML_RESPONSE = '''
                     <br><strong>ℹ️ Zmiana:</strong> Klawisze używają teraz mapowania Ctrl+Alt+1..9 dla makr globalnych.
                     <br><strong>💡 Podpowiedź:</strong> Taki układ ogranicza kolizje z typowymi skrótami przeglądarki opartymi o same cyfry i klawisze funkcyjne.
                     <br><strong>🔧 Tryb testu:</strong> Mierzy rzeczywiste naciśnięcia Ctrl+Alt+1..9 z klawiatury, czas trzymania, odstęp między aktywacjami i potencjalne drgania.
-                    <br><strong>🛡️ Filtracja:</strong> Zdarzenia krótsze od progu debounce lub zbyt szybkie powtórki są oznaczane jako podejrzane i nie zwiększają licznika zaakceptowanych naciśnięć.
+                    <br><strong>🛡️ Algorytm:</strong> Natychmiastowa detekcja wciśnięcia (pierwszy kontakt z GND). Zwolnienie dopiero po 100ms ciągłego braku sygnału GND. Krótkie drgania styków są naturalne i ignorowane.
                     <br><strong>⌨️ Test:</strong> Wciśnij Ctrl+Alt+1..9 na klawiaturze aby obserwować czasy reakcji i ewentualne zakłócenia na żywo.
                 </div>
             </div>
@@ -458,7 +458,7 @@ HTML_RESPONSE = '''
             keyPressStart: {},
             keyDownMeta: {},
             bounceCount: 0,
-            debounceThresholdMs: 35,
+            debounceThresholdMs: 5,
             perKey: {}
         };
         let keyboardListenerAttached = false;
@@ -724,20 +724,12 @@ HTML_RESPONSE = '''
             if (isPressed) {
                 const perKeyStats = ensurePerKeyStats(keyNum);
                 const reactionGap = currentMeta.lastAcceptedAt ? now - currentMeta.lastAcceptedAt : 0;
-                const isBounce = currentMeta.lastAcceptedAt && reactionGap < testStats.debounceThresholdMs;
-                if (isBounce) {
+                // Akceptuj KAŻDE wciśnięcie — firmware obsługuje debounce
+                // Krótkie odstępy to naturalne drgania, nie odrzucaj ich
+                if (currentMeta.lastAcceptedAt && reactionGap < testStats.debounceThresholdMs) {
+                    // Oznacz jako szybkie powtórzenie ale NIE odrzucaj
                     testStats.bounceCount++;
-                    testStats.lastReaction = reactionGap;
                     perKeyStats.rejected++;
-                    perKeyStats.lastDuration = reactionGap;
-                    perKeyStats.state = 'Odrzucone drganie';
-                    statusElement.textContent = '!';
-                    statusElement.style.background = '#ffc107';
-                    statusElement.style.color = 'black';
-                    timingElement.textContent = `${Math.round(reactionGap)}ms`;
-                    updateTestStats();
-                    updatePerKeyTableRow(keyNum);
-                    return;
                 }
 
                 testStats.keyPressStart[keyNum] = now;
@@ -779,10 +771,9 @@ HTML_RESPONSE = '''
                 
                 updateTestStats();
                 perKeyStats.lastDuration = duration;
+                // Akceptuj wszystkie zwolnienia — firmware gwarantuje 100ms stabilność
                 if (duration < testStats.debounceThresholdMs) {
-                    testStats.bounceCount++;
-                    perKeyStats.rejected++;
-                    perKeyStats.state = 'Podejrzane drganie';
+                    perKeyStats.state = `Zwolniony (${Math.round(duration)}ms)`;
                 } else {
                     perKeyStats.state = 'Zwolniony';
                 }

@@ -28,6 +28,36 @@ Projekt makro-klawiatury 9-przyciskowej z enkoderem obrotowym opartej na **Waves
 
 ---
 
+## 🚀 Uruchamianie Web Configurator
+
+Web configurator to interfejs graficzny do konfiguracji klawiatury RP2040.
+
+### Szybki start
+
+```bash
+# Uruchom web configurator (domyślny port 8081)
+make web
+
+# Uruchom na innym porcie
+PORT=8082 make web
+
+# Tryb deweloperski z auto-reload
+make dev
+
+# Zatrzymaj serwer
+make stop
+```
+
+Po uruchomieniu otwórz w przeglądarce: `http://localhost:8081` (lub wybrany port)
+
+### Funkcje Web Configurator
+- ⚙️ **Konfiguracja** - wizualny edytor przypisań klawiszy
+- 🔌 **Schemat** - diagram podłączeń GPIO
+- 💾 **Wgrywanie** - instrukcja flashowania firmware
+- 🧪 **Testowanie** - testowanie klawiszy w czasie rzeczywistym
+
+---
+
 ## 🚀 Auto-Deployment System with HAL
 
 Automatyczny system pobierania bibliotek i deploymentu firmware na RP2040-One/Zero z **HAL (Hardware Abstraction Layer)**:

@@ -131,7 +131,12 @@ keyboard = Keyboard(usb_hid.devices)
 '''
     
     # Konfiguracja pinów przycisków
-    key_pins_code = []
+    key_pins_code = ['''
+# =============================================================================
+# UWAGA: WSZELKIE ZMIANY MAPOWANIA KLAWISZY (LUB KONFIGURACJI)
+# MUSZĄ BYĆ RÓWNIEŻ ZAKTUALIZOWANE W PLIKU: hal/hal_config.toml
+# =============================================================================
+''']
     for i, key in enumerate(config.keys, 1):
         key_pins_code.append(f'''
 # Przycisk {i} -> {key.modifier} + {key.keycode}
@@ -144,20 +149,24 @@ key_{i}_pin.pull = digitalio.Pull.UP
     encoder_code = ""
     if config.encoder:
         encoder_code = f'''
-# Enkoder obrotowy - zoptymalizowany debouncing
+# Enkoder obrotowy
 encoder = rotaryio.IncrementalEncoder(board.GP{config.encoder.clk_gpio}, board.GP{config.encoder.dt_gpio})
 encoder_button = digitalio.DigitalInOut(board.GP{config.encoder.sw_gpio})
 encoder_button.direction = digitalio.Direction.INPUT
 encoder_button.pull = digitalio.Pull.UP
 
-# Ustawienia debouncing inspirowane Arduino
 ENCODER_DEBOUNCE_MS = {config.encoder.debounce_ms}
 SCROLL_SPEED = {config.encoder.scroll_speed}
 
-# Zmienne do śledzenia stanu
+# Parametry debounce — asymetryczny algorytm
+RELEASE_DEBOUNCE_MS = 100  # Zwolnij dopiero po 100ms ciągłego braku GND
+
+# Zmienne do śledzenia stanu enkodera
 encoder_last_pos = 0
 encoder_last_time = time.monotonic()
 encoder_last_count = 0
+encoder_btn_pressed = False
+encoder_btn_last_low = 0
 '''
     
     # Główna pętla
@@ -166,74 +175,90 @@ encoder_last_count = 0
 '''
     
     if config.keys:
-        main_loop += f'''last_positions = [None] * {len(config.keys)}
+        # Generuj tablice stanu klawiszy
+        main_loop += f'''# Stan klawiszy — asymetryczny debounce (natychmiastowe wciśnięcie, opóźnione zwolnienie)
+key_pressed = [False] * {len(config.keys)}
+key_last_low = [0.0] * {len(config.keys)}
+RELEASE_DEBOUNCE_MS = 100  # Zwolnij dopiero po 100ms ciągłego braku GND
+'''
+        # Generuj tablicę pinów i modyfikatorów
+        main_loop += f'''key_pins = [{", ".join(f"key_{i}_pin" for i in range(1, len(config.keys) + 1))}]
+'''
+        # Generuj tablicę keycodów
+        keycodes_list = []
+        modifiers_list = []
+        for key in config.keys:
+            keycodes_list.append(key.keycode)
+            mods = normalize_modifiers(key.modifier)
+            modifiers_list.append(mods)
+        
+        main_loop += f'''key_keycodes = [{", ".join(keycodes_list)}]
+'''
+        # Generuj tablicę modyfikatorów jako listę list
+        mod_strs = []
+        for mods in modifiers_list:
+            mod_strs.append(f"[{', '.join(mods)}]")
+        main_loop += f'''key_modifiers = [{", ".join(mod_strs)}]
 '''
     
     if config.encoder:
-        main_loop += '''encoder_button_pressed = None
-encoder_last_pos = encoder.position
+        main_loop += '''encoder_last_pos = encoder.position
 '''
     
     main_loop += '''
 while True:
+    now = time.monotonic() * 1000  # Czas w ms
 '''
     
-    # Dodaj obsługę przycisków
+    # Dodaj obsługę przycisków — nowy algorytm
     if config.keys:
-        main_loop += '''    # Obsługa przycisków
-'''
-        for i, key in enumerate(config.keys, 1):
-            modifiers = normalize_modifiers(key.modifier)
-            press_args = ", ".join(modifiers + [key.keycode]) if modifiers else key.keycode
-            
-            # Debug info for key 7 (Ctrl+Alt+7)
-            debug_comment = ""
-            if i == 7:
-                debug_comment = f"""
-    # DEBUG: Przycisk 7 -> {key.modifier} + {key.keycode}
-    # DEBUG: Modifiers: {modifiers}
-    # DEBUG: Press args: {press_args}
-"""
-            
-            main_loop += f'''{debug_comment}
-    # Przycisk {i} -> {key.modifier} + {key.keycode}
-    if not key_{i}_pin.value and last_positions[{i-1}] is None:
-        print(f"DEBUG: Wciśnięto przycisk {i}")
-        keyboard.press({press_args})
-        keyboard.release_all()  # Natychmiastowe zwolnienie jak w oryginalnym code.py
-        last_positions[{i-1}] = False
-        print(f"DEBUG: Zwolniono przycisk {i}")
-    elif key_{i}_pin.value and last_positions[{i-1}] is False:
-        last_positions[{i-1}] = None
+        main_loop += f'''
+    # Obsługa przycisków — działa jak zwykła klawiatura:
+    #   GND na pinie = klawisz TRZYMANY (jak palec na klawiszu)
+    #   Brak GND przez 100ms = klawisz ZWOLNIONY
+    #   Krótkie drgania styków ignorowane (naturalne zjawisko)
+    for i in range({len(config.keys)}):
+        current = key_pins[i].value  # False = wciśnięty (zwarte do GND)
+
+        if not current:  # Pin jest LOW (GND) — styk zwarty
+            key_last_low[i] = now
+            if not key_pressed[i]:
+                # Natychmiastowa detekcja wciśnięcia — bez opóźnienia
+                key_pressed[i] = True
+                keyboard.press(*key_modifiers[i], key_keycodes[i])
+        else:  # Pin jest HIGH — styk otwarty (może być drganie!)
+            if key_pressed[i]:
+                # Zwolnij dopiero gdy pin jest HIGH nieprzerwanie przez 100ms
+                if (now - key_last_low[i]) > RELEASE_DEBOUNCE_MS:
+                    key_pressed[i] = False
+                    # Zwolnij TYLKO ten klawisz
+                    keyboard.release(key_keycodes[i])
+                    # Zwolnij modyfikatory gdy ŻADEN przycisk nie jest wciśnięty
+                    if not any(key_pressed):
+                        keyboard.release_all()
 '''
     
     # Dodaj obsługę enkodera
     if config.encoder:
         main_loop += '''
-    # Obsługa enkodera - zoptymalizowana pętla inspirowana Arduino
+    # Obsługa enkodera obrotowego
     current_pos = encoder.position
     current_time = time.monotonic()
     
-    # Debouncing - sprawdzaj tylko jeśli minął wystarczający czas
     if (current_time - encoder_last_time) >= (ENCODER_DEBOUNCE_MS / 1000.0):
         if current_pos != encoder_last_pos:
-            # Wykryj kierunek i kroki (jak w Arduino)
             steps = current_pos - encoder_last_pos
             
-            # Ogranicz maksymalne kroki dla uniknięcia "skakania"
             if abs(steps) <= 10:
                 if steps > 0:
-                    # Obrót w prawo (CW) - scroll w górę
                     for _ in range(abs(steps) * SCROLL_SPEED):
                         mouse.move(wheel=1)
                 else:
-                    # Obrót w lewo (CCW) - scroll w dół  
                     for _ in range(abs(steps) * SCROLL_SPEED):
                         mouse.move(wheel=-1)
                 
                 encoder_last_count += steps
             else:
-                # Zbyt duża zmiana - zresetuj pozycję
                 encoder.position = encoder_last_pos
             
             encoder_last_pos = current_pos
@@ -241,28 +266,24 @@ while True:
     
 '''
         
-        if config.encoder.middle_click:
-            main_loop += '''    # Przycisk enkodera - debouncing (middle click)
-    if not encoder_button.value and encoder_button_pressed is None:
-        mouse.click(Mouse.MIDDLE_BUTTON)
-        encoder_button_pressed = False
-        time.sleep(0.01)  # Krótki debounce dla przycisku
-    elif encoder_button.value and encoder_button_pressed is False:
-        encoder_button_pressed = None
-
-'''
-        else:
-            main_loop += '''    # Przycisk enkodera - debouncing (left click)
-    if not encoder_button.value and encoder_button_pressed is None:
-        mouse.click(Mouse.LEFT_BUTTON)
-        encoder_button_pressed = False
-        time.sleep(0.01)  # Krótki debounce dla przycisku
-    elif encoder_button.value and encoder_button_pressed is False:
-        encoder_button_pressed = None
+        # Przycisk enkodera — ten sam algorytm asymetryczny
+        click_button = "Mouse.MIDDLE_BUTTON" if config.encoder.middle_click else "Mouse.LEFT_BUTTON"
+        click_name = "middle click" if config.encoder.middle_click else "left click"
+        main_loop += f'''    # Przycisk enkodera ({click_name}) — natychmiastowe wciśnięcie + opóźnione zwolnienie
+    if not encoder_button.value:  # Pin LOW (GND) — styk zwarty
+        encoder_btn_last_low = now
+        if not encoder_btn_pressed:
+            encoder_btn_pressed = True
+            mouse.press({click_button})
+    else:  # Pin HIGH — styk otwarty
+        if encoder_btn_pressed:
+            if (now - encoder_btn_last_low) > RELEASE_DEBOUNCE_MS:
+                encoder_btn_pressed = False
+                mouse.release({click_button})
 
 '''
     
-    main_loop += '''    time.sleep(0.01)  # Małe opóźnienie
+    main_loop += '''    time.sleep(0.001)  # 1ms — niska latencja pętli
 '''
     
     # Połącz wszystko
