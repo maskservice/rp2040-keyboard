@@ -1,0 +1,10 @@
+name: Repository policy
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  standards:
+    uses: maskservice/.github/.github/workflows/committed-policy.yml@b1ee98c9cca8070225a9ecf95ef804a5d3936782
