@@ -153,7 +153,9 @@ def test_e2e_health_endpoints(server_fixture, request):
     assert root_response.status_code == 200
     assert "text/html" in root_response.headers["content-type"]
     assert "Podejrzane drgania" in root_response.text
-    assert "Próg filtracji" in root_response.text
+    assert "Próg zwolnienia (release)" in root_response.text
+    assert 'id="debounceThreshold">100ms</div>' in root_response.text
+    assert "Natychmiastowa detekcja wciśnięcia" in root_response.text
     assert "Status nasłuchu" in root_response.text
     assert "Statystyka klawiszy" in root_response.text
     assert "Naciśnięcia" in root_response.text

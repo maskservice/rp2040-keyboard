@@ -156,7 +156,27 @@ def test_generate_code_keys_section(valid_config):
     assert "key_2_pin = digitalio.DigitalInOut(board.GP2)" in code
     assert "key_3_pin = digitalio.DigitalInOut(board.GP3)" in code
     assert "digitalio.Pull.UP" in code
-    assert "keyboard.press(Keycode.CONTROL, Keycode.SHIFT, Keycode.ONE)" in code
+    tree = ast.parse(code)
+    assignments = {
+        node.targets[0].id: node.value
+        for node in tree.body
+        if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name)
+    }
+    assert ast.unparse(assignments["key_keycodes"]) == (
+        "[Keycode.ONE, Keycode.TWO, Keycode.THREE]"
+    )
+    assert ast.unparse(assignments["key_modifiers"]) == (
+        "[[Keycode.CONTROL, Keycode.SHIFT], "
+        "[Keycode.CONTROL, Keycode.SHIFT], [Keycode.CONTROL, Keycode.SHIFT]]"
+    )
+    press_calls = [
+        node for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and ast.unparse(node.func) == "keyboard.press"
+    ]
+    assert len(press_calls) == 1
+    assert [ast.unparse(argument) for argument in press_calls[0].args] == [
+        "*key_modifiers[i]", "key_keycodes[i]",
+    ]
 
 def test_generate_code_encoder_section(valid_config):
     """Test sekcji konfiguracji enkodera."""
