@@ -9,3 +9,20 @@ def test_placeholder():
 def test_import():
     """Verify the main package can be imported."""
     import rp2040_keyboard  # noqa: F401
+
+
+def test_hal_models_exports_contract():
+    """Verify all models in hal_models are re-exported by hal_manager identically."""
+    import rp2040_keyboard.hal_manager as manager
+    import rp2040_keyboard.hal_models as models
+
+    symbols = [
+        "KeyConfig",
+        "EncoderConfig",
+        "PadConfig",
+        "HALSwitchConfig",
+        "HALEncoderConfig",
+    ]
+    for sym in symbols:
+        assert getattr(manager, sym) is getattr(models, sym)
+

@@ -20,54 +20,14 @@ from typing import Dict, List, Optional, Any
 # Dodaj ścieżkę do projektu
 sys.path.insert(0, str(Path(__file__).parent))
 
-# Proste definicje klas aby uniknąć problemów z importem
-@dataclass
-class KeyConfig:
-    gpio: int
-    keycode: str
-    modifier: str = "Keycode.CONTROL+Keycode.ALT"
-    label: str = ""
+from .hal_models import (
+    EncoderConfig,
+    HALEncoderConfig,
+    HALSwitchConfig,
+    KeyConfig,
+    PadConfig,
+)
 
-@dataclass 
-class EncoderConfig:
-    clk_gpio: int
-    dt_gpio: int
-    sw_gpio: int
-    scroll_speed: int = 2
-    middle_click: bool = True
-    debounce_ms: int = 3
-
-@dataclass
-class PadConfig:
-    keys: List[KeyConfig]
-    encoder: Optional[EncoderConfig] = None
-    
-    def to_dict(self) -> dict:
-        from dataclasses import asdict
-        return asdict(self)
-
-@dataclass
-class HALSwitchConfig:
-    """Konfiguracja przełącznika w formacie HAL."""
-    gpio: int
-    keycode: str
-    modifier: str = "Keycode.CONTROL+Keycode.ALT"
-    label: str = ""
-    pull: str = "up"
-    debounce: int = 10
-
-@dataclass
-class HALEncoderConfig:
-    """Konfiguracja enkodera w formacie HAL."""
-    enabled: bool = True
-    clk_gpio: int = 11
-    dt_gpio: int = 12
-    sw_gpio: int = 13
-    pull: str = "up"
-    debounce: int = 3
-    scroll_speed: int = 2
-    middle_click: bool = True
-    steps_per_revolution: int = 24
 
 class HALConfigManager:
     """Menadżer konfiguracji HAL."""
@@ -535,3 +495,13 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+__all__ = [
+    "EncoderConfig",
+    "HALConfigManager",
+    "HALEncoderConfig",
+    "HALSwitchConfig",
+    "KeyConfig",
+    "PadConfig",
+]
