@@ -311,6 +311,15 @@
         "policy evaluation IR",
         "conformance gating"
       ]
+    },
+    {
+      "id": "wellmanifest/reuse",
+      "owns": [
+        "cross-project code discovery",
+        "AST clone deduplication",
+        "continuous modularization",
+        "intent-based reuse execution"
+      ]
     }
   ]
 }
