@@ -7,7 +7,7 @@ services:
     ports:
       - "8080:8080"
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/')"]
+      test: ["CMD", "python", "-c", "import os, urllib.request; port = os.getenv('WEB_PORT', '8080'); urllib.request.urlopen(f'http://127.0.0.1:{port}/')"]
       interval: 5s
       timeout: 3s
       retries: 10
