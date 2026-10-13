@@ -31,6 +31,10 @@ from .hal_models import (
 
 class HALConfigManager:
     """Menadżer konfiguracji HAL."""
+
+    DEFAULT_ENCODER_CLK: int = 11
+    DEFAULT_ENCODER_DT: int = 12
+    DEFAULT_ENCODER_SW: int = 13
     
     def __init__(self, project_root: Optional[Path] = None):
         self.project_root = project_root or Path(__file__).parent.parent
@@ -86,9 +90,9 @@ class HALConfigManager:
             "switches": {},
             "encoder": {
                 "enabled": True,
-                "clk_gpio": 11,
-                "dt_gpio": 12,
-                "sw_gpio": 13,
+                "clk_gpio": self.DEFAULT_ENCODER_CLK,
+                "dt_gpio": self.DEFAULT_ENCODER_DT,
+                "sw_gpio": self.DEFAULT_ENCODER_SW,
                 "pull": "up",
                 "debounce": 3,
                 "scroll_speed": 2,
@@ -137,9 +141,9 @@ class HALConfigManager:
         encoder_data = hal_config.get("encoder", {})
         if encoder_data.get("enabled", True):
             encoder_config = EncoderConfig(
-                clk_gpio=encoder_data.get("clk_gpio", 11),
-                dt_gpio=encoder_data.get("dt_gpio", 12),
-                sw_gpio=encoder_data.get("sw_gpio", 13),
+                clk_gpio=encoder_data.get("clk_gpio", self.DEFAULT_ENCODER_CLK),
+                dt_gpio=encoder_data.get("dt_gpio", self.DEFAULT_ENCODER_DT),
+                sw_gpio=encoder_data.get("sw_gpio", self.DEFAULT_ENCODER_SW),
                 scroll_speed=encoder_data.get("scroll_speed", 2),
                 middle_click=encoder_data.get("middle_click", True),
                 debounce_ms=encoder_data.get("debounce", 3)
@@ -281,9 +285,9 @@ class HALConfigManager:
         ]
         
         default_encoder = EncoderConfig(
-            clk_gpio=11,
-            dt_gpio=12,
-            sw_gpio=13,
+            clk_gpio=self.DEFAULT_ENCODER_CLK,
+            dt_gpio=self.DEFAULT_ENCODER_DT,
+            sw_gpio=self.DEFAULT_ENCODER_SW,
             scroll_speed=2,
             middle_click=True,
             debounce_ms=3
@@ -424,74 +428,101 @@ class HALConfigManager:
         
         return backup_file
 
+def _handle_sync_from_hal(manager: HALConfigManager) -> None:
+    config = manager.sync_from_hal()
+    print(f"Konfiguracja firmware: {len(config.keys)} przełączników, enkoder: {'tak' if config.encoder else 'nie'}")
+
+
+def _handle_sync_to_hal(manager: HALConfigManager) -> None:
+    config = manager.get_current_config()
+    manager.sync_to_hal(config)
+
+
+def _handle_validate(manager: HALConfigManager) -> None:
+    hal_config = manager.load_hal_config()
+    is_valid, errors = manager.validate_hal_config(hal_config)
+    if is_valid:
+        print("✅ Konfiguracja HAL jest poprawna")
+    else:
+        print("❌ Błędy w konfiguracji HAL:")
+        for error in errors:
+            print(f"  - {error}")
+
+
+def _handle_show(manager: HALConfigManager) -> None:
+    hal_config = manager.load_hal_config()
+    print("Aktualna konfiguracja HAL:")
+    print(json.dumps(hal_config, indent=2, ensure_ascii=False))
+
+
+def _handle_profiles(manager: HALConfigManager) -> None:
+    profiles = manager.list_profiles()
+    print("Dostępne profile:")
+    for profile in profiles:
+        print(f"  - {profile}")
+
+
+def _handle_apply_profile(manager: HALConfigManager, args: list[str]) -> None:
+    if len(args) > 2:
+        manager.apply_profile(args[2])
+
+
+def _handle_save_profile(manager: HALConfigManager, args: list[str]) -> None:
+    if len(args) > 2:
+        hal_config = manager.load_hal_config()
+        manager.save_profile(args[2], hal_config)
+
+
+def _handle_backup(manager: HALConfigManager) -> None:
+    manager.create_backup()
+
+
+def _print_default_summary(manager: HALConfigManager) -> None:
+    config = manager.get_current_config()
+    print("🔧 Aktualna konfiguracja:")
+    print(f"  Przełączniki: {len(config.keys)}")
+    for i, key in enumerate(config.keys, 1):
+        print(f"    {i}. GPIO{key.gpio} → {key.modifier}+{key.keycode}")
+    if config.encoder:
+        print(f"  Enkoder: GPIO{config.encoder.clk_gpio}/{config.encoder.dt_gpio}/{config.encoder.sw_gpio}")
+
+
+def _print_help() -> None:
+    print("Dostępne komendy:")
+    print("  sync-from-hal   - Synchronizuj HAL → Firmware")
+    print("  sync-to-hal     - Synchronizuj Firmware → HAL")
+    print("  validate        - Waliduj konfigurację HAL")
+    print("  show            - Pokaż konfigurację HAL")
+    print("  profiles        - Lista dostępnych profili")
+    print("  apply-profile X - Zastosuj profil X")
+    print("  save-profile X  - Zapisz aktualną konfigurację jako profil X")
+    print("  backup          - Stwórz backup konfiguracji")
+
+
 def main():
     """Main entry point."""
     manager = HALConfigManager()
-    
-    if len(sys.argv) > 1:
-        command = sys.argv[1]
-        
-        if command == "sync-from-hal":
-            config = manager.sync_from_hal()
-            print(f"Konfiguracja firmware: {len(config.keys)} przełączników, enkoder: {'tak' if config.encoder else 'nie'}")
-        
-        elif command == "sync-to-hal":
-            # Pobierz aktualną konfigurację i zsynchronizuj do HAL
-            config = manager.get_current_config()
-            manager.sync_to_hal(config)
-        
-        elif command == "validate":
-            hal_config = manager.load_hal_config()
-            is_valid, errors = manager.validate_hal_config(hal_config)
-            if is_valid:
-                print("✅ Konfiguracja HAL jest poprawna")
-            else:
-                print("❌ Błędy w konfiguracji HAL:")
-                for error in errors:
-                    print(f"  - {error}")
-        
-        elif command == "show":
-            hal_config = manager.load_hal_config()
-            print("Aktualna konfiguracja HAL:")
-            print(json.dumps(hal_config, indent=2, ensure_ascii=False))
-        
-        elif command == "profiles":
-            profiles = manager.list_profiles()
-            print("Dostępne profile:")
-            for profile in profiles:
-                print(f"  - {profile}")
-        
-        elif command == "apply-profile" and len(sys.argv) > 2:
-            profile_name = sys.argv[2]
-            manager.apply_profile(profile_name)
-        
-        elif command == "save-profile" and len(sys.argv) > 2:
-            profile_name = sys.argv[2]
-            hal_config = manager.load_hal_config()
-            manager.save_profile(profile_name, hal_config)
-        
-        elif command == "backup":
-            manager.create_backup()
-        
-        else:
-            print("Dostępne komendy:")
-            print("  sync-from-hal   - Synchronizuj HAL → Firmware")
-            print("  sync-to-hal     - Synchronizuj Firmware → HAL")
-            print("  validate        - Waliduj konfigurację HAL")
-            print("  show            - Pokaż konfigurację HAL")
-            print("  profiles        - Lista dostępnych profili")
-            print("  apply-profile X - Zastosuj profil X")
-            print("  save-profile X  - Zapisz aktualną konfigurację jako profil X")
-            print("  backup          - Stwórz backup konfiguracji")
+    if len(sys.argv) <= 1:
+        _print_default_summary(manager)
+        return
+
+    command = sys.argv[1]
+    handlers = {
+        "sync-from-hal": lambda: _handle_sync_from_hal(manager),
+        "sync-to-hal": lambda: _handle_sync_to_hal(manager),
+        "validate": lambda: _handle_validate(manager),
+        "show": lambda: _handle_show(manager),
+        "profiles": lambda: _handle_profiles(manager),
+        "apply-profile": lambda: _handle_apply_profile(manager, sys.argv),
+        "save-profile": lambda: _handle_save_profile(manager, sys.argv),
+        "backup": lambda: _handle_backup(manager),
+    }
+    handler = handlers.get(command)
+    if handler:
+        handler()
     else:
-        # Domyślnie - pokaż aktualną konfigurację
-        config = manager.get_current_config()
-        print(f"🔧 Aktualna konfiguracja:")
-        print(f"  Przełączniki: {len(config.keys)}")
-        for i, key in enumerate(config.keys, 1):
-            print(f"    {i}. GPIO{key.gpio} → {key.modifier}+{key.keycode}")
-        if config.encoder:
-            print(f"  Enkoder: GPIO{config.encoder.clk_gpio}/{config.encoder.dt_gpio}/{config.encoder.sw_gpio}")
+        _print_help()
+
 
 if __name__ == "__main__":
     main()
