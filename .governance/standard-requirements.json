@@ -34,8 +34,16 @@
       "minimumLevel": "S4"
     },
     {
+      "id": "wellmanifest/nohardcode",
+      "minimumLevel": "S0"
+    },
+    {
       "id": "wellmanifest/poa",
       "minimumLevel": "S5"
+    },
+    {
+      "id": "wellmanifest/ssot",
+      "minimumLevel": "S0"
     },
     {
       "id": "wellmanifest/ticket-lifecycle",
