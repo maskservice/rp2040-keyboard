@@ -1,0 +1,1266 @@
+{
+  "schema": "wellmanifest.reuse-scan-receipt/v1",
+  "tool": {
+    "name": "redup",
+    "version": "0.4.48"
+  },
+  "revision": "f51129fdbf6fb4ca93828ec4bbe46760e7cd322d",
+  "scanned": [
+    {
+      "path": "auto-deploy.sh",
+      "sha256": "a429f3119322f649e412b14c468c19bbb47cd385b527e0868bc186630cf96ab0"
+    },
+    {
+      "path": "backups/20260312_165353/code.py",
+      "sha256": "c63bf759e5502fc9f4ad863b883423a2d75992aeaebee6a713eb81fe3f714a4b"
+    },
+    {
+      "path": "backups/20260312_165353/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_165353/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_165353/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_165353/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_165353/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_165353/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_165353/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_165353/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_165356/boot.py",
+      "sha256": "1d45391fb7f4ec8b3354c340888067dcdbd513ca19d34a62df2caba5429366c0"
+    },
+    {
+      "path": "backups/20260312_165356/code.py",
+      "sha256": "6df63a5ebbeab826f749e289b383cdb508d12585028c9179cad1db667c593d32"
+    },
+    {
+      "path": "backups/20260312_165356/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_165356/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_165356/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_165356/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_165356/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_165356/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_165356/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_165356/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_165414/boot.py",
+      "sha256": "1d45391fb7f4ec8b3354c340888067dcdbd513ca19d34a62df2caba5429366c0"
+    },
+    {
+      "path": "backups/20260312_165414/code.py",
+      "sha256": "6df63a5ebbeab826f749e289b383cdb508d12585028c9179cad1db667c593d32"
+    },
+    {
+      "path": "backups/20260312_165414/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_165414/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_165414/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_165414/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_165414/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_165414/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_165414/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_165414/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_165417/boot.py",
+      "sha256": "1d45391fb7f4ec8b3354c340888067dcdbd513ca19d34a62df2caba5429366c0"
+    },
+    {
+      "path": "backups/20260312_165417/code.py",
+      "sha256": "6df63a5ebbeab826f749e289b383cdb508d12585028c9179cad1db667c593d32"
+    },
+    {
+      "path": "backups/20260312_165417/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_165417/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_165417/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_165417/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_165417/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_165417/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_165417/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_165417/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_170353/boot.py",
+      "sha256": "1d45391fb7f4ec8b3354c340888067dcdbd513ca19d34a62df2caba5429366c0"
+    },
+    {
+      "path": "backups/20260312_170353/code.py",
+      "sha256": "6df63a5ebbeab826f749e289b383cdb508d12585028c9179cad1db667c593d32"
+    },
+    {
+      "path": "backups/20260312_170353/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_170353/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_170353/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_170353/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_170353/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_170353/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_170353/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_170353/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_170356/boot.py",
+      "sha256": "1d45391fb7f4ec8b3354c340888067dcdbd513ca19d34a62df2caba5429366c0"
+    },
+    {
+      "path": "backups/20260312_170356/code.py",
+      "sha256": "6df63a5ebbeab826f749e289b383cdb508d12585028c9179cad1db667c593d32"
+    },
+    {
+      "path": "backups/20260312_170356/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_170356/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_170356/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_170356/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_170356/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_170356/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_170356/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_170356/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_170424/boot.py",
+      "sha256": "1d45391fb7f4ec8b3354c340888067dcdbd513ca19d34a62df2caba5429366c0"
+    },
+    {
+      "path": "backups/20260312_170424/code.py",
+      "sha256": "6df63a5ebbeab826f749e289b383cdb508d12585028c9179cad1db667c593d32"
+    },
+    {
+      "path": "backups/20260312_170424/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_170424/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_170424/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_170424/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_170424/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_170424/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_170424/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_170424/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_170427/boot.py",
+      "sha256": "2ceabf7ccecb49fb053f9321124e0360228f57e1b04981062914f6f1448cd863"
+    },
+    {
+      "path": "backups/20260312_170427/code.py",
+      "sha256": "7874a9529aaecf6304ea25566d59912f4c8902b48c285400c2fbe42bf69d399d"
+    },
+    {
+      "path": "backups/20260312_170427/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_170427/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_170427/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_170427/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_170427/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_170427/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_170427/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_170427/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_184609/code.py",
+      "sha256": "c63bf759e5502fc9f4ad863b883423a2d75992aeaebee6a713eb81fe3f714a4b"
+    },
+    {
+      "path": "backups/20260312_184609/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_184609/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_184609/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_184609/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_184609/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_184609/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_184609/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_184609/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_184833/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260312_184833/code.py",
+      "sha256": "d7b89b753adcb46bf9ff05edfe491668b0db883e8d1b59d24332e091993317f7"
+    },
+    {
+      "path": "backups/20260312_184833/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_184833/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_184833/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_184833/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_184833/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_184833/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_184833/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_184833/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_190619/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260312_190619/code.py",
+      "sha256": "d7b89b753adcb46bf9ff05edfe491668b0db883e8d1b59d24332e091993317f7"
+    },
+    {
+      "path": "backups/20260312_190619/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_190619/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_190619/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_190619/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_190619/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_190619/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_190619/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_190619/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_191928/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260312_191928/code.py",
+      "sha256": "d7b89b753adcb46bf9ff05edfe491668b0db883e8d1b59d24332e091993317f7"
+    },
+    {
+      "path": "backups/20260312_191928/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_191928/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_191928/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_191928/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_191928/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_191928/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_191928/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_191928/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_192021/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260312_192021/code.py",
+      "sha256": "6a88a542d5de6c48c429aa539790d5f9eecd01c088e3aeb064ce816488f441bf"
+    },
+    {
+      "path": "backups/20260312_192021/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_192021/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_192021/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_192021/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_192021/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_192021/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_192021/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_192021/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_195021/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260312_195021/code.py",
+      "sha256": "6a88a542d5de6c48c429aa539790d5f9eecd01c088e3aeb064ce816488f441bf"
+    },
+    {
+      "path": "backups/20260312_195021/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_195021/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_195021/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_195021/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_195021/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_195021/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_195021/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_195021/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_201049/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260312_201049/code.py",
+      "sha256": "17cab7cefdc436345fcd2f093be635a37ced79acc3ec3429312a8c071ad02820"
+    },
+    {
+      "path": "backups/20260312_201049/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_201049/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_201049/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_201049/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_201049/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_201049/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_201049/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_201049/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260312_202315/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260312_202315/code.py",
+      "sha256": "e2226dce58efefd7a27cfebb9cd0956607234b79fe945783906b46cb06edbd37"
+    },
+    {
+      "path": "backups/20260312_202315/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260312_202315/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260312_202315/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260312_202315/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260312_202315/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260312_202315/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260312_202315/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260312_202315/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260530_125931/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260530_125931/code.py",
+      "sha256": "395a923bc52347825139242f8e133e40e03a99d2d45521f7c4b610283ca72e93"
+    },
+    {
+      "path": "backups/20260530_125931/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260530_125931/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260530_125931/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260530_125931/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260530_125931/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260530_125931/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260530_125931/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260530_125931/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260530_130620/code.py",
+      "sha256": "c63bf759e5502fc9f4ad863b883423a2d75992aeaebee6a713eb81fe3f714a4b"
+    },
+    {
+      "path": "backups/20260530_130620/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260530_130620/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260530_130620/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260530_130620/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260530_130620/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260530_130620/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260530_130620/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260530_130620/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260530_131416/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260530_131416/code.py",
+      "sha256": "395a923bc52347825139242f8e133e40e03a99d2d45521f7c4b610283ca72e93"
+    },
+    {
+      "path": "backups/20260530_131416/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260530_131416/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260530_131416/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260530_131416/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260530_131416/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260530_131416/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260530_131416/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260530_131416/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260530_132318/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260530_132318/code.py",
+      "sha256": "d64cfc5fa55d5e26cb8ba3582d00ed5b4bedb6f3ac504df17b48ba140d2dc7db"
+    },
+    {
+      "path": "backups/20260530_132318/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260530_132318/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260530_132318/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260530_132318/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260530_132318/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260530_132318/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260530_132318/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260530_132318/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260530_133246/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260530_133246/code.py",
+      "sha256": "d64cfc5fa55d5e26cb8ba3582d00ed5b4bedb6f3ac504df17b48ba140d2dc7db"
+    },
+    {
+      "path": "backups/20260530_133246/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260530_133246/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260530_133246/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260530_133246/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260530_133246/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260530_133246/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260530_133246/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260530_133246/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260530_134708/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260530_134708/code.py",
+      "sha256": "d64cfc5fa55d5e26cb8ba3582d00ed5b4bedb6f3ac504df17b48ba140d2dc7db"
+    },
+    {
+      "path": "backups/20260530_134708/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260530_134708/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260530_134708/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260530_134708/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260530_134708/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260530_134708/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260530_134708/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260530_134708/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260530_135125/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260530_135125/code.py",
+      "sha256": "d64cfc5fa55d5e26cb8ba3582d00ed5b4bedb6f3ac504df17b48ba140d2dc7db"
+    },
+    {
+      "path": "backups/20260530_135125/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260530_135125/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260530_135125/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260530_135125/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260530_135125/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260530_135125/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260530_135125/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260530_135125/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260530_135225/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260530_135225/code.py",
+      "sha256": "d64cfc5fa55d5e26cb8ba3582d00ed5b4bedb6f3ac504df17b48ba140d2dc7db"
+    },
+    {
+      "path": "backups/20260530_135225/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260530_135225/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260530_135225/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260530_135225/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260530_135225/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260530_135225/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260530_135225/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260530_135225/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260530_135811/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260530_135811/code.py",
+      "sha256": "26a307d260a0d509ff2aceff78f59e2a473f1693c523d75ae72f09d388944acb"
+    },
+    {
+      "path": "backups/20260530_135811/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260530_135811/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260530_135811/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260530_135811/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260530_135811/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260530_135811/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260530_135811/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260530_135811/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260530_153611/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260530_153611/code.py",
+      "sha256": "fee2ff240b55ada90bb9d95dd6c2ad3a7713fa6f97046ea3a1502da4c5c5b8b4"
+    },
+    {
+      "path": "backups/20260530_153611/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260530_153611/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260530_153611/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260530_153611/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260530_153611/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260530_153611/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260530_153611/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260530_153611/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260530_154226/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260530_154226/code.py",
+      "sha256": "406cadf0f18902c14a87880cc28fbc1b9f6cca44935d1cacdd0b9ac38b978f1c"
+    },
+    {
+      "path": "backups/20260530_154226/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260530_154226/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260530_154226/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260530_154226/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260530_154226/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260530_154226/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260530_154226/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260530_154226/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "backups/20260530_154547/boot.py",
+      "sha256": "c5b202d60a8c2df71ed9f0385c6c1ea1ceceb0ff4e5ca668ae6b4117fe526e3a"
+    },
+    {
+      "path": "backups/20260530_154547/code.py",
+      "sha256": "0a02f8190fcad8beee59ee735c287c95d4fc157dbcaf9110f3ee1d5818cb14d0"
+    },
+    {
+      "path": "backups/20260530_154547/lib/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "backups/20260530_154547/lib/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "backups/20260530_154547/lib/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "backups/20260530_154547/lib/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "backups/20260530_154547/lib/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "backups/20260530_154547/lib/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "backups/20260530_154547/lib/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "backups/20260530_154547/lib/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "boot-monitor.py",
+      "sha256": "2c824f00e31b543f6511347b63d2a5d105067fa9941dd47b2e99f302a187c511"
+    },
+    {
+      "path": "debug_ctrl_alt_7.py",
+      "sha256": "6e5fba5163a2f32196721a1011a9e85b5cb444119c2ff7a885e6aa4803afaa41"
+    },
+    {
+      "path": "deploy.py",
+      "sha256": "eea3dfd4a431a059dd222cb1b2747feaeba547860c404d8d02dfbb72a11383df"
+    },
+    {
+      "path": "keyscan.html",
+      "sha256": "2f306e0be90b6aee87c9225cc22fd9d2f1ebda220f7bef21ea5c95f318bb036b"
+    },
+    {
+      "path": "keyscan.py",
+      "sha256": "0386419148f8b261e2d7909acae7c0e72b2b2ca17680bfa8c74cb616b4dc6a98"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/adafruit_hid/__init__.py",
+      "sha256": "1b9ec7f0e45f283c37cea7467f65569c2223e6086eada6b985eb97b3825777aa"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/adafruit_hid/consumer_control.py",
+      "sha256": "292eb263c0dd8e0d2f5f1f6a874c47513208142beaae60772221d1bd5b830fa8"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/adafruit_hid/consumer_control_code.py",
+      "sha256": "f830b3f4f8311d730b1777933d0684dadc7a7a1a08d3c2a772dd85105e67d4af"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/adafruit_hid/keyboard.py",
+      "sha256": "4671ac9f8c0d70def35fb122058211688300930fe74e7674ce6866c3c3fdf0d3"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/adafruit_hid/keyboard_layout_base.py",
+      "sha256": "c5bb6dde393202971344aded5ab4cddf93d06dee83dc0edd3031dc7ae838a365"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/adafruit_hid/keyboard_layout_us.py",
+      "sha256": "f04cf57bd1cf8081d984748797e2c0c2346c6dee03526800dcf93212004bd7b4"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/adafruit_hid/keycode.py",
+      "sha256": "0dff8e3b3afbc45105444e1201450a3ef4c9a08fa1bccc5adb8a4fd9d404a142"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/adafruit_hid/mouse.py",
+      "sha256": "76930d0c79340de91b11c224254521bdda6ddf6f86b3c40adb988a1b5208855c"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/docs/_static/custom.css",
+      "sha256": "bf196e0a825f8056105c2a7145a7b99ba37200e62974cda2ae29e47b78f41f8d"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/docs/conf.py",
+      "sha256": "fe5945888eceedf74c7ba5bd802b6b3ba53c100e6e9f98728d547453ec25758b"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/examples/hid_consumer_control_brightness.py",
+      "sha256": "24b3fa378795beced57ba6e47f7b5314d247acb9cd0ef25b5cc27c31946755cf"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/examples/hid_gamepad.py",
+      "sha256": "8dc7c0a80d979e8079381266255926b1218fe68d0e27c0c3329f39b87da3f7dd"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/examples/hid_joywing_gamepad.py",
+      "sha256": "8f9294472918ee96b1c3783f5e2cd16263b744f5dfc387f5a1360353fc900d90"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/examples/hid_keyboard_layout.py",
+      "sha256": "d5b662eb519c0fc1bb100fb624c1c7c60d6fee1529bced8185a678499c13622b"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/examples/hid_keyboard_shortcuts.py",
+      "sha256": "462658f6020e4d3dfed775b4981ebd811f71576be62379a506732641befb29c6"
+    },
+    {
+      "path": "lib_cache/hid/Adafruit_CircuitPython_HID-main/examples/hid_simple_gamepad.py",
+      "sha256": "dd69588f31fb99addc3c0ed7059b7e86e453054c4ca78e431d6af6f5653e673f"
+    },
+    {
+      "path": "project.sh",
+      "sha256": "51b1cd4abe48f66345ecc677de8432e413a3d5f389bcfa09f266d5b61ca28d74"
+    },
+    {
+      "path": "rp2040_keyboard/__init__.py",
+      "sha256": "52617aa3366d3a3023a50383d3032fccb578390fcf3e2e24cd69be7551048d80"
+    },
+    {
+      "path": "rp2040_keyboard/firmware/__init__.py",
+      "sha256": "b0e7503f0aace011e6d3bec72648565e92df98cbbdb42af79bf6fca06967eb2e"
+    },
+    {
+      "path": "rp2040_keyboard/firmware/boot.py",
+      "sha256": "1d45391fb7f4ec8b3354c340888067dcdbd513ca19d34a62df2caba5429366c0"
+    },
+    {
+      "path": "rp2040_keyboard/firmware/boot_template.py",
+      "sha256": "da514f99594b12fc3e868d813bc635353213477e7413fe2e8fe99b19e9b1dc81"
+    },
+    {
+      "path": "rp2040_keyboard/firmware/code.py",
+      "sha256": "5a360cbdc69f0f8d4a10c072fb5eaba59ff41df947734d3f323e69c453f63a53"
+    },
+    {
+      "path": "rp2040_keyboard/firmware/generator.py",
+      "sha256": "fb0328a2e83f055136db374a9c4c0fe348e9d105d0e7788c4c6a8aaabb6d6d19"
+    },
+    {
+      "path": "rp2040_keyboard/firmware/validator.py",
+      "sha256": "f509c84e20e06d54a4613a077db03fafe166edebfd82100ac8f2e64243415143"
+    },
+    {
+      "path": "rp2040_keyboard/hal_manager.py",
+      "sha256": "8572c54684897c3129d60496e9f44e112d6db9591bee11e85d1a6a9641d6b640"
+    },
+    {
+      "path": "rp2040_keyboard/hal_models.py",
+      "sha256": "7bfdd13a5d906bbc194f679ce63e2d117775ed4a11c214ce3643540159955414"
+    },
+    {
+      "path": "rp2040_keyboard/web/__init__.py",
+      "sha256": "6346e19628519532d6ad0e7ec39bcca99afc8356bfc352faa8ca8cc79f6d870d"
+    },
+    {
+      "path": "rp2040_keyboard/web/app.py",
+      "sha256": "12bdbf301ae38b9a40d4d8df9a258f936fe41b7f5f9c7e8b5ff29c40fb320fa9"
+    },
+    {
+      "path": "standards/docs_report.py",
+      "sha256": "cfa1eb5d66a9e201d407541cc91266c9852ab9226a3b503e2e99345abb948b26"
+    },
+    {
+      "path": "standards/report/operations/conformance.py",
+      "sha256": "9614c79e43aa78c4f01bce5796a20139fe0101db05527b4ab73c70e32dff1e93"
+    }
+  ],
+  "findings": {
+    "clone_groups": 21,
+    "unmitigated": 0
+  }
+}
