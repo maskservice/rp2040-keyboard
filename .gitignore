@@ -762,3 +762,4 @@ rpi4/config/.env.rpi4
 /.subactor/receipts/
 /.subactor/cache/
 /.subactor/snapshots/
+/*.uf2.backup
