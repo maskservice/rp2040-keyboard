@@ -10,10 +10,8 @@ Uruchom:
 """
 
 import ast
-import json
 import re
 import sys
-import textwrap
 from pathlib import Path
 
 import pytest
@@ -22,9 +20,14 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from rp2040_keyboard.firmware import (
-    PadConfig, KeyConfig, EncoderConfig,
-    generate_code_py, validate_config, BOOT_PY,
-    KEYCODES, MODIFIERS, AVAILABLE_GPIOS,
+    BOOT_PY,
+    KEYCODES,
+    MODIFIERS,
+    EncoderConfig,
+    KeyConfig,
+    PadConfig,
+    generate_code_py,
+    validate_config,
 )
 
 # ============================================================================
@@ -208,9 +211,8 @@ def test_generate_code_syntax_valid(valid_config):
     code = generate_code_py(valid_config)
     try:
         ast.parse(code)
-        assert True  # Kod parsuje się poprawnie
     except SyntaxError:
-        assert False, "Wygenerowany kod ma błędy składniowe"
+        pytest.fail("Wygenerowany kod ma błędy składniowe")
 
 # ============================================================================
 # TESTY STAŁYCH
@@ -260,7 +262,7 @@ def test_full_workflow_valid_config(valid_config):
     try:
         ast.parse(code)
     except SyntaxError:
-        assert False, "Wygenerowany kod ma błędy składniowe"
+        pytest.fail("Wygenerowany kod ma błędy składniowe")
 
 def test_full_workflow_invalid_config(invalid_config):
     """Test pełnego przepływu pracy dla niepoprawnej konfiguracji."""
@@ -293,7 +295,7 @@ def test_maximum_keys_configuration():
     keys = []
     keycodes = ["Keycode.ONE", "Keycode.TWO", "Keycode.THREE", "Keycode.FOUR", 
                 "Keycode.FIVE", "Keycode.SIX", "Keycode.SEVEN", "Keycode.EIGHT", "Keycode.NINE"]
-    for i, (gpio, keycode) in enumerate(zip([1, 2, 3, 4, 5, 6, 7, 8, 29], keycodes), 1):
+    for _i, (gpio, keycode) in enumerate(zip([1, 2, 3, 4, 5, 6, 7, 8, 29], keycodes), 1):
         keys.append(KeyConfig(gpio=gpio, keycode=keycode, modifier="Keycode.CONTROL+Keycode.SHIFT"))
     
     config = PadConfig(keys=keys, encoder=None)
@@ -303,7 +305,6 @@ def test_maximum_keys_configuration():
     
     code = generate_code_py(config)
     # Count unique key pin definitions (key_1_pin, key_2_pin, etc.)
-    import re
     key_pin_matches = re.findall(r'key_(\d+)_pin = digitalio\.DigitalInOut', code)
     assert len(key_pin_matches) == 9
 

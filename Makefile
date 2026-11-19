@@ -5,8 +5,8 @@
 
 .PHONY: help install web dev test test-docker lint flash clean dist deploy deploy-monitor deploy-setup deploy-detect deploy-diagnose hal-sync hal-save hal-validate hal-show hal-profiles hal-apply hal-backup
 
-PYTHON       ?= .venv/bin/python3
-PIP          ?= .venv/bin/pip3
+PYTHON       ?= $(shell [ -x .venv/bin/python3 ] && echo .venv/bin/python3 || command -v python3)
+PIP          ?= $(shell [ -x .venv/bin/pip3 ] && echo .venv/bin/pip3 || command -v pip3)
 PORT         ?= 8081
 CIRCUITPY    ?= /media/$(USER)/CIRCUITPY
 UF2_URL      := https://downloads.circuitpython.org/bin/waveshare_rp2040_one/en_US/adafruit-circuitpython-waveshare_rp2040_one-en_US-9.2.0.uf2
@@ -94,7 +94,9 @@ test-docker: ## Zbuduj i uruchom pełny test suite w Docker
 
 lint: ## Sprawdź jakość kodu
 	@echo "$(C_CYAN)► Lint$(C_RESET)"
-	$(PYTHON) -m py_compile web/app.py && echo "$(C_GREEN)  ✓ web/app.py — OK$(C_RESET)"
+	$(PYTHON) -m py_compile rp2040_keyboard/web/app.py rp2040_keyboard/firmware/code.py rp2040_keyboard/firmware/generator.py && echo "$(C_GREEN)  ✓ py_compile — OK$(C_RESET)"
+	$(PYTHON) -m ruff check --select F811,B011 rp2040_keyboard tests
+	$(PYTHON) -m ruff check --select E4,E7,E9,F,B rp2040_keyboard/web rp2040_keyboard/firmware tests && echo "$(C_GREEN)  ✓ ruff — OK$(C_RESET)"
 
 # ============================================================================
 # FLASH / DEPLOY na RP2040
@@ -103,9 +105,9 @@ lint: ## Sprawdź jakość kodu
 flash: ## Wgraj program na podłączone CIRCUITPY
 	@if [ -d "$(CIRCUITPY)" ]; then \
 		echo "$(C_GREEN)► CIRCUITPY wykryty: $(CIRCUITPY)$(C_RESET)"; \
-		cp firmware/boot.py "$(CIRCUITPY)/boot.py"; \
+		cp rp2040_keyboard/firmware/boot.py "$(CIRCUITPY)/boot.py"; \
 		echo "  ✓ boot.py skopiowany"; \
-		cp firmware/code.py "$(CIRCUITPY)/code.py"; \
+		cp rp2040_keyboard/firmware/code.py "$(CIRCUITPY)/code.py"; \
 		echo "  ✓ code.py skopiowany"; \
 		echo "$(C_YELLOW)⚠ Odłącz i ponownie podłącz USB aby boot.py zadziałał$(C_RESET)"; \
 	else \

@@ -11,7 +11,7 @@ Docker:   make docker-run
 from __future__ import annotations
 
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 
 # Import from firmware module
 from ..firmware import (
