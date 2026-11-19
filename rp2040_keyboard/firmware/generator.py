@@ -149,21 +149,38 @@ key_{i}_pin.pull = digitalio.Pull.UP
     encoder_code = ""
     if config.encoder:
         encoder_code = f'''
-# Enkoder obrotowy
-encoder = rotaryio.IncrementalEncoder(board.GP{config.encoder.clk_gpio}, board.GP{config.encoder.dt_gpio})
+# Enkoder obrotowy (rotaryio wymaga sąsiednich pinów na RP2040; fallback dla innych par)
+_QUAD_TABLE = (
+    0, -1, 1, 0,
+    1, 0, 0, -1,
+    -1, 0, 0, 1,
+    0, 1, -1, 0,
+)
+try:
+    encoder = rotaryio.IncrementalEncoder(board.GP{config.encoder.clk_gpio}, board.GP{config.encoder.dt_gpio})
+    encoder_last_pos = encoder.position
+except (ValueError, RuntimeError):
+    encoder = None
+    encoder_clk = digitalio.DigitalInOut(board.GP{config.encoder.clk_gpio})
+    encoder_clk.direction = digitalio.Direction.INPUT
+    encoder_clk.pull = digitalio.Pull.UP
+    encoder_dt = digitalio.DigitalInOut(board.GP{config.encoder.dt_gpio})
+    encoder_dt.direction = digitalio.Direction.INPUT
+    encoder_dt.pull = digitalio.Pull.UP
+    encoder_state = (int(encoder_clk.value) << 1) | int(encoder_dt.value)
+    encoder_accum = 0
+    encoder_last_change_time = 0.0
+
 encoder_button = digitalio.DigitalInOut(board.GP{config.encoder.sw_gpio})
 encoder_button.direction = digitalio.Direction.INPUT
 encoder_button.pull = digitalio.Pull.UP
 
 ENCODER_DEBOUNCE_MS = {config.encoder.debounce_ms}
+ENCODER_IDLE_RESET_MS = 150
 SCROLL_SPEED = {config.encoder.scroll_speed}
 
-# Parametry debounce — asymetryczny algorytm
-RELEASE_DEBOUNCE_MS = 100  # Zwolnij dopiero po 100ms ciągłego braku GND
-
 # Zmienne do śledzenia stanu enkodera
-encoder_last_pos = 0
-encoder_last_time = time.monotonic()
+encoder_last_time = 0.0
 encoder_last_count = 0
 encoder_btn_pressed = False
 encoder_btn_last_low = 0
@@ -173,13 +190,15 @@ encoder_btn_last_low = 0
     main_loop = '''
 # Główna pętla
 '''
+    if config.keys or config.encoder:
+        main_loop += '''RELEASE_DEBOUNCE_MS = 20  # Zwolnij dopiero po 20ms ciągłego braku GND
+'''
     
     if config.keys:
         # Generuj tablice stanu klawiszy
         main_loop += f'''# Stan klawiszy — asymetryczny debounce (natychmiastowe wciśnięcie, opóźnione zwolnienie)
 key_pressed = [False] * {len(config.keys)}
 key_last_low = [0.0] * {len(config.keys)}
-RELEASE_DEBOUNCE_MS = 100  # Zwolnij dopiero po 100ms ciągłego braku GND
 '''
         # Generuj tablicę pinów i modyfikatorów
         main_loop += f'''key_pins = [{", ".join(f"key_{i}_pin" for i in range(1, len(config.keys) + 1))}]
@@ -201,10 +220,6 @@ RELEASE_DEBOUNCE_MS = 100  # Zwolnij dopiero po 100ms ciągłego braku GND
         main_loop += f'''key_modifiers = [{", ".join(mod_strs)}]
 '''
     
-    if config.encoder:
-        main_loop += '''encoder_last_pos = encoder.position
-'''
-    
     main_loop += '''
 while True:
     now = time.monotonic() * 1000  # Czas w ms
@@ -215,7 +230,7 @@ while True:
         main_loop += f'''
     # Obsługa przycisków — działa jak zwykła klawiatura:
     #   GND na pinie = klawisz TRZYMANY (jak palec na klawiszu)
-    #   Brak GND przez 100ms = klawisz ZWOLNIONY
+    #   Brak GND przez 20ms = klawisz ZWOLNIONY
     #   Krótkie drgania styków ignorowane (naturalne zjawisko)
     for i in range({len(config.keys)}):
         current = key_pins[i].value  # False = wciśnięty (zwarte do GND)
@@ -228,7 +243,7 @@ while True:
                 keyboard.press(*key_modifiers[i], key_keycodes[i])
         else:  # Pin jest HIGH — styk otwarty (może być drganie!)
             if key_pressed[i]:
-                # Zwolnij dopiero gdy pin jest HIGH nieprzerwanie przez 100ms
+                # Zwolnij dopiero gdy pin jest HIGH nieprzerwanie przez 20ms
                 if (now - key_last_low[i]) > RELEASE_DEBOUNCE_MS:
                     key_pressed[i] = False
                     # Zwolnij TYLKO ten klawisz
@@ -242,27 +257,35 @@ while True:
     if config.encoder:
         main_loop += '''
     # Obsługa enkodera obrotowego
-    current_pos = encoder.position
-    current_time = time.monotonic()
-    
-    if (current_time - encoder_last_time) >= (ENCODER_DEBOUNCE_MS / 1000.0):
-        if current_pos != encoder_last_pos:
-            steps = current_pos - encoder_last_pos
-            
-            if abs(steps) <= 10:
-                if steps > 0:
-                    for _ in range(abs(steps) * SCROLL_SPEED):
-                        mouse.move(wheel=1)
-                else:
-                    for _ in range(abs(steps) * SCROLL_SPEED):
-                        mouse.move(wheel=-1)
-                
-                encoder_last_count += steps
-            else:
-                encoder.position = encoder_last_pos
-            
-            encoder_last_pos = current_pos
-            encoder_last_time = current_time
+    if encoder is not None:
+        if (now - encoder_last_time) >= ENCODER_DEBOUNCE_MS:
+            current_pos = encoder.position
+            if current_pos != encoder_last_pos:
+                steps = current_pos - encoder_last_pos
+                if abs(steps) <= 32:
+                    wheel_delta = max(-127, min(127, steps * SCROLL_SPEED))
+                    if wheel_delta:
+                        mouse.move(wheel=wheel_delta)
+                    encoder_last_count += steps
+                encoder_last_pos = current_pos
+                encoder_last_time = now
+    else:
+        curr_state = (int(encoder_clk.value) << 1) | int(encoder_dt.value)
+        if curr_state != encoder_state:
+            encoder_accum += _QUAD_TABLE[(encoder_state << 2) | curr_state]
+            encoder_state = curr_state
+            encoder_last_change_time = now
+        elif curr_state == 3 and encoder_accum and (now - encoder_last_change_time) > ENCODER_IDLE_RESET_MS:
+            encoder_accum = 0
+
+        if abs(encoder_accum) >= 4 and (now - encoder_last_time) >= ENCODER_DEBOUNCE_MS:
+            steps = encoder_accum // 4 if encoder_accum > 0 else -((-encoder_accum) // 4)
+            encoder_accum -= steps * 4
+            wheel_delta = max(-127, min(127, steps * SCROLL_SPEED))
+            if wheel_delta:
+                mouse.move(wheel=wheel_delta)
+            encoder_last_count += steps
+            encoder_last_time = now
     
 '''
         
@@ -283,7 +306,7 @@ while True:
 
 '''
     
-    main_loop += '''    time.sleep(0.001)  # 1ms — niska latencja pętli
+    main_loop += '''    time.sleep(0.0005)  # 0.5ms — niska latencja pętli
 '''
     
     # Połącz wszystko

@@ -1,19 +1,20 @@
 """
-RP2040-One HID Keypad + Encoder Mouse
-======================================
+RP2040-Zero HID Keypad + Encoder Mouse (panel9 PCB)
+===================================================
 9 klawiszy (Ctrl+Alt+1..Ctrl+Alt+9) + enkoder obrotowy (scroll myszki + middle-click)
 
-Hardware:
-  - Waveshare RP2040-One / RP2040-Zero
-  - 9x switch buttons → GP1-GP9
-  - 1x rotary encoder z przyciskiem → GP11 (CLK), GP12 (DT), GP13 (SW)
+Hardware (zgodny z maskservice/viewer/artifacts/pcb/panel9.kicad_pcb):
+  - Waveshare RP2040-Zero (lub kompatybilny RP2040-One)
+  - 9x switch buttons → GP14, GP6, GP7, GP8, GP5, GP1, GP4, GP3, GP2
+  - 1x rotary encoder z przyciskiem (J1 RJ45) → GP0 (ENC_A/CLK), GP15 (ENC_B/DT), GP26 (ENC_SW)
 
-Firmware: CircuitPython 9.x + adafruit_hid
+Firmware: CircuitPython 9.x/10.x + adafruit_hid
 
 Autor: Softreck / Prototypowanie.pl
 """
 
 import time
+
 import board
 import digitalio
 import usb_hid
@@ -22,7 +23,7 @@ from adafruit_hid.keycode import Keycode
 from adafruit_hid.mouse import Mouse
 
 # =============================================================================
-# KONFIGURACJA PINÓW
+# KONFIGURACJA PINÓW (panel9.kicad_pcb)
 # =============================================================================
 
 # =============================================================================
@@ -31,27 +32,36 @@ from adafruit_hid.mouse import Mouse
 # =============================================================================
 # Mapowanie klawiszy: (pin GPIO, klawisz numeryczny dla Ctrl+Alt+N)
 KEY_PINS = [
-    (board.GP1, Keycode.NINE),      # Przycisk 1 → Ctrl+Alt+9
-    (board.GP2, Keycode.EIGHT),     # Przycisk 2 → Ctrl+Alt+8
-    (board.GP3, Keycode.FIVE),      # Przycisk 3 → Ctrl+Alt+5
-    (board.GP29, Keycode.ONE),      # Przycisk 4 → Ctrl+Alt+1
-    (board.GP4, Keycode.SEVEN),     # Przycisk 5 → Ctrl+Alt+7
-    (board.GP5, Keycode.SIX),       # Przycisk 6 → Ctrl+Alt+6
-    (board.GP6, Keycode.FOUR),      # Przycisk 7 → Ctrl+Alt+4
-    (board.GP7, Keycode.TWO),       # Przycisk 8 → Ctrl+Alt+2
-    (board.GP8, Keycode.THREE),     # Przycisk 9 → Ctrl+Alt+3
+    (board.GP14, Keycode.NINE),     # Przycisk 1 (SW1) → Ctrl+Alt+9
+    (board.GP6, Keycode.EIGHT),     # Przycisk 2 (SW2) → Ctrl+Alt+8
+    (board.GP7, Keycode.FIVE),      # Przycisk 3 (SW3) → Ctrl+Alt+5
+    (board.GP8, Keycode.ONE),       # Przycisk 4 (SW4) → Ctrl+Alt+1
+    (board.GP5, Keycode.SEVEN),     # Przycisk 5 (SW5) → Ctrl+Alt+7
+    (board.GP1, Keycode.SIX),       # Przycisk 6 (SW6) → Ctrl+Alt+6
+    (board.GP4, Keycode.FOUR),      # Przycisk 7 (SW7) → Ctrl+Alt+4
+    (board.GP3, Keycode.TWO),       # Przycisk 8 (SW8) → Ctrl+Alt+2
+    (board.GP2, Keycode.THREE),     # Przycisk 9 (SW9) → Ctrl+Alt+3
 ]
 
 
-# Enkoder obrotowy
-ENCODER_CLK_PIN = board.GP11    # Encoder A (CLK)
-ENCODER_DT_PIN = board.GP12   # Encoder B (DT)
-ENCODER_SW_PIN = board.GP13   # Encoder push button (SW)
+# Enkoder obrotowy (J1 RJ45: pin 6=ENC_A, pin 4=ENC_B, pin 2=ENC_SW)
+ENCODER_CLK_PIN = board.GP0    # Encoder A (CLK)
+ENCODER_DT_PIN = board.GP15    # Encoder B (DT)
+ENCODER_SW_PIN = board.GP26    # Encoder push button (SW)
 
-# Parametry scroll
+# Parametry scroll i debounce
 SCROLL_SPEED = 2              # Ilość kroków scrolla na tick enkodera
-RELEASE_DEBOUNCE_MS = 100     # Zwolnij przycisk dopiero po 100ms ciągłego braku GND
-ENCODER_DEBOUNCE_MS = 10      # Debounce enkodera (zwiększone dla stabilności)
+RELEASE_DEBOUNCE_MS = 20      # Zwolnij przycisk dopiero po 20ms ciągłego braku GND
+ENCODER_DEBOUNCE_MS = 5       # Minimalny odstęp raportu enkodera (ms)
+ENCODER_IDLE_RESET_MS = 150   # Reset niepełnego kroku po powrocie do spoczynku (11)
+
+# Tabela przejść Gray-code 4-stanowego dekodera kwadraturowego ((prev << 2) | curr)
+_QUAD_TABLE = (
+    0, -1, 1, 0,
+    1, 0, 0, -1,
+    -1, 0, 0, 1,
+    0, 1, -1, 0,
+)
 
 # =============================================================================
 # INICJALIZACJA HID
@@ -80,19 +90,32 @@ for pin, keycode in KEY_PINS:
 # INICJALIZACJA ENKODERA
 # =============================================================================
 
-encoder_clk = digitalio.DigitalInOut(ENCODER_CLK_PIN)
-encoder_clk.direction = digitalio.Direction.INPUT
-encoder_clk.pull = digitalio.Pull.UP
+# Uwaga: rotaryio.IncrementalEncoder na RP2040 wymaga sąsiednich pinów (|A-B|==1).
+# Dla panel9 (GP0, GP15) zgłasza ValueError — przechodzimy na dekoder digitalio.
+try:
+    import rotaryio
 
-encoder_dt = digitalio.DigitalInOut(ENCODER_DT_PIN)
-encoder_dt.direction = digitalio.Direction.INPUT
-encoder_dt.pull = digitalio.Pull.UP
+    encoder = rotaryio.IncrementalEncoder(ENCODER_CLK_PIN, ENCODER_DT_PIN)
+    encoder_last_pos = encoder.position
+except (ImportError, ValueError, RuntimeError):
+    encoder = None
+    encoder_clk = digitalio.DigitalInOut(ENCODER_CLK_PIN)
+    encoder_clk.direction = digitalio.Direction.INPUT
+    encoder_clk.pull = digitalio.Pull.UP
+
+    encoder_dt = digitalio.DigitalInOut(ENCODER_DT_PIN)
+    encoder_dt.direction = digitalio.Direction.INPUT
+    encoder_dt.pull = digitalio.Pull.UP
+
+    encoder_state = (int(encoder_clk.value) << 1) | int(encoder_dt.value)
+    encoder_accum = 0
+    encoder_last_change_time = 0.0
 
 encoder_sw = digitalio.DigitalInOut(ENCODER_SW_PIN)
 encoder_sw.direction = digitalio.Direction.INPUT
 encoder_sw.pull = digitalio.Pull.UP
 
-encoder_last_clk = encoder_clk.value
+encoder_last_time = 0.0
 encoder_sw_pressed = False
 encoder_sw_last_low = 0
 
@@ -101,8 +124,8 @@ encoder_sw_last_low = 0
 # =============================================================================
 
 print("RP2040 HID Keypad + Mouse aktywny!")
-print(f"Klawisze: 9x (Ctrl+Alt+1..Ctrl+Alt+9)")
-print(f"Enkoder: scroll góra/dół + middle-click")
+print("Klawisze: 9x (Ctrl+Alt+1..Ctrl+Alt+9)")
+print("Enkoder: scroll góra/dół + middle-click")
 
 while True:
     now = time.monotonic() * 1000  # Czas w ms
@@ -110,7 +133,7 @@ while True:
     # --- Obsługa 9 klawiszy (Ctrl+Alt+1..Ctrl+Alt+9) ---
     # Działa jak zwykła klawiatura:
     #   - GND na pinie = klawisz TRZYMANY (jak palec na klawiszu)
-    #   - Brak GND przez 100ms = klawisz ZWOLNIONY
+    #   - Brak GND przez 20ms = klawisz ZWOLNIONY
     #   - Krótkie drgania styków są ignorowane (naturalne zjawisko)
     #   - release() zwalnia TYLKO ten konkretny klawisz, nie wszystkie
     for key in keys:
@@ -124,7 +147,7 @@ while True:
                 keyboard.press(Keycode.CONTROL, Keycode.ALT, key['keycode'])
         else:  # Pin jest HIGH — styk otwarty (może być drganie!)
             if key['pressed']:
-                # Zwolnij dopiero gdy pin jest HIGH nieprzerwanie przez 100ms
+                # Zwolnij dopiero gdy pin jest HIGH nieprzerwanie przez 20ms
                 if (now - key['last_low_time']) > RELEASE_DEBOUNCE_MS:
                     key['pressed'] = False
                     # Zwolnij TYLKO ten klawisz (nie release_all!)
@@ -134,16 +157,37 @@ while True:
                         keyboard.release(Keycode.CONTROL, Keycode.ALT)
 
     # --- Obsługa enkodera obrotowego (scroll myszki) ---
-    clk_val = encoder_clk.value
-    if clk_val != encoder_last_clk:
-        dt_val = encoder_dt.value
-        if dt_val != clk_val:
-            # Obrót w prawo (CW) → scroll w górę
-            mouse.move(wheel=SCROLL_SPEED)
-        else:
-            # Obrót w lewo (CCW) → scroll w dół
-            mouse.move(wheel=-SCROLL_SPEED)
-        encoder_last_clk = clk_val
+    if encoder is not None:
+        if (now - encoder_last_time) >= ENCODER_DEBOUNCE_MS:
+            current_pos = encoder.position
+            if current_pos != encoder_last_pos:
+                steps = current_pos - encoder_last_pos
+                if abs(steps) <= 32:
+                    wheel_delta = max(-127, min(127, steps * SCROLL_SPEED))
+                    if wheel_delta:
+                        mouse.move(wheel=wheel_delta)
+                encoder_last_pos = current_pos
+                encoder_last_time = now
+    else:
+        curr_state = (int(encoder_clk.value) << 1) | int(encoder_dt.value)
+        if curr_state != encoder_state:
+            encoder_accum += _QUAD_TABLE[(encoder_state << 2) | curr_state]
+            encoder_state = curr_state
+            encoder_last_change_time = now
+        elif (
+            curr_state == 3
+            and encoder_accum
+            and (now - encoder_last_change_time) > ENCODER_IDLE_RESET_MS
+        ):
+            encoder_accum = 0
+
+        if abs(encoder_accum) >= 4 and (now - encoder_last_time) >= ENCODER_DEBOUNCE_MS:
+            steps = encoder_accum // 4 if encoder_accum > 0 else -((-encoder_accum) // 4)
+            encoder_accum -= steps * 4
+            wheel_delta = max(-127, min(127, steps * SCROLL_SPEED))
+            if wheel_delta:
+                mouse.move(wheel=wheel_delta)
+            encoder_last_time = now
 
     # --- Obsługa przycisku enkodera (middle-click) ---
     # Ten sam algorytm: natychmiastowe wciśnięcie + opóźnione zwolnienie
@@ -159,4 +203,4 @@ while True:
                 encoder_sw_pressed = False
                 mouse.release(Mouse.MIDDLE_BUTTON)
 
-    time.sleep(0.001)  # 1ms — niska latencja pętli
+    time.sleep(0.0005)  # 0.5ms — niezawodne próbkowanie enkodera i niska latencja
