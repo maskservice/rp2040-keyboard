@@ -350,67 +350,78 @@ class RP2040Deployer:
             pass
         return None
     
-    def mount_circuitpy_device(self, retries=5, initial_delay=1):
-        """Znajdź i zamontuj niezamontowane urządzenie CIRCUITPY z retry i backoff."""
-        print("🔍 Szukam niezamontowanego urządzenia CIRCUITPY...")
+    def _get_setting(self, key, default=""):
+        """Read setting with environment override over .env config."""
+        return os.environ.get(key, self.config.get(key, default))
 
-        device_real = self._find_device_by_label("CIRCUITPY")
+    def _mount_label_device(self, label, retries=5, initial_delay=1, wait_timeout=10):
+        """Find and mount an unmounted block device matching label."""
+        label_upper = label.upper()
+        print(f"🔍 Szukam niezamontowanego urządzenia {label_upper}...")
+
+        device_real = self._find_device_by_label(label_upper)
+        if not device_real and wait_timeout > 0:
+            device_real = self._wait_for_block_device_label(label_upper, timeout=wait_timeout)
+
         if not device_real:
-            # Poczekaj chwilę, może label jeszcze się nie pojawił
-            device_real = self._wait_for_block_device_label("CIRCUITPY", timeout=10)
+            return None
 
-        if device_real:
-            print(f"   ✓ Znaleziono urządzenie: {device_real}")
-
-            delay = initial_delay
-            for attempt in range(1, retries + 1):
-                try:
-                    if attempt > 1:
-                        print(f"   ⏳ Próba {attempt}/{retries} (powrót za {delay}s)...")
-                        time.sleep(delay)
-                        delay *= 2 # Exponential backoff
-
-                    result = subprocess.run(
-                        ["udisksctl", "mount", "--no-user-interaction", "-b", device_real],
-                        capture_output=True, text=True, timeout=15
-                    )
-                    
-                    if result.returncode == 0:
-                        mount_path = self._extract_mount_path(result.stdout)
-                        if mount_path:
-                            print(f"   ✓ Zamontowano w: {mount_path} (próba {attempt})")
-                            return mount_path
-                    
-                    stderr = result.stderr.lower() if result.stderr else ""
-                    if "already mounted" in stderr:
-                        mounted_paths = self._find_mounted_label_paths("CIRCUITPY")
-                        if mounted_paths:
-                            print(f"   ✓ Urządzenie już zamontowane: {mounted_paths[0]}")
-                            return mounted_paths[0]
-                    
-                    if attempt == retries:
-                        print(f"   ⚠️ udisksctl mount nieudany po {retries} próbach: {result.stderr.strip()}")
-                
-                except (subprocess.TimeoutExpired, FileNotFoundError) as e:
-                    if attempt == retries:
-                        print(f"   ⚠️ Błąd podczas montowania: {e}")
-
-            # Fallback do sudo mount
-            print("   🔧 Próba montowania przez sudo mount (fallback)...")
-            mount_point = f"/media/{self.username}/CIRCUITPY"
+        print(f"   ✓ Znaleziono urządzenie: {device_real}")
+        delay = initial_delay
+        for attempt in range(1, retries + 1):
             try:
-                os.makedirs(mount_point, exist_ok=True)
+                if attempt > 1:
+                    print(f"   ⏳ Próba {attempt}/{retries} (powrót za {delay}s)...")
+                    time.sleep(delay)
+                    delay *= 2
+
                 result = subprocess.run(
-                    ["sudo", "mount", "-o", "rw,user,sync", device_real, mount_point],
-                    capture_output=True, text=True, timeout=10
+                    ["udisksctl", "mount", "--no-user-interaction", "-b", device_real],
+                    capture_output=True, text=True, timeout=15
                 )
+
                 if result.returncode == 0:
-                    print(f"   ✓ Zamontowano (sudo) w: {mount_point}")
-                    return mount_point
-            except Exception as e:
-                print(f"   ❌ Fallback mount nieudany: {e}")
+                    mount_path = self._extract_mount_path(result.stdout)
+                    if mount_path:
+                        print(f"   ✓ Zamontowano w: {mount_path} (próba {attempt})")
+                        return mount_path
+
+                stderr = result.stderr.lower() if result.stderr else ""
+                if "already mounted" in stderr:
+                    mounted_paths = self._find_mounted_label_paths(label_upper)
+                    if mounted_paths:
+                        print(f"   ✓ Urządzenie już zamontowane: {mounted_paths[0]}")
+                        return mounted_paths[0]
+
+                if attempt == retries:
+                    print(f"   ⚠️ udisksctl mount nieudany po {retries} próbach: {result.stderr.strip()}")
+            except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+                if attempt == retries:
+                    print(f"   ⚠️ Błąd podczas montowania: {e}")
+
+        print("   🔧 Próba montowania przez sudo mount (fallback)...")
+        mount_point = f"/media/{self.username}/{label_upper}"
+        try:
+            os.makedirs(mount_point, exist_ok=True)
+            result = subprocess.run(
+                ["sudo", "mount", "-o", "rw,user,sync", device_real, mount_point],
+                capture_output=True, text=True, timeout=10
+            )
+            if result.returncode == 0:
+                print(f"   ✓ Zamontowano (sudo) w: {mount_point}")
+                return mount_point
+        except Exception as e:
+            print(f"   ❌ Fallback mount nieudany: {e}")
 
         return None
+
+    def mount_circuitpy_device(self, retries=5, initial_delay=1):
+        """Znajdź i zamontuj niezamontowane urządzenie CIRCUITPY z retry i backoff."""
+        return self._mount_label_device("CIRCUITPY", retries=retries, initial_delay=initial_delay, wait_timeout=10)
+
+    def mount_boot_device(self, retries=3, initial_delay=1):
+        """Znajdź i zamontuj niezamontowane urządzenie RPI-RP2 (tryb BOOTSEL)."""
+        return self._mount_label_device("RPI-RP2", retries=retries, initial_delay=initial_delay, wait_timeout=0)
     
     def _extract_mount_path(self, udisks_output):
         """Wyciągnij ścieżkę mount z outputu udisksctl."""
@@ -481,30 +492,27 @@ class RP2040Deployer:
         found_paths = set()  # Uniknij duplikatów
         devices = []
 
-        boot_paths = self._label_mount_patterns("RPI-RP2")
-        
-        for pattern in boot_paths:
-            if '*' in pattern:
-                from glob import glob
-                for path in glob(pattern):
-                    if path not in found_paths and Path(path).exists():
-                        found_paths.add(path)
-                        devices.append({
-                            'path': path,
-                            'name': 'RPI-RP2',
-                            'mode': 'boot',
-                            'detected_at': datetime.now().isoformat()
-                        })
-            else:
-                if pattern not in found_paths and Path(pattern).exists():
-                    found_paths.add(pattern)
-                    devices.append({
-                        'path': pattern,
-                        'name': 'RPI-RP2',
-                        'mode': 'boot',
-                        'detected_at': datetime.now().isoformat()
-                    })
-        
+        for path in self._find_mounted_label_paths("RPI-RP2"):
+            if path not in found_paths and Path(path).exists():
+                found_paths.add(path)
+                devices.append({
+                    'path': path,
+                    'name': 'RPI-RP2',
+                    'mode': 'boot',
+                    'detected_at': datetime.now().isoformat()
+                })
+
+        if not devices and self._find_device_by_label("RPI-RP2"):
+            mounted_path = self.mount_boot_device()
+            if mounted_path and mounted_path not in found_paths and Path(mounted_path).exists():
+                found_paths.add(mounted_path)
+                devices.append({
+                    'path': mounted_path,
+                    'name': 'RPI-RP2',
+                    'mode': 'boot',
+                    'detected_at': datetime.now().isoformat()
+                })
+
         return devices
     
     def flash_uf2(self, device_path, force_board=None):
@@ -881,11 +889,11 @@ class RP2040Deployer:
         """Pobierz i przygotuj biblioteki."""
         print("📚 Przygotowywanie bibliotek...")
         
-        cache_dir = Path(self.config.get('LIBRARY_CACHE_DIR', './lib_cache'))
+        cache_dir = Path(self._get_setting('LIBRARY_CACHE_DIR', './lib_cache'))
         cache_dir.mkdir(exist_ok=True)
         
         libraries = {
-            'hid': self.config.get('HID_LIBRARY_URL', 
+            'hid': self._get_setting('HID_LIBRARY_URL', 
                 'https://github.com/adafruit/Adafruit_CircuitPython_HID/archive/refs/heads/main.zip'),
             # rotaryio jest wbudowane w CircuitPython, nie trzeba pobierać
         }
@@ -893,6 +901,10 @@ class RP2040Deployer:
         for lib_name, url in libraries.items():
             lib_dir = cache_dir / lib_name
             lib_dir.mkdir(exist_ok=True)
+
+            if lib_name == 'hid' and list(lib_dir.glob("Adafruit_CircuitPython_HID-*/adafruit_hid")) and self._get_setting('REFRESH_LIBRARIES', 'false').lower() != 'true':
+                print(f"✓ Używam lokalnego cache biblioteki {lib_name}: {lib_dir}")
+                continue
             
             if not self.download_library(url, lib_dir):
                 print(f"❌ Nie udało się pobrać biblioteki {lib_name}")
@@ -908,7 +920,7 @@ class RP2040Deployer:
         self._ensure_target_ready(device_path, 4096)
         
         # Synchronizuj konfigurację HAL przed deploymentem
-        if self.config.get('SYNC_HAL_BEFORE_DEPLOY', 'true').lower() == 'true':
+        if self._get_setting('SYNC_HAL_BEFORE_DEPLOY', 'true').lower() == 'true':
             print("🔄 Synchronizacja konfiguracji HAL...")
             try:
                 config = self.hal_manager.get_current_config()
@@ -923,7 +935,7 @@ class RP2040Deployer:
         self._sync_path(lib_dir)
         
         # Skopiuj biblioteki
-        cache_dir = Path(self.config.get('LIBRARY_CACHE_DIR', './lib_cache'))
+        cache_dir = Path(self._get_setting('LIBRARY_CACHE_DIR', './lib_cache'))
         
         if (cache_dir / "hid").exists():
             hid_src = cache_dir / "hid"
@@ -942,8 +954,8 @@ class RP2040Deployer:
         # Skopiuj firmware
         firmware_dir = self.project_root / "rp2040_keyboard" / "firmware"
         
-        # Backup istniejących plików
-        if self.config.get('BACKUP_EXISTING_FILES', 'true').lower() == 'true':
+        # Backup istniejących plików (domyślnie wyłączony zgodnie z polityką dev no-backup)
+        if self._get_setting('BACKUP_EXISTING_FILES', 'false').lower() == 'true':
             self.backup_device_files(device_path)
         
         # Wygeneruj firmware z aktualnej konfiguracji HAL

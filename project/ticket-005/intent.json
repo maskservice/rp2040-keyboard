@@ -1,0 +1,25 @@
+{
+  "ticket": "ticket-005",
+  "repository": "maskservice/rp2040-keyboard",
+  "base": "4b55a61eaaf027b1d445e2efbc956df45167af7f",
+  "branch": "ticket/005-panel9-pcb-pinmap-and-encoder-fix",
+  "worktree": ".worktrees/ticket-005--panel9-pcb-pinmap-and-encoder-fix",
+  "owner_session": "agent:antigravity-rp2040-keyboard-005",
+  "allowedPaths": [
+    ".hal_sync.json",
+    "deploy.py",
+    "hal/hal_config.toml",
+    "hal/hardware_pins.toml",
+    "hal/profiles/default.toml",
+    "project/ticket-005/**",
+    "rp2040_keyboard/firmware/code.py",
+    "rp2040_keyboard/firmware/generator.py",
+    "rp2040_keyboard/hal_manager.py",
+    "rp2040_keyboard/hal_models.py",
+    "rp2040_keyboard/web/app.py",
+    "tests/test_rp2040_keyboard.py"
+  ],
+  "authorization": "Align rp2040-keyboard firmware/HAL/generator/deployer with panel9 RP2040-Zero PCB pinout, non-sequential encoder fallback, Mouse.MIDDLE_BUTTON, RPI-RP2 mounting, and dev no-backup policy.",
+  "maxActiveMinutes": 60,
+  "maxTotalActiveMinutes": 120
+}

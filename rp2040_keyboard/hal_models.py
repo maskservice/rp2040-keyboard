@@ -8,7 +8,7 @@ Dataclass models for HAL key, encoder, and switch configurations.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 
 @dataclass
@@ -55,11 +55,11 @@ class HALEncoderConfig:
     """Konfiguracja enkodera w formacie HAL."""
 
     enabled: bool = True
-    clk_gpio: int = 11
-    dt_gpio: int = 12
-    sw_gpio: int = 13
+    clk_gpio: int = 0
+    dt_gpio: int = 15
+    sw_gpio: int = 26
     pull: str = "up"
-    debounce: int = 3
+    debounce: int = 5
     scroll_speed: int = 2
     middle_click: bool = True
     steps_per_revolution: int = 24
