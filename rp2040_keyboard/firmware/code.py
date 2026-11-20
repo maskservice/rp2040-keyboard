@@ -1,7 +1,7 @@
 """
 RP2040-One HID Keypad + Encoder Mouse
 ======================================
-9 klawiszy (Ctrl+Alt+1..Ctrl+Alt+9) + enkoder obrotowy (scroll myszki + middle-click)
+9 klawiszy (Ctrl+Alt+1..Ctrl+Alt+9) + enkoder obrotowy (scroll myszki + left-click)
 
 Hardware:
   - Waveshare RP2040-One / RP2040-Zero
@@ -14,6 +14,7 @@ Autor: Softreck / Prototypowanie.pl
 """
 
 import time
+
 import board
 import digitalio
 import usb_hid
@@ -50,8 +51,8 @@ ENCODER_SW_PIN = board.GP13   # Encoder push button (SW)
 
 # Parametry scroll
 SCROLL_SPEED = 2              # Ilość kroków scrolla na tick enkodera
-RELEASE_DEBOUNCE_MS = 100     # Zwolnij przycisk dopiero po 100ms ciągłego braku GND
-ENCODER_DEBOUNCE_MS = 10      # Debounce enkodera (zwiększone dla stabilności)
+RELEASE_DEBOUNCE_MS = 20      # Zwolnij przycisk dopiero po 20ms ciągłego braku GND
+ENCODER_DEBOUNCE_MS = 10      # Debounce enkodera
 
 # =============================================================================
 # INICJALIZACJA HID
@@ -80,19 +81,28 @@ for pin, keycode in KEY_PINS:
 # INICJALIZACJA ENKODERA
 # =============================================================================
 
-encoder_clk = digitalio.DigitalInOut(ENCODER_CLK_PIN)
-encoder_clk.direction = digitalio.Direction.INPUT
-encoder_clk.pull = digitalio.Pull.UP
+try:
+    import rotaryio
 
-encoder_dt = digitalio.DigitalInOut(ENCODER_DT_PIN)
-encoder_dt.direction = digitalio.Direction.INPUT
-encoder_dt.pull = digitalio.Pull.UP
+    encoder = rotaryio.IncrementalEncoder(ENCODER_CLK_PIN, ENCODER_DT_PIN)
+    encoder_last_pos = encoder.position
+except ImportError:
+    encoder = None
+    encoder_clk = digitalio.DigitalInOut(ENCODER_CLK_PIN)
+    encoder_clk.direction = digitalio.Direction.INPUT
+    encoder_clk.pull = digitalio.Pull.UP
+
+    encoder_dt = digitalio.DigitalInOut(ENCODER_DT_PIN)
+    encoder_dt.direction = digitalio.Direction.INPUT
+    encoder_dt.pull = digitalio.Pull.UP
+
+    encoder_last_clk = encoder_clk.value
 
 encoder_sw = digitalio.DigitalInOut(ENCODER_SW_PIN)
 encoder_sw.direction = digitalio.Direction.INPUT
 encoder_sw.pull = digitalio.Pull.UP
 
-encoder_last_clk = encoder_clk.value
+encoder_last_time = 0.0
 encoder_sw_pressed = False
 encoder_sw_last_low = 0
 
@@ -101,8 +111,8 @@ encoder_sw_last_low = 0
 # =============================================================================
 
 print("RP2040 HID Keypad + Mouse aktywny!")
-print(f"Klawisze: 9x (Ctrl+Alt+1..Ctrl+Alt+9)")
-print(f"Enkoder: scroll góra/dół + middle-click")
+print("Klawisze: 9x (Ctrl+Alt+1..Ctrl+Alt+9)")
+print("Enkoder: scroll góra/dół + left-click")
 
 while True:
     now = time.monotonic() * 1000  # Czas w ms
@@ -110,7 +120,7 @@ while True:
     # --- Obsługa 9 klawiszy (Ctrl+Alt+1..Ctrl+Alt+9) ---
     # Działa jak zwykła klawiatura:
     #   - GND na pinie = klawisz TRZYMANY (jak palec na klawiszu)
-    #   - Brak GND przez 100ms = klawisz ZWOLNIONY
+    #   - Brak GND przez 20ms = klawisz ZWOLNIONY
     #   - Krótkie drgania styków są ignorowane (naturalne zjawisko)
     #   - release() zwalnia TYLKO ten konkretny klawisz, nie wszystkie
     for key in keys:
@@ -124,7 +134,7 @@ while True:
                 keyboard.press(Keycode.CONTROL, Keycode.ALT, key['keycode'])
         else:  # Pin jest HIGH — styk otwarty (może być drganie!)
             if key['pressed']:
-                # Zwolnij dopiero gdy pin jest HIGH nieprzerwanie przez 100ms
+                # Zwolnij dopiero gdy pin jest HIGH nieprzerwanie przez 20ms
                 if (now - key['last_low_time']) > RELEASE_DEBOUNCE_MS:
                     key['pressed'] = False
                     # Zwolnij TYLKO ten klawisz (nie release_all!)
@@ -134,29 +144,39 @@ while True:
                         keyboard.release(Keycode.CONTROL, Keycode.ALT)
 
     # --- Obsługa enkodera obrotowego (scroll myszki) ---
-    clk_val = encoder_clk.value
-    if clk_val != encoder_last_clk:
-        dt_val = encoder_dt.value
-        if dt_val != clk_val:
-            # Obrót w prawo (CW) → scroll w górę
-            mouse.move(wheel=SCROLL_SPEED)
-        else:
-            # Obrót w lewo (CCW) → scroll w dół
-            mouse.move(wheel=-SCROLL_SPEED)
-        encoder_last_clk = clk_val
+    if encoder is not None:
+        if (now - encoder_last_time) >= ENCODER_DEBOUNCE_MS:
+            current_pos = encoder.position
+            if current_pos != encoder_last_pos:
+                steps = current_pos - encoder_last_pos
+                if abs(steps) <= 32:
+                    wheel_delta = max(-127, min(127, steps * SCROLL_SPEED))
+                    if wheel_delta:
+                        mouse.move(wheel=wheel_delta)
+                encoder_last_pos = current_pos
+                encoder_last_time = now
+    else:
+        clk_val = encoder_clk.value
+        if clk_val != encoder_last_clk:
+            if (now - encoder_last_time) >= ENCODER_DEBOUNCE_MS:
+                step = 1 if encoder_dt.value != clk_val else -1
+                wheel_delta = max(-127, min(127, step * SCROLL_SPEED))
+                mouse.move(wheel=wheel_delta)
+                encoder_last_time = now
+            encoder_last_clk = clk_val
 
-    # --- Obsługa przycisku enkodera (middle-click) ---
+    # --- Obsługa przycisku enkodera (left-click) ---
     # Ten sam algorytm: natychmiastowe wciśnięcie + opóźnione zwolnienie
     sw_val = encoder_sw.value
     if not sw_val:  # Pin LOW (GND) — styk zwarty
         encoder_sw_last_low = now
         if not encoder_sw_pressed:
             encoder_sw_pressed = True
-            mouse.press(Mouse.MIDDLE_BUTTON)
+            mouse.press(Mouse.LEFT_BUTTON)
     else:  # Pin HIGH — styk otwarty
         if encoder_sw_pressed:
             if (now - encoder_sw_last_low) > RELEASE_DEBOUNCE_MS:
                 encoder_sw_pressed = False
-                mouse.release(Mouse.MIDDLE_BUTTON)
+                mouse.release(Mouse.LEFT_BUTTON)
 
     time.sleep(0.001)  # 1ms — niska latencja pętli

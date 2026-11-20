@@ -11,7 +11,3 @@ __all__ = [
     "app",
     "create_app",
 ]
-
-def create_app():
-    """Create and configure FastAPI application."""
-    return app

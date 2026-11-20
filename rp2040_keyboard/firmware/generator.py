@@ -158,9 +158,6 @@ encoder_button.pull = digitalio.Pull.UP
 ENCODER_DEBOUNCE_MS = {config.encoder.debounce_ms}
 SCROLL_SPEED = {config.encoder.scroll_speed}
 
-# Parametry debounce — asymetryczny algorytm
-RELEASE_DEBOUNCE_MS = 100  # Zwolnij dopiero po 100ms ciągłego braku GND
-
 # Zmienne do śledzenia stanu enkodera
 encoder_last_pos = 0
 encoder_last_time = time.monotonic()
@@ -173,13 +170,16 @@ encoder_btn_last_low = 0
     main_loop = '''
 # Główna pętla
 '''
+
+    if config.keys or config.encoder:
+        main_loop += '''RELEASE_DEBOUNCE_MS = 20  # Zwolnij dopiero po 20ms ciągłego braku GND
+'''
     
     if config.keys:
         # Generuj tablice stanu klawiszy
         main_loop += f'''# Stan klawiszy — asymetryczny debounce (natychmiastowe wciśnięcie, opóźnione zwolnienie)
 key_pressed = [False] * {len(config.keys)}
 key_last_low = [0.0] * {len(config.keys)}
-RELEASE_DEBOUNCE_MS = 100  # Zwolnij dopiero po 100ms ciągłego braku GND
 '''
         # Generuj tablicę pinów i modyfikatorów
         main_loop += f'''key_pins = [{", ".join(f"key_{i}_pin" for i in range(1, len(config.keys) + 1))}]
@@ -215,7 +215,7 @@ while True:
         main_loop += f'''
     # Obsługa przycisków — działa jak zwykła klawiatura:
     #   GND na pinie = klawisz TRZYMANY (jak palec na klawiszu)
-    #   Brak GND przez 100ms = klawisz ZWOLNIONY
+    #   Brak GND przez 20ms = klawisz ZWOLNIONY
     #   Krótkie drgania styków ignorowane (naturalne zjawisko)
     for i in range({len(config.keys)}):
         current = key_pins[i].value  # False = wciśnięty (zwarte do GND)
@@ -228,7 +228,7 @@ while True:
                 keyboard.press(*key_modifiers[i], key_keycodes[i])
         else:  # Pin jest HIGH — styk otwarty (może być drganie!)
             if key_pressed[i]:
-                # Zwolnij dopiero gdy pin jest HIGH nieprzerwanie przez 100ms
+                # Zwolnij dopiero gdy pin jest HIGH nieprzerwanie przez 20ms
                 if (now - key_last_low[i]) > RELEASE_DEBOUNCE_MS:
                     key_pressed[i] = False
                     # Zwolnij TYLKO ten klawisz
@@ -249,17 +249,11 @@ while True:
         if current_pos != encoder_last_pos:
             steps = current_pos - encoder_last_pos
             
-            if abs(steps) <= 10:
-                if steps > 0:
-                    for _ in range(abs(steps) * SCROLL_SPEED):
-                        mouse.move(wheel=1)
-                else:
-                    for _ in range(abs(steps) * SCROLL_SPEED):
-                        mouse.move(wheel=-1)
-                
+            if abs(steps) <= 32:
+                wheel_delta = max(-127, min(127, steps * SCROLL_SPEED))
+                if wheel_delta:
+                    mouse.move(wheel=wheel_delta)
                 encoder_last_count += steps
-            else:
-                encoder.position = encoder_last_pos
             
             encoder_last_pos = current_pos
             encoder_last_time = current_time
