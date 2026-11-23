@@ -336,3 +336,39 @@ def test_deployer_defaults_no_backup_and_mounts_unmounted_boot_device(monkeypatc
     assert len(detected) == 1
     assert detected[0]["path"] == str(boot_mount)
     assert detected[0]["mode"] == "boot"
+
+
+def test_web_create_app_contract():
+    """Verify web package re-exports app and create_app cleanly."""
+    from rp2040_keyboard.web import app, create_app
+
+    assert create_app() is app
+
+
+def test_generated_firmware_encoder_single_hid_report_and_20ms_debounce():
+    """Verify generated firmware avoids 100ms bleed, USB floods, and position oscillation."""
+    from rp2040_keyboard.firmware import EncoderConfig, KeyConfig, PadConfig, generate_code_py
+
+    config = PadConfig(
+        keys=[KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.ALT")],
+        encoder=EncoderConfig(clk_gpio=11, dt_gpio=12, sw_gpio=13, scroll_speed=2, debounce_ms=3),
+    )
+    code = generate_code_py(config)
+    ast.parse(code)
+    assert code.count("RELEASE_DEBOUNCE_MS = 20") == 1
+    assert "wheel_delta = max(-127, min(127, steps * SCROLL_SPEED))" in code
+    assert "mouse.move(wheel=wheel_delta)" in code
+    assert "for _ in range(abs(steps)" not in code
+    assert "encoder.position = encoder_last_pos" not in code
+
+
+def test_static_firmware_code_py_contract():
+    """Verify firmware/code.py syntax, 20ms release debounce, MIDDLE_BUTTON, and rotaryio."""
+    code_path = REPO_ROOT / "rp2040_keyboard" / "firmware" / "code.py"
+    source = code_path.read_text(encoding="utf-8")
+    ast.parse(source)
+    assert "RELEASE_DEBOUNCE_MS = 20" in source
+    assert "Mouse.MIDDLE_BUTTON" in source
+    assert "Mouse.LEFT_BUTTON" not in source
+    assert "rotaryio.IncrementalEncoder" in source
+    assert "ENCODER_DEBOUNCE_MS" in source
