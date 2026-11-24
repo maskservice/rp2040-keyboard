@@ -1,10 +1,6 @@
-# RP2040-One Hardware Pin Mapping
-# ===============================
-# Szczegółowy mapping pinów dla elektroniki
-# Format typowy dla dokumentacji sprzętowej
-
-# Pin Configuration Matrix
-# =======================
+# RP2040-Zero Hardware Pin Mapping (panel9 PCB)
+# ==============================================
+# Szczegółowy mapping pinów dla płytki panel9 (maskservice/viewer)
 
 [global]
 vcc = 3.3V
@@ -13,38 +9,36 @@ max_gpio_voltage = 3.3V
 total_gpio_count = 29
 
 [pin_mapping]
-# Physical pin → GPIO mapping dla RP2040-One
-# Format: pin_<physical> = {gpio, function, description}
+# Physical GPIO → function mapping dla panel9 RP2040-Zero
 
-# Edge connector pins
-pin_1 = {gpio = 1, function = "digital", description = "Switch 1 input", pull = "up"}
-pin_2 = {gpio = 2, function = "digital", description = "Switch 2 input", pull = "up"}
-pin_3 = {gpio = 3, function = "digital", description = "Switch 3 input", pull = "up"}
-pin_4 = {gpio = 4, function = "digital", description = "Switch 4 input", pull = "up"}
-pin_5 = {gpio = 5, function = "digital", description = "Switch 5 input", pull = "up"}
-pin_6 = {gpio = 6, function = "digital", description = "Switch 6 input", pull = "up"}
-pin_7 = {gpio = 7, function = "digital", description = "Switch 7 input", pull = "up"}
-pin_8 = {gpio = 8, function = "digital", description = "Switch 8 input", pull = "up"}
-pin_9 = {gpio = 9, function = "digital", description = "Switch 9 input", pull = "up"}
+# Switch inputs (active-LOW to GND, internal Pull.UP)
+pin_14 = {gpio = 14, function = "digital", description = "SW1 input (Ctrl+Alt+9)", pull = "up"}
+pin_6 = {gpio = 6, function = "digital", description = "SW2 input (Ctrl+Alt+8)", pull = "up"}
+pin_7 = {gpio = 7, function = "digital", description = "SW3 input (Ctrl+Alt+5)", pull = "up"}
+pin_8 = {gpio = 8, function = "digital", description = "SW4 input (Ctrl+Alt+1)", pull = "up"}
+pin_5 = {gpio = 5, function = "digital", description = "SW5 input (Ctrl+Alt+7)", pull = "up"}
+pin_1 = {gpio = 1, function = "digital", description = "SW6 input (Ctrl+Alt+6)", pull = "up"}
+pin_4 = {gpio = 4, function = "digital", description = "SW7 input (Ctrl+Alt+4)", pull = "up"}
+pin_3 = {gpio = 3, function = "digital", description = "SW8 input (Ctrl+Alt+2)", pull = "up"}
+pin_2 = {gpio = 2, function = "digital", description = "SW9 input (Ctrl+Alt+3)", pull = "up"}
 
-# Encoder pins
-pin_11 = {gpio = 11, function = "encoder_clk", description = "Encoder CLK (A)", pull = "up"}
-pin_12 = {gpio = 12, function = "encoder_dt", description = "Encoder DT (B)", pull = "up"}
-pin_13 = {gpio = 13, function = "encoder_sw", description = "Encoder switch", pull = "up"}
+# Encoder pins (J1 RJ45: pin 6=ENC_A, pin 4=ENC_B, pin 2=ENC_SW)
+pin_0 = {gpio = 0, function = "encoder_clk", description = "Encoder CLK / ENC_A (J1.6)", pull = "up"}
+pin_15 = {gpio = 15, function = "encoder_dt", description = "Encoder DT / ENC_B (J1.4)", pull = "up"}
+pin_26 = {gpio = 26, function = "encoder_sw", description = "Encoder switch / ENC_SW (J1.2)", pull = "up"}
 
-# Available pins for expansion
-pin_14 = {gpio = 14, function = "free", description = "Available GPIO"}
-pin_15 = {gpio = 15, function = "free", description = "Available GPIO"}
-pin_16 = {gpio = 16, function = "free", description = "Available GPIO"}
-pin_17 = {gpio = 17, function = "free", description = "Available GPIO"}
-pin_18 = {gpio = 18, function = "free", description = "Available GPIO"}
-pin_19 = {gpio = 19, function = "free", description = "Available GPIO"}
-pin_20 = {gpio = 20, function = "free", description = "Available GPIO"}
+# Unused / free pins on panel9
+pin_9 = {gpio = 9, function = "free", description = "Unused GPIO"}
+pin_10 = {gpio = 10, function = "free", description = "Unused GPIO"}
+pin_11 = {gpio = 11, function = "free", description = "Unused GPIO"}
+pin_12 = {gpio = 12, function = "free", description = "Unused GPIO"}
+pin_13 = {gpio = 13, function = "free", description = "Unused GPIO"}
+pin_27 = {gpio = 27, function = "free", description = "Unused GPIO"}
+pin_28 = {gpio = 28, function = "free", description = "Unused GPIO"}
+pin_29 = {gpio = 29, function = "free", description = "Unused GPIO"}
 
-# Power and control pins
-pin_23 = {gpio = 23, function = "power", description = "Power control"}
-pin_24 = {gpio = 24, function = "led", description = "Status LED"}
-pin_25 = {gpio = 25, function = "led", description = "Onboard LED"}
+# Power and onboard status
+pin_16 = {gpio = 16, function = "led", description = "Onboard WS2812 NeoPixel"}
 
 [switch_matrix]
 # Konfiguracja macierzy przełączników
@@ -59,7 +53,7 @@ type = "incremental_quadrature"
 pulses_per_revolution = 24
 detent = true
 switch_type = "tactile"
-voltage_rating = "5V@10mA"
+voltage_rating = "3.3V open-drain / pull-up"
 contact_resistance = "<100mΩ"
 life_cycles = "100,000"
 
@@ -82,11 +76,11 @@ pullup_resistance = "50kΩ typ"
 pulldown_resistance = "50kΩ typ"
 
 [pcb_layout]
-# Zalecenia PCB
-trace_width = "0.2mm min"
-via_size = "0.6mm"
+# Zalecenia PCB (panel9: 148 x 64 x 1.5 mm)
+trace_width = "0.5mm signal / 0.6mm power"
+via_size = "0.9mm"
 clearance = "0.15mm"
 solder_mask = "green"
 silkscreen = "white"
-pcb_thickness = "1.6mm"
+pcb_thickness = "1.5mm"
 copper_thickness = "1oz (35μm)"

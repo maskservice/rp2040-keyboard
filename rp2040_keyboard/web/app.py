@@ -92,24 +92,24 @@ async def get_default_config():
         print(f"⚠️ Błąd HAL, używam domyślnej konfiguracji: {e}")
         # Fallback do domyślnej konfiguracji
     default_keys = [
-        KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+1"),
-        KeyConfig(gpio=2, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+2"),
-        KeyConfig(gpio=3, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+3"),
+        KeyConfig(gpio=14, keycode="Keycode.NINE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+9"),
+        KeyConfig(gpio=6, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+8"),
+        KeyConfig(gpio=7, keycode="Keycode.FIVE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+5"),
+        KeyConfig(gpio=8, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+1"),
+        KeyConfig(gpio=5, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+7"),
+        KeyConfig(gpio=1, keycode="Keycode.SIX", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+6"),
         KeyConfig(gpio=4, keycode="Keycode.FOUR", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+4"),
-        KeyConfig(gpio=5, keycode="Keycode.FIVE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+5"),
-        KeyConfig(gpio=6, keycode="Keycode.SIX", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+6"),
-        KeyConfig(gpio=7, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+7"),
-        KeyConfig(gpio=8, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+8"),
-        KeyConfig(gpio=9, keycode="Keycode.NINE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+9"),
+        KeyConfig(gpio=3, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+2"),
+        KeyConfig(gpio=2, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+3"),
     ]
     
     default_encoder = EncoderConfig(
-        clk_gpio=11,      # WE A = GP11
-        dt_gpio=12,       # WE B = GP12  
-        sw_gpio=13,       # PUSH = GP13
+        clk_gpio=0,       # ENC_A = GP0
+        dt_gpio=15,       # ENC_B = GP15
+        sw_gpio=26,       # ENC_SW = GP26
         scroll_speed=2,
-        middle_click=False,  # Zmienione na left click
-        debounce_ms=3  # Debouncing inspirowane Arduino
+        middle_click=True,
+        debounce_ms=5
     )
     
     config = PadConfig(keys=default_keys, encoder=default_encoder)
@@ -287,32 +287,32 @@ HTML_RESPONSE = '''
             <div class="wiring-diagram">
                 <h2>🔌 Schemat podłączeń</h2>
                 
-                <h3>Przyciski (9 sztuk) → Emulacja klawiatury</h3>
+                <h3>Przyciski (9 sztuk, panel9 PCB) → Emulacja klawiatury</h3>
                 <table class="pin-table">
                     <tr><th>Przycisk</th><th>GPIO</th><th>Akcja</th><th>Opis</th></tr>
-                    <tr><td>Btn 1</td><td>GP1</td><td>Ctrl+Alt+1</td><td>Globalne makro 1</td></tr>
-                    <tr><td>Btn 2</td><td>GP2</td><td>Ctrl+Alt+2</td><td>Globalne makro 2</td></tr>
-                    <tr><td>Btn 3</td><td>GP3</td><td>Ctrl+Alt+3</td><td>Globalne makro 3</td></tr>
-                    <tr><td>Btn 4</td><td>GP4</td><td>Ctrl+Alt+4</td><td>Globalne makro 4</td></tr>
-                    <tr><td>Btn 5</td><td>GP5</td><td>Ctrl+Alt+5</td><td>Globalne makro 5</td></tr>
-                    <tr><td>Btn 6</td><td>GP6</td><td>Ctrl+Alt+6</td><td>Globalne makro 6</td></tr>
-                    <tr><td>Btn 7</td><td>GP7</td><td>Ctrl+Alt+7</td><td>Globalne makro 7</td></tr>
-                    <tr><td>Btn 8</td><td>GP8</td><td>Ctrl+Alt+8</td><td>Globalne makro 8</td></tr>
-                    <tr><td>Btn 9</td><td>GP9</td><td>Ctrl+Alt+9</td><td>Globalne makro 9</td></tr>
+                    <tr><td>SW1</td><td>GP14</td><td>Ctrl+Alt+9</td><td>Globalne makro 9</td></tr>
+                    <tr><td>SW2</td><td>GP6</td><td>Ctrl+Alt+8</td><td>Globalne makro 8</td></tr>
+                    <tr><td>SW3</td><td>GP7</td><td>Ctrl+Alt+5</td><td>Globalne makro 5</td></tr>
+                    <tr><td>SW4</td><td>GP8</td><td>Ctrl+Alt+1</td><td>Globalne makro 1</td></tr>
+                    <tr><td>SW5</td><td>GP5</td><td>Ctrl+Alt+7</td><td>Globalne makro 7</td></tr>
+                    <tr><td>SW6</td><td>GP1</td><td>Ctrl+Alt+6</td><td>Globalne makro 6</td></tr>
+                    <tr><td>SW7</td><td>GP4</td><td>Ctrl+Alt+4</td><td>Globalne makro 4</td></tr>
+                    <tr><td>SW8</td><td>GP3</td><td>Ctrl+Alt+2</td><td>Globalne makro 2</td></tr>
+                    <tr><td>SW9</td><td>GP2</td><td>Ctrl+Alt+3</td><td>Globalne makro 3</td></tr>
                 </table>
                 
-                <h3>Enkoder obrotowy (KY-040) → Emulacja myszki</h3>
+                <h3>Enkoder obrotowy (J1 RJ45) → Emulacja myszki</h3>
                 <table class="pin-table">
                     <tr><th>Pin enkodera</th><th>→ RP2040</th><th>Funkcja</th></tr>
-                    <tr><td>CLK (A)</td><td>GP9</td><td>Sygnał A enkodera</td></tr>
-                    <tr><td>DT (B)</td><td>GP10</td><td>Sygnał B enkodera</td></tr>
-                    <tr><td>SW</td><td>GP11</td><td>Przycisk enkodera (middle-click)</td></tr>
-                    <tr><td>+ (VCC)</td><td>3V3</td><td>Zasilanie 3.3V</td></tr>
-                    <tr><td>GND</td><td>GND</td><td>Masa</td></tr>
+                    <tr><td>ENC_A / CLK (J1.6)</td><td>GP0</td><td>Sygnał A enkodera</td></tr>
+                    <tr><td>ENC_B / DT (J1.4)</td><td>GP15</td><td>Sygnał B enkodera</td></tr>
+                    <tr><td>ENC_SW / SW (J1.2)</td><td>GP26</td><td>Przycisk enkodera (middle-click)</td></tr>
+                    <tr><td>+5V (J1.7, J1.8)</td><td>5V</td><td>Zasilanie modułu (RP2040 GPIO 3.3V!)</td></tr>
+                    <tr><td>GND (J1.1, J1.3, J1.5)</td><td>GND</td><td>Masa</td></tr>
                 </table>
                 
                 <div class="info" style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 4px;">
-                    <strong>💡 Wskazówka:</strong> GP12 i GP13 pozostają wolne — można je wykorzystać w przyszłych rozszerzeniach.
+                    <strong>💡 Wskazówka:</strong> GP9–GP13 oraz GP27–GP29 pozostają wolne na płytce panel9.
                 </div>
             </div>
         </div>

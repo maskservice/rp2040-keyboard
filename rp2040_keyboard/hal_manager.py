@@ -32,9 +32,9 @@ from .hal_models import (
 class HALConfigManager:
     """Menadżer konfiguracji HAL."""
 
-    DEFAULT_ENCODER_CLK: int = 11
-    DEFAULT_ENCODER_DT: int = 12
-    DEFAULT_ENCODER_SW: int = 13
+    DEFAULT_ENCODER_CLK: int = 0
+    DEFAULT_ENCODER_DT: int = 15
+    DEFAULT_ENCODER_SW: int = 26
     
     def __init__(self, project_root: Optional[Path] = None):
         self.project_root = project_root or Path(__file__).parent.parent
@@ -271,17 +271,17 @@ class HALConfigManager:
         if self.hal_config_file.exists():
             return self.sync_from_hal()
         
-        # Użyj domyślnej konfiguracji
+        # Użyj domyślnej konfiguracji (panel9.kicad_pcb)
         default_keys = [
-            KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+1"),
-            KeyConfig(gpio=2, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+2"),
-            KeyConfig(gpio=3, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+3"),
+            KeyConfig(gpio=14, keycode="Keycode.NINE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+9"),
+            KeyConfig(gpio=6, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+8"),
+            KeyConfig(gpio=7, keycode="Keycode.FIVE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+5"),
+            KeyConfig(gpio=8, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+1"),
+            KeyConfig(gpio=5, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+7"),
+            KeyConfig(gpio=1, keycode="Keycode.SIX", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+6"),
             KeyConfig(gpio=4, keycode="Keycode.FOUR", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+4"),
-            KeyConfig(gpio=5, keycode="Keycode.FIVE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+5"),
-            KeyConfig(gpio=6, keycode="Keycode.SIX", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+6"),
-            KeyConfig(gpio=7, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+7"),
-            KeyConfig(gpio=8, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+8"),
-            KeyConfig(gpio=9, keycode="Keycode.NINE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+9"),
+            KeyConfig(gpio=3, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+2"),
+            KeyConfig(gpio=2, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+3"),
         ]
         
         default_encoder = EncoderConfig(
@@ -290,7 +290,7 @@ class HALConfigManager:
             sw_gpio=self.DEFAULT_ENCODER_SW,
             scroll_speed=2,
             middle_click=True,
-            debounce_ms=3
+            debounce_ms=5
         )
         
         return PadConfig(keys=default_keys, encoder=default_encoder)
