@@ -92,15 +92,15 @@ async def get_default_config():
         print(f"⚠️ Błąd HAL, używam domyślnej konfiguracji: {e}")
         # Fallback do domyślnej konfiguracji
     default_keys = [
-        KeyConfig(gpio=14, keycode="Keycode.NINE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+9"),
-        KeyConfig(gpio=6, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+8"),
-        KeyConfig(gpio=7, keycode="Keycode.FIVE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+5"),
-        KeyConfig(gpio=8, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+1"),
-        KeyConfig(gpio=5, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+7"),
-        KeyConfig(gpio=1, keycode="Keycode.SIX", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+6"),
-        KeyConfig(gpio=4, keycode="Keycode.FOUR", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+4"),
-        KeyConfig(gpio=3, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+2"),
-        KeyConfig(gpio=2, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+3"),
+        KeyConfig(gpio=14, keycode="Keycode.SIX", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+6"),
+        KeyConfig(gpio=6, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+2"),
+        KeyConfig(gpio=7, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+3"),
+        KeyConfig(gpio=8, keycode="Keycode.FOUR", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+4"),
+        KeyConfig(gpio=5, keycode="Keycode.FIVE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+5"),
+        KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+1"),
+        KeyConfig(gpio=4, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+7"),
+        KeyConfig(gpio=3, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+8"),
+        KeyConfig(gpio=2, keycode="Keycode.NINE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+9"),
     ]
     
     default_encoder = EncoderConfig(
@@ -290,15 +290,15 @@ HTML_RESPONSE = '''
                 <h3>Przyciski (9 sztuk, panel9 PCB) → Emulacja klawiatury</h3>
                 <table class="pin-table">
                     <tr><th>Przycisk</th><th>GPIO</th><th>Akcja</th><th>Opis</th></tr>
-                    <tr><td>SW1</td><td>GP14</td><td>Ctrl+Alt+9</td><td>Globalne makro 9</td></tr>
-                    <tr><td>SW2</td><td>GP6</td><td>Ctrl+Alt+8</td><td>Globalne makro 8</td></tr>
-                    <tr><td>SW3</td><td>GP7</td><td>Ctrl+Alt+5</td><td>Globalne makro 5</td></tr>
-                    <tr><td>SW4</td><td>GP8</td><td>Ctrl+Alt+1</td><td>Globalne makro 1</td></tr>
-                    <tr><td>SW5</td><td>GP5</td><td>Ctrl+Alt+7</td><td>Globalne makro 7</td></tr>
-                    <tr><td>SW6</td><td>GP1</td><td>Ctrl+Alt+6</td><td>Globalne makro 6</td></tr>
-                    <tr><td>SW7</td><td>GP4</td><td>Ctrl+Alt+4</td><td>Globalne makro 4</td></tr>
-                    <tr><td>SW8</td><td>GP3</td><td>Ctrl+Alt+2</td><td>Globalne makro 2</td></tr>
-                    <tr><td>SW9</td><td>GP2</td><td>Ctrl+Alt+3</td><td>Globalne makro 3</td></tr>
+                    <tr><td>SW1</td><td>GP14</td><td>Ctrl+Alt+6</td><td>Głowa + (head-inflate)</td></tr>
+                    <tr><td>SW2</td><td>GP6</td><td>Ctrl+Alt+2</td><td>LP +5 (lp-pwm-plus5)</td></tr>
+                    <tr><td>SW3</td><td>GP7</td><td>Ctrl+Alt+3</td><td>LP +10 (lp-pwm-plus10)</td></tr>
+                    <tr><td>SW4</td><td>GP8</td><td>Ctrl+Alt+4</td><td>AL START (al-start)</td></tr>
+                    <tr><td>SW5</td><td>GP5</td><td>Ctrl+Alt+5</td><td>LP Upust (lp-bleed)</td></tr>
+                    <tr><td>SW6</td><td>GP1</td><td>Ctrl+Alt+1</td><td>Głowa - (head-deflate)</td></tr>
+                    <tr><td>SW7</td><td>GP4</td><td>Ctrl+Alt+7</td><td>LP -5 (lp-pwm-minus5)</td></tr>
+                    <tr><td>SW8</td><td>GP3</td><td>Ctrl+Alt+8</td><td>LP -10 (lp-pwm-minus10)</td></tr>
+                    <tr><td>SW9</td><td>GP2</td><td>Ctrl+Alt+9</td><td>AL STOP (al-stop)</td></tr>
                 </table>
                 
                 <h3>Enkoder obrotowy (J1 RJ45) → Emulacja myszki</h3>

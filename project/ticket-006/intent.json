@@ -1,0 +1,24 @@
+{
+  "ticket": "ticket-006",
+  "repository": "maskservice/rp2040-keyboard",
+  "base": "8202ad0d8cd768932757ec9c62a81c48fe5b27b1",
+  "branch": "ticket/006-panel9-physical-button-hui-keymap",
+  "worktree": ".worktrees/ticket-006--panel9-physical-button-hui-keymap",
+  "owner_session": "agent:antigravity-rp2040-keyboard-006",
+  "allowedPaths": [
+    ".hal_sync.json",
+    "docs/BUGFIX/PANEL9_HUI_BUTTON_MAPPING.md",
+    "docs/README.md",
+    "hal/hal_config.toml",
+    "hal/hardware_pins.toml",
+    "hal/profiles/default.toml",
+    "project/ticket-006/**",
+    "rp2040_keyboard/firmware/code.py",
+    "rp2040_keyboard/hal_manager.py",
+    "rp2040_keyboard/web/app.py",
+    "tests/test_rp2040_keyboard.py"
+  ],
+  "authorization": "Align panel9 SW1..SW9 HID keycodes with C2004 HUI 4+1+4 layout and fix hardware_pins.toml quoting.",
+  "maxActiveMinutes": 60,
+  "maxTotalActiveMinutes": 120
+}
