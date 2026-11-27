@@ -273,15 +273,15 @@ class HALConfigManager:
         
         # Użyj domyślnej konfiguracji (panel9.kicad_pcb)
         default_keys = [
-            KeyConfig(gpio=14, keycode="Keycode.NINE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+9"),
-            KeyConfig(gpio=6, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+8"),
-            KeyConfig(gpio=7, keycode="Keycode.FIVE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+5"),
-            KeyConfig(gpio=8, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+1"),
-            KeyConfig(gpio=5, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+7"),
-            KeyConfig(gpio=1, keycode="Keycode.SIX", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+6"),
-            KeyConfig(gpio=4, keycode="Keycode.FOUR", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+4"),
-            KeyConfig(gpio=3, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+2"),
-            KeyConfig(gpio=2, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+3"),
+            KeyConfig(gpio=14, keycode="Keycode.SIX", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+6"),
+            KeyConfig(gpio=6, keycode="Keycode.TWO", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+2"),
+            KeyConfig(gpio=7, keycode="Keycode.THREE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+3"),
+            KeyConfig(gpio=8, keycode="Keycode.FOUR", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+4"),
+            KeyConfig(gpio=5, keycode="Keycode.FIVE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+5"),
+            KeyConfig(gpio=1, keycode="Keycode.ONE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+1"),
+            KeyConfig(gpio=4, keycode="Keycode.SEVEN", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+7"),
+            KeyConfig(gpio=3, keycode="Keycode.EIGHT", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+8"),
+            KeyConfig(gpio=2, keycode="Keycode.NINE", modifier="Keycode.CONTROL+Keycode.ALT", label="Ctrl+Alt+9"),
         ]
         
         default_encoder = EncoderConfig(

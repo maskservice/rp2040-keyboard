@@ -32,15 +32,15 @@ from adafruit_hid.mouse import Mouse
 # =============================================================================
 # Mapowanie klawiszy: (pin GPIO, klawisz numeryczny dla Ctrl+Alt+N)
 KEY_PINS = [
-    (board.GP14, Keycode.NINE),     # Przycisk 1 (SW1) → Ctrl+Alt+9
-    (board.GP6, Keycode.EIGHT),     # Przycisk 2 (SW2) → Ctrl+Alt+8
-    (board.GP7, Keycode.FIVE),      # Przycisk 3 (SW3) → Ctrl+Alt+5
-    (board.GP8, Keycode.ONE),       # Przycisk 4 (SW4) → Ctrl+Alt+1
-    (board.GP5, Keycode.SEVEN),     # Przycisk 5 (SW5) → Ctrl+Alt+7
-    (board.GP1, Keycode.SIX),       # Przycisk 6 (SW6) → Ctrl+Alt+6
-    (board.GP4, Keycode.FOUR),      # Przycisk 7 (SW7) → Ctrl+Alt+4
-    (board.GP3, Keycode.TWO),       # Przycisk 8 (SW8) → Ctrl+Alt+2
-    (board.GP2, Keycode.THREE),     # Przycisk 9 (SW9) → Ctrl+Alt+3
+    (board.GP14, Keycode.SIX),      # Przycisk 1 (SW1: X=118, Y=74.5)  → Ctrl+Alt+6 (Głowa +)
+    (board.GP6, Keycode.TWO),       # Przycisk 2 (SW2: X=148, Y=74.5)  → Ctrl+Alt+2 (LP +5)
+    (board.GP7, Keycode.THREE),     # Przycisk 3 (SW3: X=198, Y=74.5)  → Ctrl+Alt+3 (LP +10)
+    (board.GP8, Keycode.FOUR),      # Przycisk 4 (SW4: X=228, Y=74.5)  → Ctrl+Alt+4 (AL START)
+    (board.GP5, Keycode.FIVE),      # Przycisk 5 (SW5: X=173, Y=92.0)  → Ctrl+Alt+5 (LP Upust)
+    (board.GP1, Keycode.ONE),       # Przycisk 6 (SW6: X=118, Y=109.5) → Ctrl+Alt+1 (Głowa -)
+    (board.GP4, Keycode.SEVEN),     # Przycisk 7 (SW7: X=148, Y=109.5) → Ctrl+Alt+7 (LP -5)
+    (board.GP3, Keycode.EIGHT),     # Przycisk 8 (SW8: X=198, Y=109.5) → Ctrl+Alt+8 (LP -10)
+    (board.GP2, Keycode.NINE),      # Przycisk 9 (SW9: X=228, Y=109.5) → Ctrl+Alt+9 (AL STOP)
 ]
 
 

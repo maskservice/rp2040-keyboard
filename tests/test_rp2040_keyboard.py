@@ -16,15 +16,15 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 EXPECTED_PANEL9_SWITCHES = [14, 6, 7, 8, 5, 1, 4, 3, 2]
 EXPECTED_PANEL9_KEYCODES = [
-    "Keycode.NINE",
-    "Keycode.EIGHT",
+    "Keycode.SIX",
+    "Keycode.TWO",
+    "Keycode.THREE",
+    "Keycode.FOUR",
     "Keycode.FIVE",
     "Keycode.ONE",
     "Keycode.SEVEN",
-    "Keycode.SIX",
-    "Keycode.FOUR",
-    "Keycode.TWO",
-    "Keycode.THREE",
+    "Keycode.EIGHT",
+    "Keycode.NINE",
 ]
 EXPECTED_PANEL9_ENCODER = (0, 15, 26)
 
@@ -212,7 +212,7 @@ def _drive_encoder_and_switch_scenario(step: int, clock: dict, pins: dict[int, o
     elif step == 32:
         pins[26].value = True   # ENC_SW release
     elif step == 35:
-        pins[1].value = False   # SW6 (GP1 -> Ctrl+Alt+6) press
+        pins[1].value = False   # SW6 (GP1 -> Ctrl+Alt+1 / head-deflate) press
     elif step == 37:
         pins[1].value = True    # SW6 release
     elif step >= 80:
@@ -281,7 +281,7 @@ def test_static_firmware_handles_nonsequential_gp0_gp15_and_middle_click():
     assert result["mouse_moves"] == [2, -2]
     assert result["mouse_presses"] == [4]
     assert result["mouse_releases"] == [4]
-    assert (0xE0, 0xE2, 0x23) in result["key_presses"]  # SW6 -> Ctrl+Alt+6
+    assert (0xE0, 0xE2, 0x1E) in result["key_presses"]  # SW6 -> Ctrl+Alt+1 (head-deflate)
 
 
 def test_generated_firmware_handles_nonsequential_gp0_gp15_and_20ms_debounce():
@@ -308,7 +308,43 @@ def test_generated_firmware_handles_nonsequential_gp0_gp15_and_20ms_debounce():
     assert result["mouse_moves"] == [2, -2]
     assert result["mouse_presses"] == [4]
     assert result["mouse_releases"] == [4]
-    assert (0xE0, 0xE2, 0x23) in result["key_presses"]
+    assert (0xE0, 0xE2, 0x1E) in result["key_presses"]
+
+
+def test_panel9_all_nine_switches_match_hui_spatial_grid():
+    """Verify all 9 panel9 GPIOs emit Ctrl+Alt shortcuts matching C2004's 4+1+4 grid."""
+    code_path = REPO_ROOT / "rp2040_keyboard" / "firmware" / "code.py"
+    code_source = code_path.read_text(encoding="utf-8")
+    # SW1..SW9 -> digits [6, 2, 3, 4, 5, 1, 7, 8, 9]
+    expected_codes = [0x23, 0x1F, 0x20, 0x21, 0x22, 0x1E, 0x24, 0x25, 0x26]
+
+    def _drive_all_switches(step: int, clock: dict, pins: dict[int, object]) -> None:
+        idx, phase = divmod(step - 1, 30)
+        if idx < len(EXPECTED_PANEL9_SWITCHES):
+            gpio = EXPECTED_PANEL9_SWITCHES[idx]
+            if phase == 0:
+                pins[gpio].value = False
+            elif phase == 2:
+                pins[gpio].value = True
+            clock["t"] += 0.015
+        else:
+            raise _StopFirmwareLoop()
+
+    result = _run_circuitpython_firmware(code_source, _drive_all_switches)
+    assert result["key_presses"] == [(0xE0, 0xE2, kc) for kc in expected_codes]
+
+
+def test_load_hardware_pins_toml_parses_cleanly():
+    """Verify hal/hardware_pins.toml parses without float conversion errors."""
+    from rp2040_keyboard.hal_manager import HALConfigManager
+
+    manager = HALConfigManager(project_root=REPO_ROOT)
+    pins = manager.load_hardware_pins()
+    assert pins, "hardware_pins.toml failed to parse"
+    assert pins["global"]["vcc"] == "3.3V"
+    assert pins["global"]["gnd"] == "0V"
+    for gp in EXPECTED_PANEL9_SWITCHES + list(EXPECTED_PANEL9_ENCODER):
+        assert f"pin_{gp}" in pins["pin_mapping"]
 
 
 def test_deployer_defaults_no_backup_and_mounts_unmounted_boot_device(monkeypatch, tmp_path):

@@ -3,24 +3,24 @@
 # Szczegółowy mapping pinów dla płytki panel9 (maskservice/viewer)
 
 [global]
-vcc = 3.3V
-gnd = 0V
-max_gpio_voltage = 3.3V
+vcc = "3.3V"
+gnd = "0V"
+max_gpio_voltage = "3.3V"
 total_gpio_count = 29
 
 [pin_mapping]
 # Physical GPIO → function mapping dla panel9 RP2040-Zero
 
 # Switch inputs (active-LOW to GND, internal Pull.UP)
-pin_14 = {gpio = 14, function = "digital", description = "SW1 input (Ctrl+Alt+9)", pull = "up"}
-pin_6 = {gpio = 6, function = "digital", description = "SW2 input (Ctrl+Alt+8)", pull = "up"}
-pin_7 = {gpio = 7, function = "digital", description = "SW3 input (Ctrl+Alt+5)", pull = "up"}
-pin_8 = {gpio = 8, function = "digital", description = "SW4 input (Ctrl+Alt+1)", pull = "up"}
-pin_5 = {gpio = 5, function = "digital", description = "SW5 input (Ctrl+Alt+7)", pull = "up"}
-pin_1 = {gpio = 1, function = "digital", description = "SW6 input (Ctrl+Alt+6)", pull = "up"}
-pin_4 = {gpio = 4, function = "digital", description = "SW7 input (Ctrl+Alt+4)", pull = "up"}
-pin_3 = {gpio = 3, function = "digital", description = "SW8 input (Ctrl+Alt+2)", pull = "up"}
-pin_2 = {gpio = 2, function = "digital", description = "SW9 input (Ctrl+Alt+3)", pull = "up"}
+pin_14 = {gpio = 14, function = "digital", description = "SW1 input (Ctrl+Alt+6 — Głowa + / head-inflate)", pull = "up"}
+pin_6 = {gpio = 6, function = "digital", description = "SW2 input (Ctrl+Alt+2 — LP +5 / lp-pwm-plus5)", pull = "up"}
+pin_7 = {gpio = 7, function = "digital", description = "SW3 input (Ctrl+Alt+3 — LP +10 / lp-pwm-plus10)", pull = "up"}
+pin_8 = {gpio = 8, function = "digital", description = "SW4 input (Ctrl+Alt+4 — AL START / al-start)", pull = "up"}
+pin_5 = {gpio = 5, function = "digital", description = "SW5 input (Ctrl+Alt+5 — LP Upust / lp-bleed)", pull = "up"}
+pin_1 = {gpio = 1, function = "digital", description = "SW6 input (Ctrl+Alt+1 — Głowa - / head-deflate)", pull = "up"}
+pin_4 = {gpio = 4, function = "digital", description = "SW7 input (Ctrl+Alt+7 — LP -5 / lp-pwm-minus5)", pull = "up"}
+pin_3 = {gpio = 3, function = "digital", description = "SW8 input (Ctrl+Alt+8 — LP -10 / lp-pwm-minus10)", pull = "up"}
+pin_2 = {gpio = 2, function = "digital", description = "SW9 input (Ctrl+Alt+9 — AL STOP / al-stop)", pull = "up"}
 
 # Encoder pins (J1 RJ45: pin 6=ENC_A, pin 4=ENC_B, pin 2=ENC_SW)
 pin_0 = {gpio = 0, function = "encoder_clk", description = "Encoder CLK / ENC_A (J1.6)", pull = "up"}

@@ -4,7 +4,7 @@ base = "../hal_config.toml"
 name = "RP2040-Zero-Keypad-Panel9"
 profile = "default"
 description = "panel9 9-key layout with RJ45 encoder (RP2040-Zero)"
-modified = "2026-11-19T12:00:00"
+modified = "2026-11-27T01:58:00"
 
 [pins]
 available = [0, 1, 2, 3, 4, 5, 6, 7, 8, 14, 15, 26]
@@ -22,72 +22,72 @@ steps_per_revolution = 24
 
 [switches.switch_1]
 gpio = 14
-keycode = "Keycode.NINE"
-modifier = "Keycode.CONTROL+Keycode.ALT"
-label = "Ctrl+Alt+9"
-pull = "up"
-debounce = 20
-
-[switches.switch_2]
-gpio = 6
-keycode = "Keycode.EIGHT"
-modifier = "Keycode.CONTROL+Keycode.ALT"
-label = "Ctrl+Alt+8"
-pull = "up"
-debounce = 20
-
-[switches.switch_3]
-gpio = 7
-keycode = "Keycode.FIVE"
-modifier = "Keycode.CONTROL+Keycode.ALT"
-label = "Ctrl+Alt+5"
-pull = "up"
-debounce = 20
-
-[switches.switch_4]
-gpio = 8
-keycode = "Keycode.ONE"
-modifier = "Keycode.CONTROL+Keycode.ALT"
-label = "Ctrl+Alt+1"
-pull = "up"
-debounce = 20
-
-[switches.switch_5]
-gpio = 5
-keycode = "Keycode.SEVEN"
-modifier = "Keycode.CONTROL+Keycode.ALT"
-label = "Ctrl+Alt+7"
-pull = "up"
-debounce = 20
-
-[switches.switch_6]
-gpio = 1
 keycode = "Keycode.SIX"
 modifier = "Keycode.CONTROL+Keycode.ALT"
 label = "Ctrl+Alt+6"
 pull = "up"
 debounce = 20
 
-[switches.switch_7]
-gpio = 4
-keycode = "Keycode.FOUR"
-modifier = "Keycode.CONTROL+Keycode.ALT"
-label = "Ctrl+Alt+4"
-pull = "up"
-debounce = 20
-
-[switches.switch_8]
-gpio = 3
+[switches.switch_2]
+gpio = 6
 keycode = "Keycode.TWO"
 modifier = "Keycode.CONTROL+Keycode.ALT"
 label = "Ctrl+Alt+2"
 pull = "up"
 debounce = 20
 
-[switches.switch_9]
-gpio = 2
+[switches.switch_3]
+gpio = 7
 keycode = "Keycode.THREE"
 modifier = "Keycode.CONTROL+Keycode.ALT"
 label = "Ctrl+Alt+3"
+pull = "up"
+debounce = 20
+
+[switches.switch_4]
+gpio = 8
+keycode = "Keycode.FOUR"
+modifier = "Keycode.CONTROL+Keycode.ALT"
+label = "Ctrl+Alt+4"
+pull = "up"
+debounce = 20
+
+[switches.switch_5]
+gpio = 5
+keycode = "Keycode.FIVE"
+modifier = "Keycode.CONTROL+Keycode.ALT"
+label = "Ctrl+Alt+5"
+pull = "up"
+debounce = 20
+
+[switches.switch_6]
+gpio = 1
+keycode = "Keycode.ONE"
+modifier = "Keycode.CONTROL+Keycode.ALT"
+label = "Ctrl+Alt+1"
+pull = "up"
+debounce = 20
+
+[switches.switch_7]
+gpio = 4
+keycode = "Keycode.SEVEN"
+modifier = "Keycode.CONTROL+Keycode.ALT"
+label = "Ctrl+Alt+7"
+pull = "up"
+debounce = 20
+
+[switches.switch_8]
+gpio = 3
+keycode = "Keycode.EIGHT"
+modifier = "Keycode.CONTROL+Keycode.ALT"
+label = "Ctrl+Alt+8"
+pull = "up"
+debounce = 20
+
+[switches.switch_9]
+gpio = 2
+keycode = "Keycode.NINE"
+modifier = "Keycode.CONTROL+Keycode.ALT"
+label = "Ctrl+Alt+9"
 pull = "up"
 debounce = 20
